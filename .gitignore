@@ -1,0 +1,11 @@
+# filetypes to ignore
+*.pyc
+.DS_store
+
+# build files/directories to ignore
+/build/
+/.cache/
+/losc.egg-info/
+/.eggs/
+__pycache__/
+/.coverage
