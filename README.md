@@ -10,7 +10,7 @@ pip install losc
 
 Then you can search for remote data URLs as follows:
 
-```
+```python
 >>> from losc.locate import get_urls
 >>> get_urls('L1', 968654552, 968654562)
 ['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5']
@@ -24,6 +24,6 @@ This arguments for this function are as follows
 
 By default, this method will return the paths to HDF5 files for the 4 kHz sample-rate data, these can be specified as keyword arguments. For full information, run
 
-```
+```python
 >>> help(get_urls)
 ```
