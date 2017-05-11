@@ -8,7 +8,19 @@ To install:
 pip install losc
 ```
 
-Then you can search for remote data URLs as follows:
+## Query by event name
+
+You can search for remote data URLS based on the event name:
+
+```python
+>>> from losc.locate import get_event_urls
+>>> get_event_urls('L1', 'GW150914')
+['https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5']
+```
+
+## Query by GPS interval
+
+You can search for remote data URLs based on the GPS time interval as follows:
 
 ```python
 >>> from losc.locate import get_urls

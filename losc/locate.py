@@ -25,7 +25,7 @@ from six.moves.urllib.request import urlopen
 
 from . import utils
 
-__all__ = ['get_urls']
+__all__ = ['get_urls', 'get_event_urls']
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 # default URL
@@ -169,3 +169,40 @@ def get_urls(detector, start, end, host=LOSC_URL,
                     return urls
     raise ValueError("Cannot find a LOSC dataset for %s covering [%d, %d)"
                      % (detector, start, end))
+
+
+def get_event_urls(detector, event, format='hdf5', duration=32,
+                   sample_rate=4096, host=LOSC_URL):
+    """Find the URLs of LIGO data files regarding a GW event
+
+    Parameters
+    ----------
+    detector : `str`
+        the prefix of the relevant GW detector
+
+    event : `str`
+        the name of the GW event to find
+
+    sample_rate : `int`, optional, default : ``4096``
+        the sampling rate (Hz) of files you want to find
+
+    format : `str`, optional, default: ``'hdf5'``
+        the file format (extension) you want to find
+
+    duration : `int`, optional, default: ``4096``
+        the duration of files you want to find
+
+    host : `str`, optional
+        the URL of the remote LOSC server
+
+    Returns
+    -------
+    urls : `list` of `str`
+        the list of remote file URLs that contain data matching the
+        relevant parameters
+    """
+    url = '%s/archive/%s/json/' % (host, event)
+    jsonmetadata = read_json(url)
+    return parse_file_urls(
+        jsonmetadata['strain'], detector, sample_rate=sample_rate,
+        format=format, duration=duration)
