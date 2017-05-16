@@ -24,8 +24,11 @@ You can search for remote data URLs based on the GPS time interval as follows:
 
 ```python
 >>> from losc.locate import get_urls
->>> get_urls('L1', 968654552, 968654562)
-['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5']
+>>> get_urls('L1', 968650000, 968660000)
+['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5',
+ 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5',
+ 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5',
+ 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
 ```
 
 This arguments for this function are as follows
