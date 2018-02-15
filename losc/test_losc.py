@@ -112,6 +112,25 @@ def test_get_urls():
             losc_utils.url_segment(url), span)
 
 
+def test_get_event_urls(gw150914_urls):
+    # find latest version by brute force
+    latestv = sorted(
+        losc_urls.LOSC_URL_RE.match(
+            os.path.basename(u['url'])).groupdict()['version'] for
+        u in gw150914_urls)[-1]
+
+    event = 'GW150914'
+    urls = losc_locate.get_event_urls(event)
+    for url in urls:
+        assert url.endswith('.hdf5')  # default format
+        assert '_4_' in url  # default sample rate
+        assert '_{}-'.format(latestv) in url  # highest matched version
+
+    urls = losc_locate.get_event_urls(event, version=1)
+    for url in urls:
+        assert '_V1-' in url
+
+
 # -- losc.urls ----------------------------------------------------------------
 
 def test_urls_sieve(gw150914_urls):
