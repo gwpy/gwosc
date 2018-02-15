@@ -43,6 +43,9 @@ setup(name='losc',
       author_email='duncan.macleod@ligo.org',
       license='MIT',
       setup_requires=setup_requires,
+      install_requires=[
+          'six',
+      ]
       tests_require=['pytest>=2.8'],
       cmdclass=versioneer.get_cmdclass(),
       classifiers=[
