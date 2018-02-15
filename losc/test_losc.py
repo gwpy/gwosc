@@ -27,7 +27,9 @@ import pytest
 
 from losc import (
     api as losc_api,
+    locate as losc_locate,
     urls as losc_urls,
+    utils as losc_utils,
 )
 
 
@@ -92,6 +94,23 @@ def test_api_fetch_run_json():
     assert out['GPSstart'] == start
     assert out['GPSend'] == end
     check_json_url_list(out['strain'])
+
+
+# -- losc.locate --------------------------------------------------------------
+
+def test_get_urls():
+    # test simple fetch for S6 data returns only files within segment
+    detector = 'L1'
+    start = 934000000
+    end = 934100000
+    span = (start, end)
+    urls = losc_locate.get_urls(detector, start, end)
+    assert len(urls) == 18
+    for url in urls:
+        assert os.path.basename(url).startswith(
+            '{}-{}'.format(detector[0], detector))
+        assert losc_utils.segments_overlap(
+            losc_utils.url_segment(url), span)
 
 
 # -- losc.urls ----------------------------------------------------------------
