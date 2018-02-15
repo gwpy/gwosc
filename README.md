@@ -14,9 +14,17 @@ You can search for remote data URLS based on the event name:
 
 ```python
 >>> from losc.locate import get_event_urls
->>> get_event_urls('L1', 'GW150914')
+>>> get_event_urls('GW150914')
+['https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126257414-4096.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126257414-4096.hdf5']
+```
+
+You can down-select the URLs using keyword arguments:
+
+```python
+>>> get_event_urls('GW150914', detector='L1', duration=32)
 ['https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5']
 ```
+
 
 ## Query by GPS interval
 
