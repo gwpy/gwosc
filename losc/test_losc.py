@@ -100,4 +100,4 @@ def test_urls_sieve(gw150914_urls):
     assert len(sieved) == nfiles // 4
 
     with pytest.raises(KeyError):
-        losc_urls.sieve(gw150914_urls, blah=None)
+        list(losc_urls.sieve(gw150914_urls, blah=None))
