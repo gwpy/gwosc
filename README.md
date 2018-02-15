@@ -1,5 +1,8 @@
 # The LIGO Open Science Center Python API
 
+[![Build Status](https://travis-ci.org/duncanmmacleod/python-losc.svg?branch=master)](https://travis-ci.org/duncanmmacleod/python-losc)
+[![Coverage Status](https://coveralls.io/repos/github/duncanmmacleod/python-losc/badge.svg?branch=master)](https://coveralls.io/github/duncanmmacleod/python-losc?branch=master)
+
 The ``losc`` package provides an interface to querying and discovering data files hosted on https://losc.ligo.org as part of the open data releases from the LIGO Scientific Collaboration.
 
 To install:
