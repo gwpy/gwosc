@@ -28,6 +28,7 @@ import pytest
 from losc import (
     api as losc_api,
     locate as losc_locate,
+    timeline as losc_timeline,
     urls as losc_urls,
     utils as losc_utils,
 )
@@ -129,6 +130,24 @@ def test_get_event_urls(gw150914_urls):
     urls = losc_locate.get_event_urls(event, version=1)
     for url in urls:
         assert '_V1-' in url
+
+
+# -- losc.timeline ------------------------------------------------------------
+
+def test_get_segments():
+    # test some O1 data (first 100,000 seconds of the run)
+    flag = 'H1_DATA'
+    start = 1126051217
+    end = 1126151217
+
+    segs = losc_timeline.get_segments(flag, start, end)
+    assert segs == [
+        (1126073529, 1126114861),
+        (1126121462, 1126123267),
+        (1126123553, 1126126832),
+        (1126139205, 1126139266),
+        (1126149058, 1126151217),
+    ]
 
 
 # -- losc.urls ----------------------------------------------------------------
