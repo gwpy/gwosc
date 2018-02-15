@@ -1,6 +1,7 @@
 # filetypes to ignore
 *.pyc
 .DS_store
+*.swp
 
 # build files/directories to ignore
 /build/
