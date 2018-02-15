@@ -65,7 +65,7 @@ def url_overlaps_segment(url, segment):
         otherwise `False`
     """
     useg = url_segment(url)
-    segments_overlap(useg, segment)
+    return segments_overlap(useg, segment)
 
 
 def full_coverage(urls, segment):
@@ -78,12 +78,13 @@ def full_coverage(urls, segment):
     if not urls:
         return False
     # sort URLs by GPS timestamp
-    urls.sort(key=lambda u: url_segment(u))
+    urlsegs = [url_segment(u) for u in urls]
+    starts, ends = zip(*urlsegs)
     # extract segments for first and last files
-    a = url_segment(urls[0])
-    b = url_segment(urls[-1])
+    a = min(starts)
+    b = max(ends)
     # compare to given segment
-    return segments_overlap((a[0], b[1]), segment)
+    return a <= segment[0] and b >= segment[1]
 
 
 def segments_overlap(a, b):
