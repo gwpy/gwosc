@@ -43,6 +43,11 @@ def gw150914_urls(scope='module'):
     return losc_api.fetch_event_json('GW150914')['strain']
 
 
+@pytest.fixture
+def gw170817_urls(scope='module'):
+    return losc_api.fetch_event_json('GW170817')['strain']
+
+
 # -- losc.api -----------------------------------------------------------------
 
 def test_api_fetch_json():
@@ -101,3 +106,24 @@ def test_urls_sieve(gw150914_urls):
 
     with pytest.raises(KeyError):
         list(losc_urls.sieve(gw150914_urls, blah=None))
+
+
+def test_urls_match(gw150914_urls, gw170817_urls):
+    urls = [u['url'] for u in gw150914_urls]
+    nfiles = len(urls)
+    matched = losc_urls.match(urls, version=1)
+    assert len(matched) == nfiles // 2
+    for url in matched:
+        assert '_V1-' in url
+
+    # test GW170817 for multiple tags
+    urls = [u['url'] for u in gw170817_urls]
+    with pytest.raises(ValueError) as exc:
+        losc_urls.match(urls)
+    assert str(exc.value).startswith('multiple LOSC URL tags')
+
+    matched = losc_urls.match(urls, tag='CLN')
+    for url in matched:
+        assert '_CLN_' in url
+
+    assert losc_urls.match(urls, tag='BLAH') == []
