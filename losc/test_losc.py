@@ -105,7 +105,6 @@ def test_get_urls():
     end = 934100000
     span = (start, end)
     urls = losc_locate.get_urls(detector, start, end)
-    assert len(urls) == 18
     for url in urls:
         assert os.path.basename(url).startswith(
             '{}-{}'.format(detector[0], detector))
