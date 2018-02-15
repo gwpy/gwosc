@@ -20,11 +20,19 @@
 """Setup the LOSC-Python package
 """
 
-from distutils.core import setup
+import sys
+
+from setuptools import setup
 
 import versioneer
 
 __version__ = versioneer.get_version()
+
+# setup dependencies for testing (only if we are actually testing)
+if set(('test',)).intersection(sys.argv):
+    setup_requires = ['pytest_runner']
+else:
+    setup_requires = []
 
 # run setup
 setup(name='losc',
@@ -34,6 +42,8 @@ setup(name='losc',
       author='Duncan Macleod',
       author_email='duncan.macleod@ligo.org',
       license='MIT',
+      setup_requires=setup_requires,
+      tests_require=['pytest>=2.8'],
       cmdclass=versioneer.get_cmdclass(),
       classifiers=[
           'Development Status :: 3 - Alpha',

@@ -1,0 +1,20 @@
+language: python
+sudo: false
+dist: trusty
+python:
+  - '2.6'
+  - '2.7'
+  - '3.3'
+  - '3.4'
+  - '3.5'
+  - '3.6'
+  - 'nightly'
+install:
+  - python -m pip install .
+before_script:
+  - python -m pip install coveralls "pytest>=2.8" pytest-runner
+script:
+  - coverage run ./setup.py test
+after_success:
+  - coveralls
+cache: pip
