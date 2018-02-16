@@ -134,20 +134,20 @@ def test_get_event_urls(gw150914_urls):
 
 # -- losc.timeline ------------------------------------------------------------
 
-def test_get_segments():
-    # test some O1 data (first 100,000 seconds of the run)
-    flag = 'H1_DATA'
-    start = 1126051217
-    end = 1126151217
-
-    segs = losc_timeline.get_segments(flag, start, end)
-    assert segs == [
+@pytest.mark.parametrize('flag, start, end, result', [
+    ('H1_DATA', 1126051217, 1126151217, [
         (1126073529, 1126114861),
         (1126121462, 1126123267),
         (1126123553, 1126126832),
         (1126139205, 1126139266),
         (1126149058, 1126151217),
-    ]
+    ]),
+    ('L1_DATA', 1126259446, 1126259478, [
+        (1126259446, 1126259478),
+    ])
+])
+def test_timeline_get_segments(flag, start, end, result):
+    assert losc_timeline.get_segments(flag, start, end) == result
 
 
 # -- losc.urls ----------------------------------------------------------------
