@@ -2,22 +2,22 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) Duncan Macleod (2017)
 #
-# This file is part of LOSC-Python.
+# This file is part of GWOpenSci
 #
-# LOSC-Python is free software: you can redistribute it and/or modify
+# GWOpenSci is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# LOSC-Python is distributed in the hope that it will be useful,
+# GWOpenSci is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with LOSC-Python.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Setup the LOSC-Python package
+"""Setup the GWOpenSci package
 """
 
 import sys
@@ -35,10 +35,10 @@ else:
     setup_requires = []
 
 # run setup
-setup(name='losc',
+setup(name='gwopensci',
       version=__version__,
-      packages=['losc'],
-      description="A python interface to the LOSC data archive",
+      packages=['gwopensci'],
+      description="A python interface to the GW Open Science data archive",
       author='Duncan Macleod',
       author_email='duncan.macleod@ligo.org',
       license='MIT',
@@ -49,8 +49,9 @@ setup(name='losc',
       tests_require=['pytest>=2.8'],
       cmdclass=versioneer.get_cmdclass(),
       classifiers=[
-          'Development Status :: 3 - Alpha',
+          'Development Status :: 4 - Beta',
           'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
           'Programming Language :: Python :: 3.3',
@@ -64,4 +65,4 @@ setup(name='losc',
           'Topic :: Scientific/Engineering :: Physics',
           'License :: OSI Approved :: MIT License',
       ],
-      )
+)
