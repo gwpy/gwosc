@@ -157,7 +157,7 @@ def test_urls_sieve(gw150914_urls):
     sieved = list(gwopensci_urls.sieve(gw150914_urls, detector='L1'))
     assert len(sieved) == nfiles // 2
     sieved = list(gwopensci_urls.sieve(gw150914_urls, detector='L1',
-                                  sample_rate=4096))
+                                       sample_rate=4096))
     assert len(sieved) == nfiles // 4
 
     with pytest.raises(KeyError):
