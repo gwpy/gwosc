@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Copyright Duncan Macleod 2018
 #
-# This file is part of LOSC-Python.
+# This file is part of GWOpenSci.
 #
-# LOSC-Python is free software: you can redistribute it and/or modify
+# GWOpenSci is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# LOSC-Python is distributed in the hope that it will be useful,
+# GWOpenSci is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with LOSC-Python.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
 
 """Utilities for URL handling
 """
@@ -23,7 +23,7 @@ import os.path
 import re
 
 # LOSC filename re
-LOSC_URL_RE = re.compile(
+URL_REGEX = re.compile(
     r"\A((.*/)*(?P<obs>[^/]+)-"
     r"(?P<ifo>[A-Z][0-9])_LOSC_"
     r"((?P<tag>[^/]+)_)?"
@@ -33,7 +33,7 @@ LOSC_URL_RE = re.compile(
     r"(?P<dur>[^/\.]+)\."
     r"(?P<ext>[^/]+))\Z"
 )
-LOSC_VERSION_RE = re.compile(r'V\d+')
+VERSION_REGEX = re.compile(r'V\d+')
 
 
 def sieve(urllist, **match):
@@ -67,7 +67,7 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
         if the start time of the URL is _after_ the end time of the
         request
     """
-    reg = LOSC_URL_RE.match(os.path.basename(url)).groupdict()
+    reg = URL_REGEX.match(os.path.basename(url)).groupdict()
     if (tag and reg['tag'] != tag) or (version and reg['version'] != version):
         return
 
@@ -120,7 +120,7 @@ def match(urls, start=None, end=None, tag=None, version=None):
               os.path.splitext(os.path.basename(u))[0].split('-')[::-1])
 
     # format version request
-    if version and not LOSC_VERSION_RE.match(str(version)):
+    if version and not VERSION_REGEX.match(str(version)):
         version = 'V{}'.format(int(version))
 
     # loop URLS
