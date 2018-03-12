@@ -1,6 +1,9 @@
 language: python
-sudo: false
-dist: trusty
+
+env:
+  global:
+    secure: SR5ZvA0edPX23KFHuGoMn1GHjmi2/Ewk75DAUf+8+qtAME6o3p47Oalgx2gSDC3irWjyWiUNnwMnWeMXo9zB1IEXwF9GMWfJhO7d++nL8aFG1lYgEOnf8rLSZhPJts2MZxEiKj62f3aNDD4o5d9EW1haPcTvjvKd63a1sgT6lYJwDhvGsORhS/xf9aQH9SPKW637mckq5wJqqIrvDJHB/L59U9iRv2iaNerQeb64zni3+B3n7LlMKT0a5eZWC4Rdl5FgDKVbQK2I4XTNQXr8p5Zv1tTtYkRi46n50/arT7jkE6+FKSQzdoVHtWP8g8FWlEFWTBkm5bsI5ON6OxFiwd6j23agcmj22781YQkP/oabtYwql9GqC77Ja6GtU5X/V7pncxMidhhh6O/VJZu5445W8gZoUxyGCPIDKRAYcuv1vRzi1VTgvOlFF9KMQ9P3HpTsxIyoh5TSyCRwpOiZ5WCjzCiqlUDziljRIScIIhoZX58cbh+O+W3exm8RRAUXF+Hd7dDGi/fXIrEQLa8w0frkn4DDBrcFCihh1IxpOT/EZR0w9G4A/tyPXT99UVUP0iQVQ0jxQY8QuxuL/hBRbnAD7mwMHawAfjPSCixZ8AKf2Gnj/hWrAQtTFU2pfkzbJJQ7HlT4jAjNzCfl1kJHkJI/Qx1ABeFlIcsxq24jiQc=
+
 python:
   - '2.7'
   - '3.3'
@@ -8,14 +11,40 @@ python:
   - '3.5'
   - '3.6'
   - 'nightly'
+
 before_install:
   - pip install pip setuptools --upgrade
+
 install:
   - python -m pip install .
+
 before_script:
   - python -m pip install coveralls "pytest>=2.8" pytest-runner
+
 script:
   - coverage run ./setup.py test
+
 after_success:
   - coveralls
+
+deploy:
+  - provider: pypi
+    user: duncanmmacleod
+    password: ${PYPI_PASSWD}
+    distributions: sdist bdist_wheel
+    on:
+      branch: master
+      tags: true
+      python: '2.7'
+      repo: duncanmmacleod/gwopensci
+  - provider: pypi
+    user: duncanmmacleod
+    password: ${PYPI_PASSWD}
+    distributions: bdist_wheel
+    on:
+      branch: master
+      tags: true
+      python: '3.6'
+      repo: duncanmmacleod/gwopensci
+
 cache: pip
