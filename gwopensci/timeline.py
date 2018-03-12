@@ -22,7 +22,7 @@ from . import api
 from .urls import sieve
 
 
-def get_segments(flag, start, end, host=api.LOSC_URL):
+def get_segments(flag, start, end, host=api.DEFAULT_URL):
     """Return the [start, end) GPS segments for this flag
 
     Parameters
@@ -48,7 +48,7 @@ def get_segments(flag, start, end, host=api.LOSC_URL):
         timeline_url(flag, start, end, host=host))['segments']))
 
 
-def timeline_url(flag, start, end, host=api.LOSC_URL):
+def timeline_url(flag, start, end, host=api.DEFAULT_URL):
     """Returns the Timeline JSON URL for a flag name and GPS interval
     """
     detector = flag.split('_', 1)[0]
@@ -57,7 +57,7 @@ def timeline_url(flag, start, end, host=api.LOSC_URL):
         host, dataset, flag, start, end-start)
 
 
-def _find_dataset(start, end, detector, host=api.LOSC_URL):
+def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
     meta = api.fetch_dataset_json(start, end, host=host)
     span = (start, end)
     duration = end-start
@@ -95,7 +95,7 @@ def _find_dataset(start, end, detector, host=api.LOSC_URL):
     return sorted(epochs, key=itemgetter(1, 0))[0][0]
 
 
-def _event_segment(event, host=api.LOSC_URL, **match):
+def _event_segment(event, host=api.DEFAULT_URL, **match):
     jdata = api.fetch_event_json(event, host=host)
     seg = None
     for fmeta in sieve(jdata['strain'], **match):
