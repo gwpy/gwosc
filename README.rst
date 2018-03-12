@@ -1,3 +1,5 @@
+|PyPI Release| |Zenodo DOI| |License| |Python Versions|
+
 |Build Status| |Coverage Status|
 
 The ``gwopensci`` package provides an interface to querying and discovering
@@ -75,6 +77,13 @@ For documentation on what flags are available, for example for the O1
 science run, see `the O1 data release
 page <https://losc.ligo.org/O1/>`__ (*Data Quality*).
 
+.. |PyPI Release| image:: https://badge.fury.io/py/gwopensci.svg
+   :target: http://badge.fury.io/py/gwopensci
+.. |Zenodo DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1196306.svg
+   :target: https://doi.org/10.5281/zenodo.1196306
+.. |License| image:: https://img.shields.io/pypi/l/gwopensci.svg
+   :target: https://choosealicense.com/licenses/mit/
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/gwopensci.svg
 .. |Build Status| image:: https://travis-ci.org/duncanmmacleod/gwopensci.svg?branch=develop
    :target: https://travis-ci.org/duncanmmacleod/gwopensci
 .. |Coverage Status| image:: https://coveralls.io/repos/github/duncanmmacleod/gwopensci/badge.svg?branch=develop
