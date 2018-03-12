@@ -34,35 +34,40 @@ if set(('test',)).intersection(sys.argv):
 else:
     setup_requires = []
 
+# get long description from README
+with open('README.rst', 'rb') as f:
+    longdesc = f.read().decode().strip()
+
 # run setup
-setup(name='gwopensci',
-      version=__version__,
-      packages=['gwopensci'],
-      description="A python interface to the GW Open Science data archive",
-      author='Duncan Macleod',
-      author_email='duncan.macleod@ligo.org',
-      license='MIT',
-      setup_requires=setup_requires,
-      install_requires=[
-          'six',
-      ],
-      tests_require=['pytest>=2.8'],
-      cmdclass=versioneer.get_cmdclass(),
-      classifiers=[
-          'Development Status :: 4 - Beta',
-          'Programming Language :: Python',
-          'Programming Language :: Python :: 2',
-          'Programming Language :: Python :: 2.7',
-          'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Intended Audience :: Science/Research',
-          'Natural Language :: English',
-          'Topic :: Scientific/Engineering',
-          'Topic :: Scientific/Engineering :: Astronomy',
-          'Topic :: Scientific/Engineering :: Physics',
-          'License :: OSI Approved :: MIT License',
-      ],
+setup(
+    name='gwopensci',
+    version=__version__,
+    packages=['gwopensci'],
+    description="A python interface to the GW Open Science data archive",
+    long_description=longdesc,
+    author='Duncan Macleod',
+    author_email='duncan.macleod@ligo.org',
+    url='https://github.com/duncanmmacleod/gwopensci',
+    license='MIT',
+    setup_requires=setup_requires,
+    install_requires=['six'],
+    tests_require=['pytest>=2.8'],
+    cmdclass=versioneer.get_cmdclass(),
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Intended Audience :: Science/Research',
+        'Natural Language :: English',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Astronomy',
+        'Topic :: Scientific/Engineering :: Physics',
+        'License :: OSI Approved :: MIT License',
+    ],
 )
