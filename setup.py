@@ -34,11 +34,16 @@ if set(('test',)).intersection(sys.argv):
 else:
     setup_requires = []
 
+# get long description from README
+with open('README.rst', 'rb') as f:
+    longdesc = f.read().strip()
+
 # run setup
 setup(name='gwopensci',
       version=__version__,
       packages=['gwopensci'],
       description="A python interface to the GW Open Science data archive",
+      long_description=longdesc,
       author='Duncan Macleod',
       author_email='duncan.macleod@ligo.org',
       license='MIT',
