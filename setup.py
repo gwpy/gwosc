@@ -36,7 +36,7 @@ else:
 
 # get long description from README
 with open('README.rst', 'rb') as f:
-    longdesc = f.read().strip()
+    longdesc = f.read().decode().strip()
 
 # run setup
 setup(
