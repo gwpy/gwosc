@@ -19,15 +19,13 @@
 """Locate files within a given interval on losc.ligo.org
 """
 
-from six.moves.urllib.request import urlopen
-
 from . import (api, urls as lurls, utils)
 
 __all__ = ['get_urls', 'get_event_urls']
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
-def get_urls(detector, start, end, host=api.LOSC_URL,
+def get_urls(detector, start, end, host=api.DEFAULT_URL,
              tag=None, version=None, sample_rate=4096, format='hdf5'):
     """Fetch the metadata from LOSC regarding a given GPS interval
 
@@ -106,7 +104,7 @@ def get_urls(detector, start, end, host=api.LOSC_URL,
 
 
 def get_event_urls(event, format='hdf5', sample_rate=4096, **match):
-    meta = api.fetch_event_json(event, host=match.pop('host', api.LOSC_URL))
+    meta = api.fetch_event_json(event, host=match.pop('host', api.DEFAULT_URL))
     sieve_kw = {k: match.pop(k) for k in list(match.keys()) if
                 k not in {'start', 'end', 'tag', 'version'}}
     return lurls.match(

@@ -21,7 +21,7 @@ import json
 
 from six.moves.urllib.request import urlopen
 
-LOSC_URL = 'https://losc.ligo.org'
+DEFAULT_URL = 'https://losc.ligo.org'
 MAX_GPS = 99999999999
 
 
@@ -64,7 +64,7 @@ def fetch_json(url):
 
 # -- API calls ----------------------------------------------------------------
 
-def fetch_dataset_json(gpsstart, gpsend, host=LOSC_URL):
+def fetch_dataset_json(gpsstart, gpsend, host=DEFAULT_URL):
     """Returns the JSON metadata for all datasets matching the GPS interval
 
     Parameters
@@ -87,7 +87,7 @@ def fetch_dataset_json(gpsstart, gpsend, host=LOSC_URL):
     return fetch_json(url)
 
 
-def fetch_event_json(event, host=LOSC_URL):
+def fetch_event_json(event, host=DEFAULT_URL):
     """Returns the JSON metadata for the given event
 
     Parameters
@@ -107,7 +107,8 @@ def fetch_event_json(event, host=LOSC_URL):
     return fetch_json(url)
 
 
-def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS, host=LOSC_URL):
+def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
+                   host=DEFAULT_URL):
     """Returns the JSON metadata for the given science run parameters
 
     Parameters
