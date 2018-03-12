@@ -1,2 +1,2 @@
 include versioneer.py
-include losc/_version.py
+include gwopensci/_version.py
