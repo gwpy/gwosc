@@ -4,9 +4,10 @@
 *.swp
 
 # build files/directories to ignore
+/dist/
 /build/
 /.cache/
-/losc.egg-info/
+/*.egg-info/
 /.eggs/
 __pycache__/
 /.coverage
