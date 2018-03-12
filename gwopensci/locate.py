@@ -19,8 +19,6 @@
 """Locate files within a given interval on losc.ligo.org
 """
 
-from six.moves.urllib.request import urlopen
-
 from . import (api, urls as lurls, utils)
 
 __all__ = ['get_urls', 'get_event_urls']

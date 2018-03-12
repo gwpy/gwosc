@@ -59,7 +59,6 @@ def timeline_url(flag, start, end, host=api.DEFAULT_URL):
 
 def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
     meta = api.fetch_dataset_json(start, end, host=host)
-    span = (start, end)
     duration = end-start
 
     epochs = []
