@@ -46,6 +46,7 @@ setup(name='gwopensci',
       long_description=longdesc,
       author='Duncan Macleod',
       author_email='duncan.macleod@ligo.org',
+      url='https://github.com/duncanmmacleod/gwopensci',
       license='MIT',
       setup_requires=setup_requires,
       install_requires=[
