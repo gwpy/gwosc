@@ -28,23 +28,58 @@ from . import api
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
-def find_datasets(detector=None, host=api.DEFAULT_URL):
+def find_datasets(detector=None, type=None, host=api.DEFAULT_URL):
     """Find datasets available on the given GW open science host
+
+    Parameters
+    ----------
+    detector : `str`, optional
+        prefix of GW detector
+
+    type : `str`, optional
+        type of datasets to restrict, one of ``'run'`` or ``'event'``
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    Returns
+    -------
+    datasets : `list` of `str`
+        the names of all matched datasets, possibly empty
 
     Examples
     --------
+    (Correct as of 2018-03-14)
+
     >>> from gwopensci.datasets import find_datasets
     >>> find_datasets()
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817',
      'LVT151012', 'O1', 'S5', 'S6']
-    >>> find_datasets('V1')
+    >>> find_datasets(detector='V1')
     ['GW170814', 'GW170817']
+    >>> find_datasets(type='event')
+    ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817',
+     'LVT151012']
     """
+    # format type
+    if type not in [None, 'run', 'event']:
+        raise ValueError('unrecognised type {!r}, select one of \'run\', '
+                         '\'event\''.format(type))
+    if type and not type.endswith('s'):
+        type += 's'
+
+    # search
     meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)
-    return sorted(
-        epoch for type_ in meta for epoch, metadata in meta[type_].items() if
-        epoch != 'tenyear' and (detector is None or
-                                detector in metadata['detectors']))
+    names = []
+    for type_ in meta:
+        if type and type_ != type:
+            continue
+        for epoch, metadata in meta[type_].items():
+            if epoch == 'tenyear':
+                continue
+            if detector is None or detector in metadata['detectors']:
+                names.append(epoch)
+    return sorted(names)
 
 
 def event_gps(event, host=api.DEFAULT_URL):

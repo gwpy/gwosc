@@ -23,8 +23,10 @@ To search for available datasets (correct as of March 14 2018):
     >>> from gwopensci import datasets
     >>> datasets.find_datasets()
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817', 'LVT151012', 'O1', 'S5', 'S6']
-    >>> find_datasets('V1')
+    >>> datasets.find_datasets(detector='V1')
     ['GW170814', 'GW170817']
+    >>> datasets.find_datasets(type='run')
+    ['O1', 'S5', 'S6']
 
 To query for the GPS time of an event dataset (or vice-versa):
 

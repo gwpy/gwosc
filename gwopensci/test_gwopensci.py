@@ -22,6 +22,7 @@ These tests can be executed using `python setup.py test`
 """
 
 import os.path
+import re
 
 import pytest
 
@@ -112,6 +113,15 @@ def test_find_datasets():
     assert 'GW150914' not in v1sets
 
     assert gwopensci_datasets.find_datasets('X1') == []
+
+    runsets = gwopensci_datasets.find_datasets(type='run')
+    assert 'O1' in runsets
+    run_regex = re.compile('\A[OS]\d+\Z')
+    for dset in runsets:
+        assert run_regex.match(dset)
+
+    with pytest.raises(ValueError):
+        gwopensci_datasets.find_datasets(type='badtype')
 
 
 def test_event_gps():
