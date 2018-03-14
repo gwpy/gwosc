@@ -22,11 +22,13 @@ These tests can be executed using `python setup.py test`
 """
 
 import os.path
+import re
 
 import pytest
 
 from gwopensci import (
     api as gwopensci_api,
+    datasets as gwopensci_datasets,
     locate as gwopensci_locate,
     timeline as gwopensci_timeline,
     urls as gwopensci_urls,
@@ -95,6 +97,59 @@ def test_api_fetch_run_json():
     assert out['GPSstart'] == start
     assert out['GPSend'] == end
     check_json_url_list(out['strain'])
+
+
+# -- gwopensci.datasets -------------------------------------------------------
+
+
+def test_find_datasets():
+    sets = gwopensci_datasets.find_datasets()
+    for dset in ('S6', 'O1', 'GW150914', 'GW170817'):
+        assert dset in sets
+    assert 'tenyear' not in sets
+
+    v1sets = gwopensci_datasets.find_datasets('V1')
+    assert 'GW170817' in v1sets
+    assert 'GW150914' not in v1sets
+
+    assert gwopensci_datasets.find_datasets('X1') == []
+
+    runsets = gwopensci_datasets.find_datasets(type='run')
+    assert 'O1' in runsets
+    run_regex = re.compile('\A[OS]\d+\Z')
+    for dset in runsets:
+        assert run_regex.match(dset)
+
+    with pytest.raises(ValueError):
+        gwopensci_datasets.find_datasets(type='badtype')
+
+
+def test_event_gps():
+    assert gwopensci_datasets.event_gps('GW170817') == 1187008882.43
+    with pytest.raises(ValueError) as exc:
+        gwopensci_datasets.event_gps('GW123456')
+    assert str(exc.value) == 'no event dataset found for \'GW123456\''
+
+
+def test_event_at_gps():
+    assert gwopensci_datasets.event_at_gps(1187008882) == 'GW170817'
+    with pytest.raises(ValueError) as exc:
+        gwopensci_datasets.event_at_gps(1187008882, tol=.1)
+    assert str(exc.value) == 'no event found within 0.1 seconds of 1187008882'
+
+
+def test_run_segment():
+    assert gwopensci_datasets.run_segment('O1') == (1126051217, 1137254417)
+    with pytest.raises(ValueError) as exc:
+        gwopensci_datasets.run_segment('S7')
+    assert str(exc.value) == 'no run dataset found for \'S7\''
+
+
+def test_run_at_gps():
+    assert gwopensci_datasets.run_at_gps(1135136350) == 'O1'
+    with pytest.raises(ValueError) as exc:
+        gwopensci_datasets.run_at_gps(0)
+    assert str(exc.value) == 'no run dataset found containing GPS 0'
 
 
 # -- gwopensci.locate ---------------------------------------------------------
