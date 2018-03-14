@@ -2,9 +2,9 @@
 
 |Build Status| |Coverage Status|
 
-The ``gwopensci`` package provides an interface to querying and discovering
-data files hosted on https://losc.ligo.org as part of the open data
-releases from the LIGO and Virgo gravitational-wave observatories.
+The ``gwopensci`` package provides an interface to querying the
+open data releases hosted on https://losc.ligo.org from the LIGO and
+Virgo gravitational-wave observatories.
 
 To install:
 
@@ -12,8 +12,41 @@ To install:
 
     pip install gwopensci
 
-Query by event name
--------------------
+
+Searching for datasets
+----------------------
+
+To search for available datasets (correct as of March 14 2018):
+
+.. code:: python
+
+    >>> from gwopensci import datasets
+    >>> datasets.find_datasets()
+    ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817', 'LVT151012', 'O1', 'S5', 'S6']
+    >>> find_datasets('V1')
+    ['GW170814', 'GW170817']
+
+To query for the GPS time of an event dataset (or vice-versa):
+
+.. code:: python
+
+    >>> datasets.event_gps('GW170817')
+    1187008882.43
+    >>> datasets.event_at_gps(1187008882)
+    'GW170817'
+
+Similar queries are available for observing run datasets:
+
+.. code:: python
+
+    >>> datasets.run_segment('O1')
+    (1126051217, 1137254417)
+    >>> datasets.run_at_gps(1135136350)  # event_gps('GW151226')
+    'O1'
+
+
+Locating data URLs by event name
+---------------------------------
 
 You can search for remote data URLS based on the event name:
 
@@ -30,8 +63,9 @@ You can down-select the URLs using keyword arguments:
     >>> get_event_urls('GW150914', detector='L1', duration=32)
     ['https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5']
 
-Query by GPS interval
----------------------
+
+Locating data URLs by GPS interval
+----------------------------------
 
 You can search for remote data URLs based on the GPS time interval as
 follows:
@@ -57,6 +91,7 @@ full information, run
 .. code:: python
 
     >>> help(get_urls)
+
 
 Query for Timeline segments
 ---------------------------
