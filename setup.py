@@ -52,6 +52,9 @@ setup(
     setup_requires=setup_requires,
     install_requires=['six>=1.9.0'],
     tests_require=['pytest>=2.8'],
+    extras_require={
+        'docs': ['sphinx', 'sphinx_rtd_theme', 'numpydoc'],
+    },
     cmdclass=versioneer.get_cmdclass(),
     classifiers=[
         'Development Status :: 4 - Beta',
