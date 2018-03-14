@@ -50,7 +50,7 @@ setup(
     url='https://github.com/duncanmmacleod/gwopensci',
     license='MIT',
     setup_requires=setup_requires,
-    install_requires=['six'],
+    install_requires=['six>=1.9.0'],
     tests_require=['pytest>=2.8'],
     cmdclass=versioneer.get_cmdclass(),
     classifiers=[
@@ -59,7 +59,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

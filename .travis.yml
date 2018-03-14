@@ -6,7 +6,6 @@ env:
 
 python:
   - '2.7'
-  - '3.3'
   - '3.4'
   - '3.5'
   - '3.6'
@@ -19,10 +18,14 @@ install:
   - python -m pip install .
 
 before_script:
-  - python -m pip install coveralls "pytest>=2.8" pytest-runner
+  - python -m pip install coveralls "pytest>=2.8" pytest-runner sphinx_rtd_theme numpydoc
 
 script:
+  # run unit tests
   - coverage run ./setup.py test
+
+  # build documentation
+  - cd docs && make html
 
 after_success:
   - coveralls

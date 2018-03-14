@@ -11,3 +11,5 @@
 /.eggs/
 __pycache__/
 /.coverage
+
+/docs/_build/
