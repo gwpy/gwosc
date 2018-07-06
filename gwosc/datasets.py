@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Copyright Duncan Macleod 2017
 #
-# This file is part of GWOpenSci.
+# This file is part of GWOSC.
 #
-# GWOpenSci is free software: you can redistribute it and/or modify
+# GWOSC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# GWOpenSci is distributed in the hope that it will be useful,
+# GWOSC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
 """Functions for getting information about available datasets
 
@@ -51,7 +51,7 @@ def find_datasets(detector=None, type=None, host=api.DEFAULT_URL):
     --------
     (Correct as of 2018-03-14)
 
-    >>> from gwopensci.datasets import find_datasets
+    >>> from gwosc.datasets import find_datasets
     >>> find_datasets()
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817',
      'LVT151012', 'O1', 'S5', 'S6']
@@ -100,7 +100,7 @@ def event_gps(event, host=api.DEFAULT_URL):
 
     Examples
     --------
-    >>> from gwopensci.datasets import event_gps
+    >>> from gwosc.datasets import event_gps
     >>> event_gps('GW170817')
     1187008882.43
     >>> event_gps('GW123456')
@@ -143,7 +143,7 @@ def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
 
     Examples
     --------
-    >>> from gwopensci.datasets import event_at_gps
+    >>> from gwosc.datasets import event_at_gps
     >>> event_at_gps(1187008882)
     'GW170817'
     >>> event_at_gps(1187008882, tol=.1)
@@ -176,7 +176,7 @@ def run_segment(run, host=api.DEFAULT_URL):
 
     Examples
     --------
-    >>> from gwopensci.datasets import run_segment
+    >>> from gwosc.datasets import run_segment
     >>> run_segment('O1')
     (1126051217, 1137254417)
     >>> run_segment('Oh dear')
@@ -215,7 +215,7 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
 
     Examples
     --------
-    >>> from gwopensci.datasets import run_at_gps
+    >>> from gwosc.datasets import run_at_gps
     >>> run_at_gps(1135136350)
     'O1'
     >>> run_at_gps(0)

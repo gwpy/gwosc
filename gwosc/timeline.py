@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Copyright Duncan Macleod 2017
 #
-# This file is part of GWOpenSci.
+# This file is part of GWOSC.
 #
-# GWOpenSci is free software: you can redistribute it and/or modify
+# GWOSC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# GWOpenSci is distributed in the hope that it will be useful,
+# GWOSC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
 from operator import itemgetter
 
@@ -82,8 +82,6 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
                     "Unrecognised dataset type {!r}".format(type_))
 
             # compare with request
-            if segment[1] <= start or segment[0] >= end:  # no overlap
-                continue
             overlap = min(end, segment[1]) - max(start, segment[0])
             epochs.append((epoch, duration-overlap))
 
@@ -103,10 +101,7 @@ def _event_segment(event, host=api.DEFAULT_URL, **match):
         if seg is None:  # first segment
             seg = (start, end)
             continue
-        if start < seg[0]:  # earlier start
-            seg = (start, seg[1])
-        if end > seg[1]:  # later end
-            seg = (seg[0], end)
+        seg = min(start, seg[0]), max(end, seg[1])
 
     # fail on no match
     if seg is None:

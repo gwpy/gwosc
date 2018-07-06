@@ -8,7 +8,7 @@ You can search for remote data URLS based on the event name:
 
 .. code:: python
 
-    >>> from gwopensci.locate import get_event_urls
+    >>> from gwosc.locate import get_event_urls
     >>> get_event_urls('GW150914')
     ['https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126257414-4096.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126257414-4096.hdf5']
 
@@ -28,7 +28,7 @@ follows:
 
 .. code:: python
 
-    >>> from gwopensci.locate import get_urls
+    >>> from gwosc.locate import get_urls
     >>> get_urls('L1', 968650000, 968660000)
     ['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
 
@@ -48,10 +48,10 @@ full information, run
 
     >>> help(get_urls)
 
-gwopensci.locate reference
---------------------------
+gwosc.locate reference
+----------------------
 
-.. automodule:: gwopensci.locate
+.. automodule:: gwosc.locate
     :members:
     :undoc-members:
     :show-inheritance:
