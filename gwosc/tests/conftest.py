@@ -38,4 +38,3 @@ def gw150914_urls(scope='module'):
 @pytest.fixture
 def gw170817_urls(scope='module'):
     return _event_urls('GW170817')
-
