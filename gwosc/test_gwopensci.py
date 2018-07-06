@@ -61,7 +61,7 @@ def test_api_fetch_json():
     assert isinstance(out, dict)
     assert len(out['events']) == 1
     assert sorted(out['events']['GW150914']['detectors']) == ['H1', 'L1']
-    assert set(out['runs'].keys()) == {'tenyear', 'O1'}
+    assert set(out['runs'].keys()) == {'tenyear', 'O1', 'O1_16KHZ'}
 
     # check errors (use legit URL that isn't JSON)
     url2 = os.path.dirname(os.path.dirname(url))
@@ -116,7 +116,7 @@ def test_find_datasets():
 
     runsets = gwosc_datasets.find_datasets(type='run')
     assert 'O1' in runsets
-    run_regex = re.compile('\A[OS]\d+\Z')
+    run_regex = re.compile('\A[OS]\d+(_16KHZ)?\Z')
     for dset in runsets:
         assert run_regex.match(dset)
 
@@ -146,7 +146,7 @@ def test_run_segment():
 
 
 def test_run_at_gps():
-    assert gwosc_datasets.run_at_gps(1135136350) == 'O1'
+    assert gwosc_datasets.run_at_gps(1135136350) in {'O1', 'O1_16KHZ'}
     with pytest.raises(ValueError) as exc:
         gwosc_datasets.run_at_gps(0)
     assert str(exc.value) == 'no run dataset found containing GPS 0'
