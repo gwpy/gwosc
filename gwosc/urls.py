@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Copyright Duncan Macleod 2018
 #
-# This file is part of GWOpenSci.
+# This file is part of GWOSC.
 #
-# GWOpenSci is free software: you can redistribute it and/or modify
+# GWOSC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# GWOpenSci is distributed in the hope that it will be useful,
+# GWOSC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
 """Utilities for URL handling
 """
@@ -78,6 +78,7 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
             raise StopIteration
 
     if start is not None:
+        gps = int(reg['strt'])
         dur = int(reg['dur'])
         if gps + dur <= start:  # too early
             return

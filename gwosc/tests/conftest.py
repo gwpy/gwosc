@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright Duncan Macleod 2017
+# Copyright Duncan Macleod 2018
 #
 # This file is part of GWOSC.
 #
@@ -16,9 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
-from ._version import get_versions
+"""Helpers for tests
+"""
 
-__version__ = get_versions()['version']
+import pytest
+
+from ..api import fetch_event_json
+
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
-del get_versions
+
+def _event_urls(name):
+    return fetch_event_json(name)['strain']
+
+
+@pytest.fixture
+def gw150914_urls(scope='module'):
+    return _event_urls('GW150914')
+
+
+@pytest.fixture
+def gw170817_urls(scope='module'):
+    return _event_urls('GW170817')
