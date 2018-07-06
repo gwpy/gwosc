@@ -103,10 +103,7 @@ def _event_segment(event, host=api.DEFAULT_URL, **match):
         if seg is None:  # first segment
             seg = (start, end)
             continue
-        if start < seg[0]:  # earlier start
-            seg = (start, seg[1])
-        if end > seg[1]:  # later end
-            seg = (seg[0], end)
+        seg = min(start, seg[0]), max(end, seg[1])
 
     # fail on no match
     if seg is None:
