@@ -11,5 +11,6 @@
 /.eggs/
 __pycache__/
 /.coverage
+.pytest_cache/
 
 /docs/_build/
