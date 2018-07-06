@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/pypi/l/gwosc.svg)](https://choosealicense.com/licenses/mit/)
 ![Python Versions](https://img.shields.io/pypi/pyversions/gwosc.svg)
 
-[![Linux Build](https://travis-ci.org/gwpy/gwosc.svg?branch=develop)](https://travis-ci.org/gwpy/gwosc)
+[![Linux Build](https://travis-ci.com/gwpy/gwosc.svg?branch=develop)](https://travis-ci.com/gwpy/gwosc)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/t1xsjb4kieunjp66?svg=true)](https://ci.appveyor.com/project/gwpy/gwosc)
 [![Coverage Status](https://coveralls.io/repos/github/gwpy/gwosc/badge.svg?branch=develop)](https://coveralls.io/github/gwpy/gwosc?branch=develop)
 
