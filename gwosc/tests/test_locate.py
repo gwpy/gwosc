@@ -23,6 +23,8 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 import os.path
 
+import pytest
+
 from .. import (
     locate,
     urls as gwosc_urls,
@@ -42,6 +44,15 @@ def test_get_urls():
             '{}-{}'.format(detector[0], detector))
         assert utils.segments_overlap(
             utils.url_segment(url), span)
+
+    # test fetch for GW170817 data
+    assert len(locate.get_urls('L1', 1187007040, 1187009088, tag='CLN')) == 1
+
+    # assert no hits raises exception
+    with pytest.raises(ValueError):  # no data in 1980
+        locate.get_urls(detector, 0, 1)
+    with pytest.raises(ValueError):  # no Virgo data for S6
+        locate.get_urls('V1', start, end)
 
 
 def test_get_event_urls(gw150914_urls):
