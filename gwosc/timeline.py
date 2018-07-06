@@ -82,8 +82,6 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
                     "Unrecognised dataset type {!r}".format(type_))
 
             # compare with request
-            if segment[1] <= start or segment[0] >= end:  # no overlap
-                continue
             overlap = min(end, segment[1]) - max(start, segment[0])
             epochs.append((epoch, duration-overlap))
 

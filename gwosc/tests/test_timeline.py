@@ -40,3 +40,9 @@ from .. import timeline
 ])
 def test_get_segments(flag, start, end, result):
     assert timeline.get_segments(flag, start, end) == result
+
+
+def test_timeline_url():
+    # check that unknown IFO results in no matches
+    with pytest.raises(ValueError):
+        timeline.timeline_url('X1', 1126259446, 1126259478)
