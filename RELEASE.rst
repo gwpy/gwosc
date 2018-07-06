@@ -1,6 +1,6 @@
-#####################
-Releasing python-losc
-#####################
+#################
+Releasing `gwosc`
+#################
 
 This repo follows the `git flow <https://github.com/nvie/gitflow>`__ branching model for releases, meaning all development changes are pushed onto the `develop` branch, and `master` is only updated at release time.
 This means that the `master` branch always represents a stable working copy of the package.
@@ -40,7 +40,7 @@ So, to release a new version of the package:
 
 #. **Draft a release on GitHub**
 
-   * Go to https://github.com/duncanmmacleod/python-losc/releases/new
+   * Go to https://github.com/gwpy/gwosc/releases/new
    * Use ``v1.0.0`` as the *Tag version*
    * Use 1.0.0 as the *Release title*
    * Copy the tag message into the text box to serve as release notes
@@ -52,5 +52,4 @@ So, to release a new version of the package:
       $ rm -rf dist/*
       $ python setup.py sdist
       $ python2.7 bdist_wheel
-      $ python3.6 bdist_wheel
       $ twine upload dist/losc-1.0.0.*

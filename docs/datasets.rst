@@ -5,7 +5,7 @@ To search for available datasets (correct as of March 14 2018):
 
 .. code:: python
 
-    >>> from gwopensci import datasets
+    >>> from gwosc import datasets
     >>> datasets.find_datasets()
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817', 'LVT151012', 'O1', 'S5', 'S6']
     >>> datasets.find_datasets(detector='V1')
@@ -31,10 +31,10 @@ Similar queries are available for observing run datasets:
     >>> datasets.run_at_gps(1135136350)  # event_gps('GW151226')
     'O1'
 
-`gwopensci.datasets` reference
-------------------------------
+`gwosc.datasets` reference
+--------------------------
 
-.. automodule:: gwopensci.datasets
+.. automodule:: gwosc.datasets
     :members:
     :undoc-members:
     :show-inheritance:

@@ -2,22 +2,22 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) Duncan Macleod (2017)
 #
-# This file is part of GWOpenSci
+# This file is part of GWOSC
 #
-# GWOpenSci is free software: you can redistribute it and/or modify
+# GWOSC is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# GWOpenSci is distributed in the hope that it will be useful,
+# GWOSC is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with GWOpenSci.  If not, see <http://www.gnu.org/licenses/>.
+# along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Setup the GWOpenSci package
+"""Setup the GWOSC package
 """
 
 import sys
@@ -40,14 +40,14 @@ with open('README.rst', 'rb') as f:
 
 # run setup
 setup(
-    name='gwopensci',
+    name='gwosc',
     version=__version__,
-    packages=['gwopensci'],
+    packages=['gwosc'],
     description="A python interface to the GW Open Science data archive",
     long_description=longdesc,
     author='Duncan Macleod',
     author_email='duncan.macleod@ligo.org',
-    url='https://github.com/duncanmmacleod/gwopensci',
+    url='https://github.com/gwpy/gwosc',
     license='MIT',
     setup_requires=setup_requires,
     install_requires=['six>=1.9.0'],
