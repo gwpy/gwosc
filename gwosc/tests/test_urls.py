@@ -56,4 +56,6 @@ def test_match(gw150914_urls, gw170817_urls):
     for url in matched:
         assert '_CLN_' in url
 
-    assert gwosc_urls.match(urls, tag='BLAH') == []
+    assert not gwosc_urls.match(urls, tag='BLAH')
+    assert not gwosc_urls.match(urls, start=1e12)
+    assert not gwosc_urls.match(urls, end=0)

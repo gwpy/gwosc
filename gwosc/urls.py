@@ -78,6 +78,7 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
             raise StopIteration
 
     if start is not None:
+        gps = int(reg['strt'])
         dur = int(reg['dur'])
         if gps + dur <= start:  # too early
             return
