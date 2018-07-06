@@ -19,13 +19,13 @@
 """Tests for :mod:`gwosc.datasets`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import re
 
 import pytest
 
 from .. import datasets
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def test_find_datasets():

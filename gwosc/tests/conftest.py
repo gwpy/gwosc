@@ -19,11 +19,11 @@
 """Helpers for tests
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import pytest
 
 from ..api import fetch_event_json
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def _event_urls(name):

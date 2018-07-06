@@ -19,11 +19,11 @@
 """Tests for :mod:`gwosc.utils`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import pytest
 
 from .. import utils
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def test_url_segment():

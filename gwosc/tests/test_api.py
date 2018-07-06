@@ -19,13 +19,13 @@
 """Tests for :mod:`gwosc.api`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import os.path
 
 import pytest
 
 from .. import api
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def check_json_url_list(urllist, keys={'detector', 'format', 'url'}):

@@ -19,11 +19,11 @@
 """Tests for :mod:`gwosc.timeline`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import pytest
 
 from .. import timeline
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 @pytest.mark.parametrize('flag, start, end, result', [

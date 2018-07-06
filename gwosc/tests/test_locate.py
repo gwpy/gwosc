@@ -19,8 +19,6 @@
 """Tests for :mod:`gwosc.locate`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import os.path
 
 import pytest
@@ -30,6 +28,8 @@ from .. import (
     urls as gwosc_urls,
     utils,
 )
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def test_get_urls():

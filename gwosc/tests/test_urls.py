@@ -19,11 +19,11 @@
 """Tests for :mod:`gwosc.urls`
 """
 
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
-
 import pytest
 
 from .. import urls as gwosc_urls
+
+__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def test_sieve(gw150914_urls):
