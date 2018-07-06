@@ -6,6 +6,7 @@
 [![Linux Build](https://travis-ci.com/gwpy/gwosc.svg?branch=develop)](https://travis-ci.com/gwpy/gwosc)
 [![Windows Build](https://ci.appveyor.com/api/projects/status/t1xsjb4kieunjp66?svg=true)](https://ci.appveyor.com/project/gwpy/gwosc)
 [![Coverage Status](https://coveralls.io/repos/github/gwpy/gwosc/badge.svg?branch=develop)](https://coveralls.io/github/gwpy/gwosc?branch=develop)
+[![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
 
 The `gwosc` package provides an interface to querying the open data
 releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
