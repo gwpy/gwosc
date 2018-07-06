@@ -35,7 +35,7 @@ else:
     setup_requires = []
 
 # get long description from README
-with open('README.rst', 'rb') as f:
+with open('README.md', 'rb') as f:
     longdesc = f.read().decode().strip()
 
 # run setup
@@ -45,6 +45,7 @@ setup(
     packages=['gwosc'],
     description="A python interface to the GW Open Science data archive",
     long_description=longdesc,
+    long_description_content_type='text/markdown',
     author='Duncan Macleod',
     author_email='duncan.macleod@ligo.org',
     url='https://github.com/gwpy/gwosc',
