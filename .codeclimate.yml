@@ -3,7 +3,7 @@ version: "2"
 checks:
   argument-count:
     config:
-      threshold: 5
+      threshold: 8
   file-lines:
     config:
       threshold: 500
@@ -26,13 +26,11 @@ plugins:
     enabled: true
     config:
       threshold: "C"
-    exclude_paths:
-      - gwopensci/test_gwopensci.py
 
 ratings:
   paths:
-    - "**.py"
+  - "**.py"
 
 exclude_paths:
-- versioneer.py
-- gwopensci/_version.py
+- "versioneer.py"
+- "gwosc/_version.py"
