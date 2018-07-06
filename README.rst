@@ -2,7 +2,7 @@
 
 |Build Status| |Coverage Status|
 
-The ``gwopensci`` package provides an interface to querying the
+The ``gwosc`` package provides an interface to querying the
 open data releases hosted on https://losc.ligo.org from the LIGO and
 Virgo gravitational-wave observatories.
 
@@ -10,7 +10,7 @@ To install:
 
 ::
 
-    pip install gwopensci
+    pip install gwosc
 
 
 Searching for datasets
@@ -20,7 +20,7 @@ To search for available datasets (correct as of March 14 2018):
 
 .. code:: python
 
-    >>> from gwopensci import datasets
+    >>> from gwosc import datasets
     >>> datasets.find_datasets()
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817', 'LVT151012', 'O1', 'S5', 'S6']
     >>> datasets.find_datasets(detector='V1')
@@ -54,7 +54,7 @@ You can search for remote data URLS based on the event name:
 
 .. code:: python
 
-    >>> from gwopensci.locate import get_event_urls
+    >>> from gwosc.locate import get_event_urls
     >>> get_event_urls('GW150914')
     ['https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126257414-4096.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126257414-4096.hdf5']
 
@@ -74,7 +74,7 @@ follows:
 
 .. code:: python
 
-    >>> from gwopensci.locate import get_urls
+    >>> from gwosc.locate import get_urls
     >>> get_urls('L1', 968650000, 968660000)
     ['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
 
@@ -103,7 +103,7 @@ GPS time interval as follows:
 
 .. code:: python
 
-    >>> from gwopensci.timeline import get_segments
+    >>> from gwosc.timeline import get_segments
     >>> get_segments('H1_DATA', 1126051217, 1126151217)
     [(1126073529, 1126114861), (1126121462, 1126123267), (1126123553, 1126126832), (1126139205, 1126139266), (1126149058, 1126151217)]
 
@@ -114,14 +114,14 @@ For documentation on what flags are available, for example for the O1
 science run, see `the O1 data release
 page <https://losc.ligo.org/O1/>`__ (*Data Quality*).
 
-.. |PyPI Release| image:: https://badge.fury.io/py/gwopensci.svg
-   :target: http://badge.fury.io/py/gwopensci
+.. |PyPI Release| image:: https://badge.fury.io/py/gwosc.svg
+   :target: http://badge.fury.io/py/gwosc
 .. |Zenodo DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1196306.svg
    :target: https://doi.org/10.5281/zenodo.1196306
-.. |License| image:: https://img.shields.io/pypi/l/gwopensci.svg
+.. |License| image:: https://img.shields.io/pypi/l/gwosc.svg
    :target: https://choosealicense.com/licenses/mit/
-.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/gwopensci.svg
-.. |Build Status| image:: https://travis-ci.org/duncanmmacleod/gwopensci.svg?branch=develop
-   :target: https://travis-ci.org/duncanmmacleod/gwopensci
-.. |Coverage Status| image:: https://coveralls.io/repos/github/duncanmmacleod/gwopensci/badge.svg?branch=develop
-   :target: https://coveralls.io/github/duncanmmacleod/gwopensci?branch=develop
+.. |Python Versions| image:: https://img.shields.io/pypi/pyversions/gwosc.svg
+.. |Build Status| image:: https://travis-ci.org/gwpy/gwosc.svg?branch=develop
+   :target: https://travis-ci.org/gwpy/gwosc
+.. |Coverage Status| image:: https://coveralls.io/repos/github/gwpy/gwosc/badge.svg?branch=develop
+   :target: https://coveralls.io/github/gwpy/gwosc?branch=develop
