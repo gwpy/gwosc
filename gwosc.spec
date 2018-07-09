@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.3.1
+%define version 0.3.3
 %define release 1
 
 Name:      %{name}
@@ -80,3 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/*
+
+# -- changelog
+
+%changelog
+* Mon Jul 9 2018 Duncan Macleod <duncan.macleod@ligo.org>
+- 0.3.3 packaging bug-fix release
