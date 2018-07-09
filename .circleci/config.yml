@@ -1,12 +1,14 @@
 test: &test
   name: Test
   command: |
+    set -x;
     python${PYTHON_VERSION} -m pip install pytest pytest-cov;
     python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc;
 
 build:debian: &build-debian
   name: Build
   command: |
+    set -x;
     apt-get -yqq update;
     apt-get -yqq install \
         dpkg-dev \
@@ -21,7 +23,9 @@ build:debian: &build-debian
         python-pytest \
         python3-pytest \
         python-pip \
-        python3-pip;
+        python3-pip \
+        python-pytest-cov \
+        python3-pytest-cov;
     pushd $(mktemp -d -p .)
     tar -xf ../gwosc-*.tar.gz --strip-components=1;
     dpkg-buildpackage -us -uc -b;
@@ -32,6 +36,7 @@ build:debian: &build-debian
 build:centos: &build-centos
   name: Build
   command: |
+    set -x;
     yum -y -q update;
     yum -y -q install \
         rpm-build \
@@ -45,7 +50,9 @@ build:centos: &build-centos
         python2-pytest \
         python34-pytest \
         python2-pip \
-        python34-pip;
+        python34-pip \
+        python2-pytest-cov \
+        python34-pytest-cov;
     tar -xf gwosc-*.tar.gz
     rm -rf gwosc-*.tar.gz
     _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}')
