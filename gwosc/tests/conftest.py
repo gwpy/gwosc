@@ -19,11 +19,17 @@
 """Helpers for tests
 """
 
+import os
+
 import pytest
 
 from ..api import fetch_event_json
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
+
+# unset these variables to allow the tests to run with pybuild
+os.environ.pop('http_proxy', None)
+os.environ.pop('https_proxy', None)
 
 
 def _event_urls(name):

@@ -3,8 +3,9 @@
 [![License](https://img.shields.io/pypi/l/gwosc.svg)](https://choosealicense.com/licenses/mit/)
 ![Python Versions](https://img.shields.io/pypi/pyversions/gwosc.svg)
 
-[![Linux Build](https://travis-ci.com/gwpy/gwosc.svg?branch=develop)](https://travis-ci.com/gwpy/gwosc)
-[![Windows Build](https://ci.appveyor.com/api/projects/status/t1xsjb4kieunjp66?svg=true)](https://ci.appveyor.com/project/gwpy/gwosc)
+[![TravisCI Build](https://travis-ci.com/gwpy/gwosc.svg?branch=develop)](https://travis-ci.com/gwpy/gwosc)
+[![Appveyor Build](https://ci.appveyor.com/api/projects/status/t1xsjb4kieunjp66?svg=true)](https://ci.appveyor.com/project/gwpy/gwosc)
+[![CircleCI Build](https://circleci.com/gh/gwpy/gwosc/tree/develop.svg?style=svg)](https://circleci.com/gh/gwpy/gwosc/tree/develop)
 [![Coverage Status](https://coveralls.io/repos/github/gwpy/gwosc/badge.svg?branch=develop)](https://coveralls.io/github/gwpy/gwosc?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
 
