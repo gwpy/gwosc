@@ -22,7 +22,7 @@
 
 import sys
 
-from setuptools import setup
+from setuptools import (setup, find_packages)
 
 import versioneer
 
@@ -42,7 +42,7 @@ with open('README.md', 'rb') as f:
 setup(
     name='gwosc',
     version=__version__,
-    packages=['gwosc'],
+    packages=find_packages(),
     description="A python interface to the GW Open Science data archive",
     long_description=longdesc,
     long_description_content_type='text/markdown',
