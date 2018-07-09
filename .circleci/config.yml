@@ -1,0 +1,142 @@
+test: &test
+  name: Test
+  command: |
+    set -x;
+    python${PYTHON_VERSION} -m pip install pytest pytest-cov;
+    python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc;
+
+build:debian: &build-debian
+  name: Build
+  command: |
+    set -x;
+    apt-get -yqq update;
+    apt-get -yqq install \
+        dpkg-dev \
+        debhelper \
+        dh-python \
+        python-all \
+        python3-all \
+        python-setuptools \
+        python3-setuptools \
+        python-six \
+        python3-six \
+        python-pytest \
+        python3-pytest \
+        python-pip \
+        python3-pip \
+        python-pytest-cov \
+        python3-pytest-cov;
+    pushd $(mktemp -d -p .)
+    tar -xf ../gwosc-*.tar.gz --strip-components=1;
+    dpkg-buildpackage -us -uc -b;
+    popd;
+    rm -rf tmp*;
+    dpkg --install python*-gwosc*.deb;
+
+build:centos: &build-centos
+  name: Build
+  command: |
+    set -x;
+    yum -y -q update;
+    yum -y -q install \
+        rpm-build \
+        python-rpm-macros \
+        python2-rpm-macros \
+        python3-rpm-macros \
+        python2-setuptools \
+        python34-setuptools \
+        python2-six \
+        python34-six \
+        python2-pytest \
+        python34-pytest \
+        python2-pip \
+        python34-pip \
+        python2-pytest-cov \
+        python34-pytest-cov;
+    tar -xf gwosc-*.tar.gz
+    rm -rf gwosc-*.tar.gz
+    _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}')
+    mv gwosc-* gwosc-${_version}
+    tar -zcf gwosc-${_version}.tar.gz gwosc-${_version}
+    rm -rf gwosc-${_version}/
+    rpmbuild --quiet --define "_rpmdir $(pwd)" -tb gwosc-*.tar.gz;
+    mv noarch/*.rpm .;
+    rm -rf noarch;
+    yum -y -q --nogpgcheck localinstall *.rpm;
+
+debian: &debian
+  steps:
+    - attach_workspace:
+        at: .
+    - run: *build-debian
+    - run: *test
+    - store_artifacts:
+        path: "*.deb"
+
+centos: &centos
+  steps:
+    - attach_workspace:
+        at: .
+    - run: *build-centos
+    - run: *test
+    - store_artifacts:
+        path: "*.rpm"
+
+version: 2
+jobs:
+  sdist:
+    docker:
+      - image: python
+    steps:
+      - checkout
+      - run: python setup.py --quiet sdist --dist-dir .
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "gwosc-*.tar.gz"
+
+  debian:stretch:2.7:
+    <<: *debian
+    docker:
+      - image: ligo/base:stretch
+    environment:
+      PYTHON_VERSION: "2.7"
+
+  debian:stretch:3.5:
+    <<: *debian
+    docker:
+      - image: ligo/base:stretch
+    environment:
+      PYTHON_VERSION: "3.5"
+
+  el7:2.7:
+    <<: *centos
+    docker:
+      - image: ligo/base:el7
+    environment:
+      PYTHON_VERSION: "2.7"
+
+  el7:3.4:
+    <<: *centos
+    docker:
+      - image: ligo/base:el7
+    environment:
+      PYTHON_VERSION: "3.4"
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - sdist
+      - debian:stretch:2.7:
+          requires:
+            - sdist
+      - debian:stretch:3.5:
+          requires:
+            - sdist
+      - el7:2.7:
+          requires:
+            - sdist
+      - el7:3.4:
+          requires:
+            - sdist
