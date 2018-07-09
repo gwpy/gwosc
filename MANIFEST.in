@@ -1,2 +1,3 @@
+include LICENSE README.md
 include versioneer.py
 include gwosc/_version.py
