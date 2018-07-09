@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.3.1
+%define version 0.3.3
 %define release 1
 
 Name:      %{name}
@@ -19,6 +19,10 @@ BuildRequires: python-rpm-macros
 BuildRequires: python3-rpm-macros
 BuildRequires: python-setuptools
 BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python2-six
+BuildRequires: python%{python3_pkgversion}-six
+BuildRequires: python2-pytest
+BuildRequires: python%{python3_pkgversion}-pytest
 
 %description
 The `gwosc` package provides an interface to querying the open data
@@ -76,3 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/*
+
+# -- changelog
+
+%changelog
+* Mon Jul 9 2018 Duncan Macleod <duncan.macleod@ligo.org>
+- 0.3.3 packaging bug-fix release
