@@ -1,0 +1,47 @@
+# -- gwosc source package ------------------------------------------------------
+
+Source: gwosc
+Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
+Section: python
+Priority: optional
+Standards-Version: 3.9.1
+X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.4
+Build-Depends: debhelper (>= 9),
+               dh-python,
+               python-all,
+               python3-all,
+               python-setuptools,
+               python3-setuptools,
+               python-six,
+               python3-six,
+               python-pytest,
+               python3-pytest
+
+# -- python-gwosc --------------------------------------------------------------
+
+Package: python-gwosc
+Architecture: all
+Depends: ${misc:Depends},
+         ${python:Depends},
+         python-six (>= 1.9.0)
+Description: A python2 interface to the Gravitational-Wave Open Science Center data archive
+ .
+           The `gwosc` package provides an interface to querying the open data
+           releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
+           gravitational-wave observatories.
+ .
+
+# -- python3-gwosc -------------------------------------------------------------
+
+Package: python3-gwosc
+Architecture: all
+Depends: ${misc:Depends},
+         ${python3:Depends},
+         python3-six (>= 1.9.0)
+Description: A python3 interface to the Gravitational-Wave Open Science Center data archive
+ .
+           The `gwosc` package provides an interface to querying the open data
+           releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
+           gravitational-wave observatories.
+ .

@@ -1,3 +1,6 @@
 include LICENSE README.md
 include versioneer.py
 include gwosc/_version.py
+include gwosc.spec
+include debian/*
+include debian/source/*
