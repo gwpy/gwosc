@@ -19,6 +19,10 @@ BuildRequires: python-rpm-macros
 BuildRequires: python3-rpm-macros
 BuildRequires: python-setuptools
 BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python2-six
+BuildRequires: python%{python3_pkgversion}-six
+BuildRequires: python2-pytest
+BuildRequires: python%{python3_pkgversion}-pytest
 
 %description
 The `gwosc` package provides an interface to querying the open data
