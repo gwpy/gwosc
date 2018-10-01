@@ -26,6 +26,7 @@ from .. import urls as gwosc_urls
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+@pytest.mark.remote
 def test_sieve(gw150914_urls):
     nfiles = len(gw150914_urls)
     sieved = list(gwosc_urls.sieve(gw150914_urls, detector='L1'))
@@ -38,6 +39,7 @@ def test_sieve(gw150914_urls):
         list(gwosc_urls.sieve(gw150914_urls, blah=None))
 
 
+@pytest.mark.remote
 def test_match(gw150914_urls, gw170817_urls):
     urls = [u['url'] for u in gw150914_urls]
     nfiles = len(urls)
@@ -59,3 +61,29 @@ def test_match(gw150914_urls, gw170817_urls):
     assert not gwosc_urls.match(urls, tag='BLAH')
     assert not gwosc_urls.match(urls, start=1e12)
     assert not gwosc_urls.match(urls, end=0)
+
+
+# -- local tests
+
+
+URLS = [
+    {'url': 'X-X1_LOSC_TEST_4_V1-0-1.ext',
+     'detector': 'X1',
+     'sampling_rate': 100,},
+    {'url': 'Y-Y1_LOSC_TEST_16_V2-1-1.ext',
+     'detector': 'Y1',
+     'sampling_rate': 200,},
+]
+
+
+@pytest.mark.local
+def test_sieve_local():
+    assert list(gwosc_urls.sieve(URLS, detector='X1')) == URLS[:1]
+    assert list(gwosc_urls.sieve(URLS, sample_rate=200)) == URLS[1:]
+
+
+@pytest.mark.local
+def test_match_local():
+    urls = [u['url'] for u in URLS]
+    assert gwosc_urls.match(urls, start=0, end=1) == urls[:1]
+    assert gwosc_urls.match(urls, version=2) == urls[1:]
