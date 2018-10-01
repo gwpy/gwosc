@@ -33,6 +33,7 @@ from .. import api
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
+
 def losc_url(path):
     return '{0}/{1}'.format(api.DEFAULT_URL, path)
 
