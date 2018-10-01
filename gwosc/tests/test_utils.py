@@ -41,6 +41,7 @@ def test_url_overlaps_segment(url, segment, result):
     assert utils.url_overlaps_segment(url, segment) is result
 
 
+@pytest.mark.remote
 @pytest.mark.parametrize('segment, result', [
     ((1126257414, 1126257414+4096), True),
     ((1126257413, 1126257414+4096), False),
