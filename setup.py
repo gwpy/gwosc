@@ -28,11 +28,25 @@ import versioneer
 
 __version__ = versioneer.get_version()
 
-# setup dependencies for testing (only if we are actually testing)
-if set(('test',)).intersection(sys.argv):
-    setup_requires = ['pytest_runner']
-else:
-    setup_requires = []
+# dependencies
+setup_requires = []
+if {'test'}.intersection(sys.argv):
+    setup_requires.append('pytest_runner')
+install_requires = [
+    'six>=1.9.0',
+]
+tests_require = [
+    'pytest>=2.8',
+]
+if sys.version_info.major < 3:
+    tests_require.append('mock')
+extras_require = {
+    'docs': [
+        'sphinx',
+        'sphinx_rtd_theme',
+        'numpydoc',
+    ],
+}
 
 # get long description from README
 with open('README.md', 'rb') as f:
@@ -40,9 +54,9 @@ with open('README.md', 'rb') as f:
 
 # run setup
 setup(
+    # metadata
     name='gwosc',
     version=__version__,
-    packages=find_packages(),
     description="A python interface to the GW Open Science data archive",
     long_description=longdesc,
     long_description_content_type='text/markdown',
@@ -50,13 +64,6 @@ setup(
     author_email='duncan.macleod@ligo.org',
     url='https://github.com/gwpy/gwosc',
     license='MIT',
-    setup_requires=setup_requires,
-    install_requires=['six>=1.9.0'],
-    tests_require=['pytest>=2.8', 'mock ; python_version < '3';'],
-    extras_require={
-        'docs': ['sphinx', 'sphinx_rtd_theme', 'numpydoc'],
-    },
-    cmdclass=versioneer.get_cmdclass(),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
@@ -73,4 +80,13 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'License :: OSI Approved :: MIT License',
     ],
+    # build
+    cmdclass=versioneer.get_cmdclass(),
+    # content
+    packages=find_packages(),
+    # dependencies
+    setup_requires=setup_requires,
+    install_requires=install_requires,
+    tests_require=tests_require,
+    extras_require=extras_require,
 )
