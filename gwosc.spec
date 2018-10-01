@@ -23,6 +23,7 @@ BuildRequires: python2-six
 BuildRequires: python%{python3_pkgversion}-six
 BuildRequires: python2-pytest
 BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python2-mock
 
 %description
 The `gwosc` package provides an interface to querying the open data
