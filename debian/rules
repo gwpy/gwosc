@@ -2,5 +2,10 @@
 
 export PYBUILD_NAME = gwosc
 
+# use pytest for tests
+export PYBUILD_TEST_PYTEST = 1
+# but don't run tests requiring network
+export PYBUILD_TEST_ARGS = -m 'not remote'
+
 %:
 	dh $@ --with python2,python3 --buildsystem=pybuild

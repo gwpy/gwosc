@@ -61,8 +61,8 @@ gravitational-wave observatories.
 %py3_build
 
 %check
-%{__python2} -m pytest --pyargs %{name}
-%{__python3} -m pytest --pyargs %{name}
+%{__python2} -m pytest --pyargs %{name} -m "not remote"
+%{__python3} -m pytest --pyargs %{name} -m "not remote"
 
 %install
 %py2_install
