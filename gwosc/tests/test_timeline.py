@@ -19,6 +19,11 @@
 """Tests for :mod:`gwosc.timeline`
 """
 
+try:
+    from unittest import mock
+except ImportError:  # python < 3
+    import mock
+
 import pytest
 
 from .. import timeline
@@ -48,3 +53,11 @@ def test_timeline_url():
     # check that unknown IFO results in no matches
     with pytest.raises(ValueError):
         timeline.timeline_url('X1', 1126259446, 1126259478)
+
+
+@pytest.mark.local
+@mock.patch('gwosc.timeline._find_dataset', return_value='S6')
+def test_timeline_url_local(find):
+    assert timeline.timeline_url('L1_DATA', 0, 1, host='test') == (
+        'test/timeline/segments/json/S6/L1_DATA/0/1/')
+    find.assert_called_with(0, 1, 'L1', host='test')
