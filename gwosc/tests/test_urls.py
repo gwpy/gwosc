@@ -69,10 +69,10 @@ def test_match(gw150914_urls, gw170817_urls):
 URLS = [
     {'url': 'X-X1_LOSC_TEST_4_V1-0-1.ext',
      'detector': 'X1',
-     'sampling_rate': 100,},
+     'sampling_rate': 100},
     {'url': 'Y-Y1_LOSC_TEST_16_V2-1-1.ext',
      'detector': 'Y1',
-     'sampling_rate': 200,},
+     'sampling_rate': 200},
 ]
 
 

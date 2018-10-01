@@ -88,6 +88,7 @@ def test_fetch_dataset_json_local(fetch):
     fetch.assert_called_with(
         losc_url('archive/{0}/{1}/json/'.format(start, end)))
 
+
 @pytest.mark.remote
 def test_fetch_event_json():
     event = 'GW150914'
@@ -95,6 +96,7 @@ def test_fetch_event_json():
     assert int(out['GPS']) == 1126259462
     assert out['dataset'] == event
     check_json_url_list(out['strain'])
+
 
 @pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
