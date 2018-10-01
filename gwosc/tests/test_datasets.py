@@ -32,6 +32,18 @@ from .. import datasets
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+DATASET_JSON = {
+    'events': {
+        'GW150914': {'GPStime': 12345, 'detectors': ['H1', 'L1']},
+        'GW151226': {'GPStime': 12347, 'detectors': ['H1', 'L1']},
+    },
+    'runs': {
+        'S1': {'GPSstart': 0, 'GPSend': 1, 'detectors': ['H1', 'L1', 'V1']},
+        'tenyear': None,
+    },
+}
+
+
 @pytest.mark.remote
 def test_find_datasets():
     sets = datasets.find_datasets()
@@ -56,20 +68,12 @@ def test_find_datasets():
 
 
 @pytest.mark.local
-@mock.patch('gwosc.api.fetch_dataset_json', return_value={
-    'runs': {
-        'S6': {'detectors': ['H1', 'L1', 'V1']},
-        'tenyear': None,
-    },
-    'events': {
-        'GW150914': {'detectors': ['H1', 'L1']},
-    }
-})
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_find_datasets_local(fetch):
     sets = datasets.find_datasets()
-    assert datasets.find_datasets() == ['GW150914', 'S6']
-    assert datasets.find_datasets(detector='V1') == ['S6']
-    assert datasets.find_datasets(type='event') == ['GW150914']
+    assert datasets.find_datasets() == ['GW150914', 'GW151226', 'S1']
+    assert datasets.find_datasets(detector='V1') == ['S1']
+    assert datasets.find_datasets(type='event') == ['GW150914', 'GW151226']
     assert datasets.find_datasets(type='event', detector='V1') == []
 
 
@@ -103,12 +107,7 @@ def test_event_at_gps():
 
 
 @pytest.mark.local
-@mock.patch('gwosc.api.fetch_dataset_json', return_value={
-    'events': {
-        'GW150914': {'GPStime': 12345},
-        'GW151226': {'GPStime': 12347},
-    },
-})
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_event_at_gps_local(fetch):
     assert datasets.event_at_gps(12345) == 'GW150914'
     with pytest.raises(ValueError):
@@ -124,11 +123,7 @@ def test_run_segment():
 
 
 @pytest.mark.local
-@mock.patch('gwosc.api.fetch_dataset_json', return_value={
-    'runs': {
-        'S1': {'GPSstart': 0, 'GPSend': 1},
-    },
-})
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_run_segment_local(fetch):
     assert datasets.run_segment('S1') == (0, 1)
     with pytest.raises(ValueError) as exc:
@@ -144,11 +139,7 @@ def test_run_at_gps():
 
 
 @pytest.mark.local
-@mock.patch('gwosc.api.fetch_dataset_json', return_value={
-    'runs': {
-        'S1': {'GPSstart': 0, 'GPSend': 1},
-    },
-})
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_run_at_gps_local(fetch):
     assert datasets.run_at_gps(0) == 'S1'
     with pytest.raises(ValueError):
