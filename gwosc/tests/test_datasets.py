@@ -28,6 +28,7 @@ from .. import datasets
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+@pytest.mark.remote
 def test_find_datasets():
     sets = datasets.find_datasets()
     for dset in ('S6', 'O1', 'GW150914', 'GW170817'):
@@ -50,6 +51,7 @@ def test_find_datasets():
         datasets.find_datasets(type='badtype')
 
 
+@pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.43
     with pytest.raises(ValueError) as exc:
@@ -57,6 +59,7 @@ def test_event_gps():
     assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
+@pytest.mark.remote
 def test_event_at_gps():
     assert datasets.event_at_gps(1187008882) == 'GW170817'
     with pytest.raises(ValueError) as exc:
@@ -64,6 +67,7 @@ def test_event_at_gps():
     assert str(exc.value) == 'no event found within 0.1 seconds of 1187008882'
 
 
+@pytest.mark.remote
 def test_run_segment():
     assert datasets.run_segment('O1') == (1126051217, 1137254417)
     with pytest.raises(ValueError) as exc:
@@ -71,6 +75,7 @@ def test_run_segment():
     assert str(exc.value) == 'no run dataset found for \'S7\''
 
 
+@pytest.mark.remote
 def test_run_at_gps():
     assert datasets.run_at_gps(1135136350) in {'O1', 'O1_16KHZ'}
     with pytest.raises(ValueError) as exc:

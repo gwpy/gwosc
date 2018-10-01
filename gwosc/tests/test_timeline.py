@@ -26,6 +26,7 @@ from .. import timeline
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+@pytest.mark.remote
 @pytest.mark.parametrize('flag, start, end, result', [
     ('H1_DATA', 1126051217, 1126151217, [
         (1126073529, 1126114861),
@@ -42,6 +43,7 @@ def test_get_segments(flag, start, end, result):
     assert timeline.get_segments(flag, start, end) == result
 
 
+@pytest.mark.remote
 def test_timeline_url():
     # check that unknown IFO results in no matches
     with pytest.raises(ValueError):

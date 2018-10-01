@@ -52,7 +52,7 @@ setup(
     license='MIT',
     setup_requires=setup_requires,
     install_requires=['six>=1.9.0'],
-    tests_require=['pytest>=2.8'],
+    tests_require=['pytest>=2.8', 'mock ; python_version < '3';'],
     extras_require={
         'docs': ['sphinx', 'sphinx_rtd_theme', 'numpydoc'],
     },

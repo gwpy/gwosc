@@ -26,6 +26,7 @@ from .. import urls as gwosc_urls
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+@pytest.mark.remote
 def test_sieve(gw150914_urls):
     nfiles = len(gw150914_urls)
     sieved = list(gwosc_urls.sieve(gw150914_urls, detector='L1'))
@@ -38,6 +39,7 @@ def test_sieve(gw150914_urls):
         list(gwosc_urls.sieve(gw150914_urls, blah=None))
 
 
+@pytest.mark.remote
 def test_match(gw150914_urls, gw170817_urls):
     urls = [u['url'] for u in gw150914_urls]
     nfiles = len(urls)

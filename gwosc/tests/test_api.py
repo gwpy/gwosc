@@ -35,6 +35,7 @@ def check_json_url_list(urllist, keys={'detector', 'format', 'url'}):
             assert key in urld
 
 
+@pytest.mark.remote
 def test_fetch_json():
     url = 'https://losc.ligo.org/archive/1126257414/1126261510/json/'
     out = api.fetch_json(url)
@@ -51,6 +52,7 @@ def test_fetch_json():
         "Failed to parse LOSC JSON from {!r}: ".format(url2))
 
 
+@pytest.mark.remote
 def test_fetch_dataset_json():
     start = 934000000
     end = 934100000
@@ -59,6 +61,7 @@ def test_fetch_dataset_json():
     assert set(out['runs'].keys()) == {'tenyear', 'S6'}
 
 
+@pytest.mark.remote
 def test_fetch_event_json():
     event = 'GW150914'
     out = api.fetch_event_json(event)
@@ -67,6 +70,7 @@ def test_fetch_event_json():
     check_json_url_list(out['strain'])
 
 
+@pytest.mark.remote
 def test_fetch_run_json():
     run = 'S6'
     detector = 'L1'
