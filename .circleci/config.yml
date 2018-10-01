@@ -22,6 +22,7 @@ build:debian: &build-debian
         python3-six \
         python-pytest \
         python3-pytest \
+        python-mock \
         python-pip \
         python3-pip \
         python-pytest-cov \
@@ -49,6 +50,7 @@ build:centos: &build-centos
         python34-six \
         python2-pytest \
         python34-pytest \
+        python2-mock \
         python2-pip \
         python34-pip \
         python2-pytest-cov \
