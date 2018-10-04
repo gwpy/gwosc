@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.3.3
+%define version 0.3.4
 %define release 1
 
 Name:      %{name}
@@ -85,5 +85,8 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Mon Oct 1 2018 Duncan Macleod <duncan.macleod@ligo.org>
+- 0.3.4 testing bug-fix release
+
 * Mon Jul 9 2018 Duncan Macleod <duncan.macleod@ligo.org>
 - 0.3.3 packaging bug-fix release

@@ -1,3 +1,9 @@
+gwosc (0.3.4-1) unstable; urgency=low
+
+  * testing bug-fix release
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Mon, 01 Oct 2018 20:16:00 +0100
+
 gwosc (0.3.3-1) unstable; urgency=low
 
   * packaging bug-fix release
