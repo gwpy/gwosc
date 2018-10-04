@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.3.3
+%define version 0.3.4
 %define release 1
 
 Name:      %{name}
@@ -23,6 +23,7 @@ BuildRequires: python2-six
 BuildRequires: python%{python3_pkgversion}-six
 BuildRequires: python2-pytest
 BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python2-mock
 
 %description
 The `gwosc` package provides an interface to querying the open data
@@ -61,8 +62,8 @@ gravitational-wave observatories.
 %py3_build
 
 %check
-%{__python2} -m pytest --pyargs %{name}
-%{__python3} -m pytest --pyargs %{name}
+%{__python2} -m pytest --pyargs %{name} -m "not remote"
+%{__python3} -m pytest --pyargs %{name} -m "not remote"
 
 %install
 %py2_install
@@ -84,5 +85,8 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Mon Oct 1 2018 Duncan Macleod <duncan.macleod@ligo.org>
+- 0.3.4 testing bug-fix release
+
 * Mon Jul 9 2018 Duncan Macleod <duncan.macleod@ligo.org>
 - 0.3.3 packaging bug-fix release

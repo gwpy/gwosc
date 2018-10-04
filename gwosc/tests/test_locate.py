@@ -32,6 +32,7 @@ from .. import (
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+@pytest.mark.remote
 def test_get_urls():
     # test simple fetch for S6 data returns only files within segment
     detector = 'L1'
@@ -55,6 +56,7 @@ def test_get_urls():
         locate.get_urls('V1', start, end)
 
 
+@pytest.mark.remote
 def test_get_event_urls(gw150914_urls):
     # find latest version by brute force
     latestv = sorted(

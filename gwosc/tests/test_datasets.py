@@ -20,6 +20,10 @@
 """
 
 import re
+try:
+    from unittest import mock
+except ImportError:  # python < 3
+    import mock
 
 import pytest
 
@@ -28,6 +32,19 @@ from .. import datasets
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+DATASET_JSON = {
+    'events': {
+        'GW150914': {'GPStime': 12345, 'detectors': ['H1', 'L1']},
+        'GW151226': {'GPStime': 12347, 'detectors': ['H1', 'L1']},
+    },
+    'runs': {
+        'S1': {'GPSstart': 0, 'GPSend': 1, 'detectors': ['H1', 'L1', 'V1']},
+        'tenyear': None,
+    },
+}
+
+
+@pytest.mark.remote
 def test_find_datasets():
     sets = datasets.find_datasets()
     for dset in ('S6', 'O1', 'GW150914', 'GW170817'):
@@ -50,6 +67,17 @@ def test_find_datasets():
         datasets.find_datasets(type='badtype')
 
 
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
+def test_find_datasets_local(fetch):
+    sets = datasets.find_datasets()
+    assert datasets.find_datasets() == ['GW150914', 'GW151226', 'S1']
+    assert datasets.find_datasets(detector='V1') == ['S1']
+    assert datasets.find_datasets(type='event') == ['GW150914', 'GW151226']
+    assert datasets.find_datasets(type='event', detector='V1') == []
+
+
+@pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.43
     with pytest.raises(ValueError) as exc:
@@ -57,6 +85,20 @@ def test_event_gps():
     assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_event_json', return_value={
+    'GPS': 12345,
+    'something else': None,
+})
+def test_event_gps_local(fetch):
+    assert datasets.event_gps('GW150914') == 12345
+    fetch.side_effect = ValueError('test')
+    with pytest.raises(ValueError) as exc:
+        datasets.event_gps('something')
+    assert str(exc.value) == 'no event dataset found for \'something\''
+
+
+@pytest.mark.remote
 def test_event_at_gps():
     assert datasets.event_at_gps(1187008882) == 'GW170817'
     with pytest.raises(ValueError) as exc:
@@ -64,6 +106,15 @@ def test_event_at_gps():
     assert str(exc.value) == 'no event found within 0.1 seconds of 1187008882'
 
 
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
+def test_event_at_gps_local(fetch):
+    assert datasets.event_at_gps(12345) == 'GW150914'
+    with pytest.raises(ValueError):
+        datasets.event_at_gps(12349)
+
+
+@pytest.mark.remote
 def test_run_segment():
     assert datasets.run_segment('O1') == (1126051217, 1137254417)
     with pytest.raises(ValueError) as exc:
@@ -71,8 +122,25 @@ def test_run_segment():
     assert str(exc.value) == 'no run dataset found for \'S7\''
 
 
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
+def test_run_segment_local(fetch):
+    assert datasets.run_segment('S1') == (0, 1)
+    with pytest.raises(ValueError) as exc:
+        datasets.run_segment('S2')
+
+
+@pytest.mark.remote
 def test_run_at_gps():
     assert datasets.run_at_gps(1135136350) in {'O1', 'O1_16KHZ'}
     with pytest.raises(ValueError) as exc:
         datasets.run_at_gps(0)
     assert str(exc.value) == 'no run dataset found containing GPS 0'
+
+
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
+def test_run_at_gps_local(fetch):
+    assert datasets.run_at_gps(0) == 'S1'
+    with pytest.raises(ValueError):
+        datasets.run_at_gps(10)
