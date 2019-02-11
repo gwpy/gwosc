@@ -61,6 +61,8 @@ def test_find_datasets():
     assert 'O1' in runsets
     run_regex = re.compile('\A[OS]\d+(_16KHZ)?\Z')
     for dset in runsets:
+        if dset == 'history':
+            continue
         assert run_regex.match(dset)
 
     with pytest.raises(ValueError):
