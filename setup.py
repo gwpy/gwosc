@@ -36,6 +36,7 @@ install_requires = [
     'six>=1.9.0',
 ]
 tests_require = [
+    'more-itertools < 6.0a0 ; python_version < \'3\'',
     'pytest>=2.8',
 ]
 if sys.version_info.major < 3:
