@@ -61,7 +61,7 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
     start = int(start)
     end = int(end)
 
-    metadata = api.fetch_dataset_json(start, end, host=host)
+    metadata = api.fetch_dataset_json(start-4000, end+4000, host=host)
 
     # find dataset that provides required data
     for dstype in sorted(metadata, key=lambda x: 0 if x == 'events' else 1):
