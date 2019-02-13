@@ -19,6 +19,7 @@
 from operator import itemgetter
 
 from . import api
+from .datasets import IGNORE as IGNORED_DATASETS
 from .urls import sieve
 
 
@@ -65,7 +66,7 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
 
     for type_ in meta:
         for epoch, metadata in meta[type_].items():
-            if epoch == 'tenyear':  # tenyear doesn't work with json API
+            if epoch in IGNORED_DATASETS:  # tenyear doesn't work with json API
                 continue
 
             # filter on detector

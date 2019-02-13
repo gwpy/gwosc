@@ -400,7 +400,7 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
     """
     for run, meta in api.fetch_dataset_json(
             0, api.MAX_GPS, host=host)['runs'].items():
-        if run == 'tenyear':
+        if run in IGNORE:
             continue
         start, end = meta['GPSstart'], meta['GPSend']
         if start <= gps < end:
