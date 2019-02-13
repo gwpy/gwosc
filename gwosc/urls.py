@@ -78,8 +78,8 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
     # match times
     if end is not None:
         gps = int(reg['strt'])
-        if gps >= end:  # too late, stop
-            raise StopIteration
+        if gps >= end:  # too late
+            return
 
     if start is not None:
         gps = int(reg['strt'])
@@ -133,10 +133,7 @@ def match(urls, start=None, end=None, tag=None, version=None):
 
     # loop URLS
     for url in urls:
-        try:
-            m = _match_url(url, start, end, tag=tag, version=version)
-        except StopIteration:
-            break
+        m = _match_url(url, start, end, tag=tag, version=version)
         if m is None:
             continue
 
