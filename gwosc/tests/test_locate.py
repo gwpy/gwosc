@@ -20,6 +20,7 @@
 """
 
 import os.path
+import re
 
 import pytest
 
@@ -47,7 +48,10 @@ def test_get_urls():
             utils.url_segment(url), span)
 
     # test fetch for GW170817 data
-    assert len(locate.get_urls('L1', 1187007040, 1187009088, tag='CLN')) == 1
+    assert len(locate.get_urls(
+        'L1', 1187007040, 1187009088,
+        dataset="GW170817",
+    )) == 2
 
     # assert no hits raises exception
     with pytest.raises(ValueError):  # no data in 1980
@@ -66,11 +70,13 @@ def test_get_event_urls(gw150914_urls):
 
     event = 'GW150914'
     urls = locate.get_event_urls(event)
+    v_regex = re.compile("_[RV]{}-".format(latestv))
     for url in urls:
         assert url.endswith('.hdf5')  # default format
-        assert '_4_' in url  # default sample rate
-        assert '_{}-'.format(latestv) in url  # highest matched version
+        assert '_4KHZ_' in url  # default sample rate
+        assert v_regex.search(url)  # highest matched version
 
     urls = locate.get_event_urls(event, version=1)
+    v1_regex = re.compile("_[RV]1-")
     for url in urls:
-        assert '_V1-' in url
+        assert v1_regex.search(url)

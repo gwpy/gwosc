@@ -42,6 +42,11 @@ DATASET_JSON = {
         'tenyear': None,
     },
 }
+CATALOG_JSON = {
+    'data': {
+        'GW150914': {},
+    }
+}
 
 
 @pytest.mark.remote
@@ -50,16 +55,17 @@ def test_find_datasets():
     for dset in ('S6', 'O1', 'GW150914', 'GW170817'):
         assert dset in sets
     assert 'tenyear' not in sets
+    assert 'history' not in sets
 
     v1sets = datasets.find_datasets('V1')
     assert 'GW170817' in v1sets
     assert 'GW150914' not in v1sets
 
-    assert datasets.find_datasets('X1') == []
+    assert datasets.find_datasets('X1', type="run") == []
 
     runsets = datasets.find_datasets(type='run')
     assert 'O1' in runsets
-    run_regex = re.compile('\A[OS]\d+(_16KHZ)?\Z')
+    run_regex = re.compile(r'\A[OS]\d+(_16KHZ)?\Z')
     for dset in runsets:
         assert run_regex.match(dset)
 
@@ -67,26 +73,54 @@ def test_find_datasets():
         datasets.find_datasets(type='badtype')
 
 
+@pytest.mark.remote
+def test_find_datasets_segment():
+    sets = datasets.find_datasets(segment=(1126051217, 1137254417))
+    assert "GW150914" in sets
+    assert "GW170817" not in sets
+
+
 @pytest.mark.local
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
-def test_find_datasets_local(fetch):
-    sets = datasets.find_datasets()
-    assert datasets.find_datasets() == ['GW150914', 'GW151226', 'S1']
-    assert datasets.find_datasets(detector='V1') == ['S1']
-    assert datasets.find_datasets(type='event') == ['GW150914', 'GW151226']
+@mock.patch('gwosc.api.fetch_catalog_json', return_value=CATALOG_JSON)
+@mock.patch(
+    'gwosc.api.fetch_catalog_event_json',
+    side_effect=[
+        {"strain": [
+            {"url": "https://test.com/X-X1-123-456.gwf",
+             "detector": "L1",
+             },
+            {"url": "https://test.com/X-X1-234-567.gwf",
+             "detector": "L1",
+            },
+        ]},
+    ],
+)
+@mock.patch("gwosc.datasets.CATALOGS", ["GWTC-1-confident"])
+def test_find_datasets_local(fcej, fcj, fdj):
+    assert datasets.find_datasets() == [
+        "GW150914",
+        "GWTC-1-confident",
+        'S1',
+    ]
+    assert datasets.find_datasets(detector='V1') == [
+        "GWTC-1-confident",
+        "S1",
+    ]
+    assert datasets.find_datasets(type='event') == ['GW150914']
     assert datasets.find_datasets(type='event', detector='V1') == []
 
 
 @pytest.mark.remote
 def test_event_gps():
-    assert datasets.event_gps('GW170817') == 1187008882.43
+    assert datasets.event_gps('GW170817') == 1187008882.4
     with pytest.raises(ValueError) as exc:
         datasets.event_gps('GW123456')
     assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
 @pytest.mark.local
-@mock.patch('gwosc.api.fetch_event_json', return_value={
+@mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
     'GPS': 12345,
     'something else': None,
 })
@@ -96,6 +130,22 @@ def test_event_gps_local(fetch):
     with pytest.raises(ValueError) as exc:
         datasets.event_gps('something')
     assert str(exc.value) == 'no event dataset found for \'something\''
+
+
+@pytest.mark.remote
+def test_event_segment():
+    assert datasets.event_segment("GW170817") == (1187006835, 1187010931)
+
+
+@pytest.mark.local
+@mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
+    "strain": [
+        {"url": "https://test.com/X-X1-123-456.gwf"},
+        {"url": "https://test.com/X-X1-234-567.gwf"},
+    ],
+})
+def test_event_segment_local(fetch):
+    assert datasets.event_segment("GW170817") == (123, 801)
 
 
 @pytest.mark.remote
@@ -126,7 +176,7 @@ def test_run_segment():
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_run_segment_local(fetch):
     assert datasets.run_segment('S1') == (0, 1)
-    with pytest.raises(ValueError) as exc:
+    with pytest.raises(ValueError):
         datasets.run_segment('S2')
 
 

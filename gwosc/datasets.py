@@ -21,14 +21,89 @@
 Note: each of these methods deliberately excludes the 'tenyear' dataset.
 """
 
-from six import raise_from
+import multiprocessing.dummy
 
-from . import api
+from six import raise_from
+from six.moves.urllib.error import URLError
+
+from ligo.segments import (
+    segment as Segment,
+    segmentlist as SegmentList,
+)
+
+from . import (api, utils)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
+IGNORE = {
+    "tenyear",
+    "history",
+}
+DATASET_TYPES = {
+    "run",
+    "event",
+    "catalog",
+}
+CATALOGS = {
+    "GWTC-1-confident",
+    "GWTC-1-marginal",
+}
 
-def find_datasets(detector=None, type=None, host=api.DEFAULT_URL):
+
+def _run_datasets(detector=None, segment=None, host=api.DEFAULT_URL):
+    meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)["runs"]
+    for epoch, metadata in meta.items():
+        if (
+                epoch in IGNORE or
+                (detector and detector not in metadata['detectors']) or
+                (segment and not utils.segments_overlap(
+                    segment, (metadata['GPSstart'], metadata['GPSend'])))
+        ):
+            continue
+        yield epoch
+
+
+def _catalog_datasets(
+        catalog,
+        detector=None,
+        segment=None,
+        host=api.DEFAULT_URL,
+):
+    """Yields events from one or more catalogs
+    """
+    # fetch list of all events (adding MC prefix for marginal candidates)
+    events = ["MC{}".format(e) if catalog.endswith("-marginal") else e for
+              e in api.fetch_catalog_json(catalog, host=host)['data']]
+
+    # if not filtering by detectors, just return now
+    if detector is None and segment is None:
+        return events
+
+    # otherwise query for the detector set for all events, using threading
+    def _func(event):
+        data = api.fetch_catalog_event_json(event, host=host, version=None)
+        segment = SegmentList(utils.url_segment(meta["url"]) for
+                              meta in data["strain"]).extent()
+        detectors = set(url['detector'] for url in data['strain'])
+        return (event, segment, detectors)
+    pool = multiprocessing.dummy.Pool(len(events))
+    keep = []
+    for event, eseg, detset in pool.map(_func, events):
+        if (
+                (detector and detector not in detset) or
+                (segment and not Segment(segment).intersects(eseg))
+        ):
+            continue
+        keep.append(event)
+    return keep
+
+
+def find_datasets(
+        detector=None,
+        type=None,
+        segment=None,
+        host=api.DEFAULT_URL,
+):
     """Find datasets available on the given GW open science host
 
     Parameters
@@ -37,7 +112,12 @@ def find_datasets(detector=None, type=None, host=api.DEFAULT_URL):
         prefix of GW detector
 
     type : `str`, optional
-        type of datasets to restrict, one of ``'run'`` or ``'event'``
+        type of datasets to restrict, one of ``'run'``, ``'event'``, or
+        ``'catalog'``
+
+    segment : `ligo.segments.segment`, `None`, optional
+        a GPS ``[start, stop)`` interval to restrict matches to;
+        datasets will match if they overlap at any point
 
     host : `str`, optional
         the URL of the LOSC host to query, defaults to losc.ligo.org
@@ -62,25 +142,57 @@ def find_datasets(detector=None, type=None, host=api.DEFAULT_URL):
      'LVT151012']
     """
     # format type
-    if type not in [None, 'run', 'event']:
-        raise ValueError('unrecognised type {!r}, select one of \'run\', '
-                         '\'event\''.format(type))
+    if type and type not in DATASET_TYPES:
+        raise ValueError(
+            "unrecognised type {0!r}, select one of: {1}".format(
+                type, ", ".join(map(repr, DATASET_TYPES))))
     if type and not type.endswith('s'):
         type += 's'
 
-    # search
-    meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)
-    names = []
-    for type_ in meta:
-        if type and type_ != type:
-            continue
-        for epoch, metadata in meta[type_].items():
-            if epoch == 'tenyear':
+    # get queries
+    needruns = type in {None, "runs"}
+    needcatalogs = type in {None, "catalogs"}
+    needevents = type in {None, "events"}
+
+    names = set()
+
+    # search for events and datasets
+    if needruns:
+        names.update(_run_datasets(
+            detector=detector,
+            host=host,
+            segment=segment,
+        ))
+
+    # if we're only search for catalogs, unset other kwargs so that
+    # _catalog_datasets doesn't use it (it's slow)
+    if not needevents:
+        detector = None
+        segment = None
+
+    # search for catalogs and catalog entries
+    if needcatalogs or needevents:
+        for catalog in CATALOGS:
+            try:
+                cnames = _catalog_datasets(
+                    catalog,
+                    detector=detector,
+                    segment=segment,
+                    host=host,
+                )
+            except (URLError, ValueError):  # catalog not found
                 continue
-            if detector is None or detector in metadata['detectors']:
-                names.append(epoch)
+            # record catalog itself
+            if needcatalogs:
+                names.add(catalog)
+            # record events
+            if needevents:
+                names.update(cnames)
+
     return sorted(names)
 
+
+# -- event utilities ----------------------------------------------------------
 
 def event_gps(event, host=api.DEFAULT_URL):
     """Returns the GPS time of an open-data event
@@ -107,11 +219,43 @@ def event_gps(event, host=api.DEFAULT_URL):
     ValueError: no event dataset found for 'GW123456'
     """
     try:
-        return api.fetch_event_json(event, host=host)['GPS']
+        return api.fetch_catalog_event_json(event, host=host)['GPS']
     except ValueError as exc:
         raise_from(
             ValueError('no event dataset found for {0!r}'.format(event)),
-            exc)
+            exc,
+        )
+
+
+def event_segment(event, version=None, host=api.DEFAULT_URL):
+    """Returns the GPS ``[start, stop)`` interval covered by an event dataset
+
+    Parameters
+    ----------
+    event : `str`
+        the name of the event
+
+    version : `int`, `None`, optional
+        the version of the data release to use,
+        defaults to the highest available version
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    Returns
+    -------
+    segment : :class:`ligo.segments.segment`
+        a GPS ``[start, stop)`` interval
+
+    Examples
+    --------
+    >>> from gwosc.datasets import event_segment
+    >>> event_segment("GW150914")
+    segment(1126257415, 1126261511)
+    """
+    data = api.fetch_catalog_event_json(event, host=host, version=version)
+    return SegmentList(utils.url_segment(meta["url"]) for
+                       meta in data["strain"]).extent()
 
 
 def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
@@ -158,8 +302,41 @@ def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
         tol, gps))
 
 
+def event_detectors(event, host=api.DEFAULT_URL, version=None):
+    """Returns the `set` of detectors that observed an event
+
+    Parameters
+    ----------
+    event : `str`
+        the name of the event to query
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    version : `int`, `None`, optional
+        the data-release version to use, defaults to the highest available
+        version
+
+    Returns
+    -------
+    detectors : `set`
+        the set of detectors for which data file URLs are included in
+        the data release
+
+    Examples
+    --------
+    >>> from gwosc.datasets import event_detectors
+    >>> event_detectors("GW150914")
+    {'H1', 'L1'}
+    """
+    data = api.fetch_catalog_event_json(event, host=host, version=version)
+    return set(url['detector'] for url in data['strain'])
+
+
+# -- run utilities ------------------------------------------------------------
+
 def run_segment(run, host=api.DEFAULT_URL):
-    """Returns the GPS time of an open-data event
+    """Returns the GPS ``[start, stop)`` interval covered by a run dataset
 
     Parameters
     ----------
@@ -171,14 +348,14 @@ def run_segment(run, host=api.DEFAULT_URL):
 
     Returns
     -------
-    gps : `float`
-        the GPS time of this event
+    segment : :class:`ligo.segments.segment`
+        a GPS ``[start, stop)`` interval
 
     Examples
     --------
     >>> from gwosc.datasets import run_segment
     >>> run_segment('O1')
-    (1126051217, 1137254417)
+    segment(1126051217, 1137254417)
     >>> run_segment('Oh dear')
     ValueError: no run dataset found for 'Oh dear'
     """
@@ -186,11 +363,11 @@ def run_segment(run, host=api.DEFAULT_URL):
         meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)['runs'][run]
     except KeyError as exc:
         raise ValueError('no run dataset found for {!r}'.format(exc.args[0]))
-    return (meta['GPSstart'], meta['GPSend'])
+    return Segment(meta['GPSstart'], meta['GPSend'])
 
 
 def run_at_gps(gps, host=api.DEFAULT_URL):
-    """Returns the name of the open-data event matching the GPS time
+    """Returns the name of the open-data run dataset matching the GPS time
 
     This function will return the first event for which
     ``start <= gps < end``

@@ -20,6 +20,7 @@
 """
 
 import os.path
+import re
 from io import BytesIO
 
 try:
@@ -47,7 +48,7 @@ def check_json_url_list(urllist, keys={'detector', 'format', 'url'}):
 
 @pytest.mark.remote
 def test_fetch_json():
-    url = 'https://losc.ligo.org/archive/1126257414/1126261510/json/'
+    url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/json/'
     out = api.fetch_json(url)
     assert isinstance(out, dict)
     assert len(out['events']) == 1
@@ -125,3 +126,29 @@ def test_fetch_run_json_local(fetch):
     api.fetch_run_json('S6', 'L1', 934000000, 934100000)
     fetch.assert_called_with(
         losc_url('archive/links/S6/L1/934000000/934100000/json/'))
+
+
+@pytest.mark.remote
+def test_fetch_catalog_event_json():
+    event = 'GW150914'
+    out = api.fetch_catalog_event_json(event)
+    assert int(out["GPS"]) == 1126259462
+    assert re.match(r"GW150914_R\d+", out["dataset"])
+    check_json_url_list(out["strain"])
+
+
+@pytest.mark.local
+@mock.patch("gwosc.api.fetch_json", side_effect=[1, ValueError()])
+def test_fetch_catalog_event_json_local(fetch):
+    api.fetch_catalog_event_json("GW150914")
+    assert fetch.call_count == 2  # two version queries, one JSON queries
+    fetch.assert_any_call(losc_url("archive/GW150914_R1/json/"))
+    fetch.assert_any_call(losc_url("archive/GW150914_R2/json/"))
+
+
+@pytest.mark.local
+@mock.patch("gwosc.api.fetch_json")
+def test_fetch_catalog_event_json_version_local(fetch):
+    api.fetch_catalog_event_json("GW150914", version=10)
+    assert fetch.call_count == 1
+    fetch.assert_called_with(losc_url("archive/GW150914_R10/json/"))

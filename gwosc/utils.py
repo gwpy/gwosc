@@ -18,6 +18,11 @@
 
 from os.path import basename
 
+from ligo.segments import (
+    segment as Segment,
+    segmentlist as SegmentList,
+)
+
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
@@ -44,7 +49,7 @@ def url_segment(url):
     _, _, s, e = base.split('-')
     s = int(s)
     e = int(e.split('.')[0])
-    return (s, s+e)
+    return Segment(s, s+e)
 
 
 def url_overlaps_segment(url, segment):
@@ -65,7 +70,7 @@ def url_overlaps_segment(url, segment):
         otherwise `False`
     """
     useg = url_segment(url)
-    return segments_overlap(useg, segment)
+    return useg.intersects(Segment(segment))
 
 
 def full_coverage(urls, segment):
@@ -78,16 +83,11 @@ def full_coverage(urls, segment):
     if not urls:
         return False
     # sort URLs by GPS timestamp
-    urlsegs = [url_segment(u) for u in urls]
-    starts, ends = zip(*urlsegs)
-    # extract segments for first and last files
-    a = min(starts)
-    b = max(ends)
-    # compare to given segment
-    return a <= segment[0] and b >= segment[1]
+    extent = SegmentList(url_segment(u) for u in urls).extent()
+    return Segment(segment) in extent
 
 
 def segments_overlap(a, b):
     """Returns True if GPS segment ``a`` overlaps GPS segment ``b``
     """
-    return (a[1] > b[0]) and (a[0] < b[1])
+    return Segment(a).intersects(Segment(b))

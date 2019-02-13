@@ -20,6 +20,7 @@ import contextlib
 import json
 
 from six.moves.urllib.request import urlopen
+from six.moves.urllib.error import URLError
 
 DEFAULT_URL = "https://www.gw-openscience.org"
 MAX_GPS = 99999999999
@@ -136,3 +137,76 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
     url = '{}/archive/links/{}/{}/{:d}/{:d}/json/'.format(
         host, run, detector, gpsstart, gpsend)
     return fetch_json(url)
+
+
+def fetch_catalog_json(catalog, host=DEFAULT_URL):
+    """"Returns the JSON metadata for the given catalogue
+
+    Parameters
+    ----------
+    catalog : `str`
+        the name of the event catalog, e.g. `GWTC-1-confident`
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    Returns
+    -------
+    json
+        the JSON data retrieved from GWOSC and returnend by
+        :func:`json.loads`
+    """
+    url = "{}/catalog/{}/json/".format(
+        host, catalog,
+    )
+    return fetch_json(url)
+
+
+def fetch_catalog_event_json(event, version=None, host=DEFAULT_URL):
+    """Returns the JSON metadata for the given event in a catalog
+
+    This method queries for all available data-release versions, returning
+    the highest available version, unless ``version=<X>`` is specified.
+
+    Parameters
+    ----------
+    event : `str`
+        the name of the event to query
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    version : `int`, `None`, optional
+        restrict query to a given data-release version
+
+    Returns
+    -------
+    json
+        the JSON data retrieved from LOSC and returned by `json.loads`
+    """
+    # if user specified, just use it
+    if version:
+        return fetch_json(_catalog_event_url(event, version, host=host))
+    # otherwise query from first version and return highest available
+    # its inefficient, but it works..
+    thisv = 1
+    while True:
+        url = _catalog_event_url(event, thisv, host=host)
+        try:
+            data = fetch_json(url)
+        except (URLError, ValueError):  # no data for this version
+            if thisv == 1:  # first version, so fail
+                raise ValueError(
+                    "no catalog datasets found for {!r}".format(event),
+                )
+            # return data from last successful query
+            return data
+        thisv += 1
+
+
+def _catalog_event_url(event, version, host=DEFAULT_URL):
+    return "{0}/archive/{1}_R{2}/json/".format(
+        host,
+        event,
+        version,
+    )
