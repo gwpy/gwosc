@@ -92,7 +92,7 @@ def test_find_datasets_segment():
              },
             {"url": "https://test.com/X-X1-234-567.gwf",
              "detector": "L1",
-            },
+             },
         ]},
     ],
 )

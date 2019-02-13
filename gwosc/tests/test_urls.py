@@ -48,6 +48,7 @@ def test_match(gw150914_urls, gw170817_urls):
     for url in matched:
         assert '_R1-' in url
 
+
 @pytest.mark.local
 def test_match_tags():
     urls = [
