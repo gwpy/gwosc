@@ -1,10 +1,3 @@
-test: &test
-  name: Test
-  command: |
-    set -x;
-    python${PYTHON_VERSION} -m pip install pytest pytest-cov;
-    python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc;
-
 build:debian: &build-debian
   name: Build
   command: |
@@ -12,24 +5,14 @@ build:debian: &build-debian
     apt-get -yqq update;
     apt-get -yqq install \
         dpkg-dev \
-        debhelper \
-        dh-python \
-        python-all \
-        python3-all \
-        python-setuptools \
-        python3-setuptools \
-        python-six \
-        python3-six \
-        python-pytest \
-        python3-pytest \
-        python-mock \
-        python-pip \
-        python3-pip \
-        python-pytest-cov \
-        python3-pytest-cov;
-    pushd $(mktemp -d -p .)
+        devscripts;
+    pushd $(mktemp -d -p .);
     tar -xf ../gwosc-*.tar.gz --strip-components=1;
+    # install build dependencies
+    mk-build-deps --tool "apt-get -y" --install --remove;
+    # build binary package
     dpkg-buildpackage -us -uc -b;
+    # mv and install
     popd;
     rm -rf tmp*;
     dpkg --install python*-gwosc*.deb;
@@ -40,37 +23,60 @@ build:centos: &build-centos
     set -x;
     yum -y -q update;
     yum -y -q install \
+        yum-utils \
         rpm-build \
-        python-rpm-macros \
-        python2-rpm-macros \
-        python3-rpm-macros \
-        python2-setuptools \
-        python34-setuptools \
-        python2-six \
-        python34-six \
-        python2-pytest \
-        python34-pytest \
-        python2-mock \
-        python2-pip \
-        python34-pip \
-        python2-pytest-cov \
-        python34-pytest-cov;
-    tar -xf gwosc-*.tar.gz
-    rm -rf gwosc-*.tar.gz
-    _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}')
-    mv gwosc-* gwosc-${_version}
-    tar -zcf gwosc-${_version}.tar.gz gwosc-${_version}
-    rm -rf gwosc-${_version}/
-    rpmbuild --quiet --define "_rpmdir $(pwd)" -tb gwosc-*.tar.gz;
+        python34 \
+        python3-rpm-macros;
+    # hack version number
+    tar -xf gwosc-*.tar.gz;
+    rm -rf gwosc-*.tar.gz;
+    _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}');
+    mv gwosc-* gwosc-${_version};
+    tar -zcf gwosc-${_version}.tar.gz gwosc-${_version};
+    rm -rf gwosc-${_version}/;
+    # build src rpm
+    SRC_RPM=$(rpmbuild -ts gwosc*.tar.gz | cut -d\  -f2);
+    # install build dependencies
+    yum-builddep -y -q ${SRC_RPM};
+    # build binary rpm(s)
+    rpmbuild --quiet --define "_rpmdir $(pwd)" --rebuild ${SRC_RPM};
+    # mv and install
     mv noarch/*.rpm .;
     rm -rf noarch;
     yum -y -q --nogpgcheck localinstall *.rpm;
+
+prepare-test:debian: &prep-test-debian
+  name: Prepare tests
+  command: |
+    set -x;
+    apt-get -yqq install \
+        python-pip python3-pip \
+        python-pytest python3-pytest \
+        python-pytest-cov python3-pytest-cov;
+
+prepare-test:centos: &prep-test-centos
+  name: Prepare tests
+  command: |
+    set -x;
+    yum -y -q install \
+        python2-pip python34-pip \
+        pytest python34-pytest \
+        python2-pytest-cov python34-pytest-cov;
+
+test: &test
+  name: Test
+  command: |
+    set -x;
+    python${PYTHON_VERSION} -m pip install pytest "pytest-cov==2.6.0";
+    python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc;
+
 
 debian: &debian
   steps:
     - attach_workspace:
         at: .
     - run: *build-debian
+    - run: *prep-test-debian
     - run: *test
     - store_artifacts:
         path: "*.deb"
@@ -80,6 +86,7 @@ centos: &centos
     - attach_workspace:
         at: .
     - run: *build-centos
+    - run: *prep-test-centos
     - run: *test
     - store_artifacts:
         path: "*.rpm"
