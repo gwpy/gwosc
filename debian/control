@@ -15,6 +15,8 @@ Build-Depends: debhelper (>= 9),
                python3-setuptools,
                python-six,
                python3-six,
+               python-ligo-segments,
+               python3-ligo-segments,
                python-pytest,
                python3-pytest,
                python-mock,
@@ -25,7 +27,8 @@ Package: python-gwosc
 Architecture: all
 Depends: ${misc:Depends},
          ${python:Depends},
-         python-six (>= 1.9.0)
+         python-six (>= 1.9.0),
+         python-ligo-segments
 Description: A python2 interface to the Gravitational-Wave Open Science Center data archive
  .
            The `gwosc` package provides an interface to querying the open data
@@ -39,7 +42,8 @@ Package: python3-gwosc
 Architecture: all
 Depends: ${misc:Depends},
          ${python3:Depends},
-         python3-six (>= 1.9.0)
+         python3-six (>= 1.9.0),
+         python3-ligo-segments
 Description: A python3 interface to the Gravitational-Wave Open Science Center data archive
  .
            The `gwosc` package provides an interface to querying the open data

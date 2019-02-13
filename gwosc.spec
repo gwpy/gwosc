@@ -14,14 +14,24 @@ Source0:   https://pypi.io/packages/source/g/%{name}/%{name}-%{version}.tar.gz
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 
 BuildArch: noarch
+
+# rpmbuild dependencies
 BuildRequires: rpm-build
 BuildRequires: python-rpm-macros
 BuildRequires: python2-rpm-macros
 BuildRequires: python3-rpm-macros
+
+# build dependencies
 BuildRequires: python-setuptools
 BuildRequires: python%{python3_version_nodots}-setuptools
+
+# runtime dependencies (required for %check)
 BuildRequires: python2-six
 BuildRequires: python%{python3_version_nodots}-six
+BuildRequires: python2-ligo-segments
+BuildRequires: python%{python3_version_nodots}-ligo-segments
+
+# testing dependencies (required for %check)
 BuildRequires: python2-pytest
 BuildRequires: python%{python3_version_nodots}-pytest
 BuildRequires: python2-mock
@@ -36,6 +46,7 @@ gravitational-wave observatories.
 %package -n python2-%{name}
 Summary:  %{summary}
 Requires: python-six
+Requires: python-ligo-segments
 %{?python_provide:%python_provide python2-%{name}}
 %description -n python2-%{name}
 The `gwosc` package provides an interface to querying the open data
@@ -47,6 +58,7 @@ gravitational-wave observatories.
 %package -n python%{python3_version_nodots}-%{name}
 Summary:  %{summary}
 Requires: python%{python3_version_nodots}-six
+Requires: python%{python3_version_nodots}-ligo-segments
 %{?python_provide:%python_provide python%{python3_version_nodots}-%{name}}
 %description -n python%{python3_version_nodots}-%{name}
 The `gwosc` package provides an interface to querying the open data
