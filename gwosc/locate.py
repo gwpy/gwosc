@@ -61,6 +61,8 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
     start = int(start)
     end = int(end)
 
+    # padding needed to fetch data given gps interval before or after
+    # the event time, 4000 sec is aprrox the length of the raw data.
     metadata = api.fetch_dataset_json(start-4000, end+4000, host=host)
 
     # find dataset that provides required data
