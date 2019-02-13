@@ -28,6 +28,8 @@ from .. import (
     urls as gwosc_urls,
     utils,
 )
+from gwpy.timeseries import TimeSeries
+from gwosc import datasets
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
@@ -74,3 +76,18 @@ def test_get_event_urls(gw150914_urls):
     urls = locate.get_event_urls(event, version=1)
     for url in urls:
         assert '_V1-' in url
+        
+def test_get_urls_bilby():
+    psd_offset = -1024   # default values used in bilby
+    psd_duration = 100   # to estimate the psd data.
+    for event in datasets.find_datasets(type='event'):
+        try:
+            gps_time = datasets.event_gps(event)
+            test = TimeSeries.fetch_open_data('L1',gps_time+psd_offset,gps_time+psd_offset+psd_duration)
+            print('Data found for', event)
+        except:
+            try:
+                test = TimeSeries.fetch_open_data('L1',gps_time+psd_offset,gps_time+psd_offset+psd_duration, tag='CLN')
+                print('Tag required for', event)
+            except: 
+                pytest.fail('No data found for', event) 
