@@ -21,7 +21,7 @@ import json
 
 from six.moves.urllib.request import urlopen
 
-DEFAULT_URL = 'https://losc.ligo.org'
+DEFAULT_URL = "https://www.gw-openscience.org"
 MAX_GPS = 99999999999
 
 
