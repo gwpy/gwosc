@@ -85,16 +85,16 @@ def test_find_datasets_segment():
 @mock.patch('gwosc.api.fetch_catalog_json', return_value=CATALOG_JSON)
 @mock.patch(
     'gwosc.api.fetch_catalog_event_json',
-    side_effect=[
-        {"strain": [
+    return_value={
+        "strain": [
             {"url": "https://test.com/X-X1-123-456.gwf",
              "detector": "L1",
              },
             {"url": "https://test.com/X-X1-234-567.gwf",
              "detector": "L1",
              },
-        ]},
-    ],
+        ],
+    },
 )
 @mock.patch("gwosc.datasets.CATALOGS", ["GWTC-1-confident"])
 def test_find_datasets_local(fcej, fcj, fdj):
