@@ -3,7 +3,7 @@ version: "2"
 checks:
   argument-count:
     config:
-      threshold: 8
+      threshold: 10
   file-lines:
     config:
       threshold: 500
