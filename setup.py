@@ -34,7 +34,6 @@ if {'test'}.intersection(sys.argv):
     setup_requires.append('pytest_runner')
 install_requires = [
     'six>=1.9.0',
-    'ligo-segments',
 ]
 tests_require = [
     'pytest>=2.8',

@@ -22,14 +22,10 @@ Note: each of these methods deliberately excludes the 'tenyear' dataset.
 """
 
 import multiprocessing.dummy
+from operator import itemgetter
 
 from six import raise_from
 from six.moves.urllib.error import URLError
-
-from ligo.segments import (
-    segment as Segment,
-    segmentlist as SegmentList,
-)
 
 from . import (api, utils)
 
@@ -82,8 +78,7 @@ def _catalog_datasets(
     # otherwise query for the detector set for all events, using threading
     def _func(event):
         data = api.fetch_catalog_event_json(event, host=host, version=None)
-        segment = SegmentList(utils.url_segment(meta["url"]) for
-                              meta in data["strain"]).extent()
+        segment = utils.urllist_extent(map(itemgetter("url"), data["strain"]))
         detectors = set(url['detector'] for url in data['strain'])
         return (event, segment, detectors)
     pool = multiprocessing.dummy.Pool(len(events))
@@ -91,7 +86,7 @@ def _catalog_datasets(
     for event, eseg, detset in pool.map(_func, events):
         if (
                 (detector and detector not in detset) or
-                (segment and not Segment(segment).intersects(eseg))
+                (segment and not utils.segments_overlap(segment, eseg))
         ):
             continue
         keep.append(event)
@@ -115,7 +110,7 @@ def find_datasets(
         type of datasets to restrict, one of ``'run'``, ``'event'``, or
         ``'catalog'``
 
-    segment : `ligo.segments.segment`, `None`, optional
+    segment : 2-`tuple` of `int`, `None`, optional
         a GPS ``[start, stop)`` interval to restrict matches to;
         datasets will match if they overlap at any point
 
@@ -244,8 +239,8 @@ def event_segment(event, version=None, host=api.DEFAULT_URL):
 
     Returns
     -------
-    segment : :class:`ligo.segments.segment`
-        a GPS ``[start, stop)`` interval
+    start, end : `int`
+        the GPS ``[start, end)`` interval covered by this run dataset
 
     Examples
     --------
@@ -254,8 +249,7 @@ def event_segment(event, version=None, host=api.DEFAULT_URL):
     segment(1126257415, 1126261511)
     """
     data = api.fetch_catalog_event_json(event, host=host, version=version)
-    return SegmentList(utils.url_segment(meta["url"]) for
-                       meta in data["strain"]).extent()
+    return utils.urllist_extent(map(itemgetter("url"), data["strain"]))
 
 
 def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
@@ -348,8 +342,8 @@ def run_segment(run, host=api.DEFAULT_URL):
 
     Returns
     -------
-    segment : :class:`ligo.segments.segment`
-        a GPS ``[start, stop)`` interval
+    start, end : `int`
+        the GPS ``[start, end)`` interval covered by this run dataset
 
     Examples
     --------
@@ -363,7 +357,7 @@ def run_segment(run, host=api.DEFAULT_URL):
         meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)['runs'][run]
     except KeyError as exc:
         raise ValueError('no run dataset found for {!r}'.format(exc.args[0]))
-    return Segment(meta['GPSstart'], meta['GPSend'])
+    return meta['GPSstart'], meta['GPSend']
 
 
 def run_at_gps(gps, host=api.DEFAULT_URL):

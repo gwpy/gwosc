@@ -21,8 +21,6 @@
 
 import pytest
 
-from ligo.segments import segment as Segment
-
 from .. import utils
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
@@ -30,7 +28,6 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 def test_url_segment():
     seg = utils.url_segment('X-TEST-123-456.ext')
-    assert isinstance(seg, Segment)
     assert seg == (123, 579)
 
 

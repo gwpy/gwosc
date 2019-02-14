@@ -1,17 +1,11 @@
 environment:
   matrix:
-    - MINICONDA: C:\Miniconda-x64
-    - MINICONDA: C:\Miniconda35-x64
-    - MINICONDA: C:\Miniconda36-x64
-    - MINICONDA: C:\Miniconda37-x64
+    - PYTHON: "C:\\Python27-x64"
+    - PYTHON: "C:\\Python35-x64"
+    - PYTHON: "C:\\Python36-x64"
 install:
-  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
-  - conda config --set always_yes yes
-  - conda config --add channels conda-forge
-  - conda install --yes "pip" "setuptools>=27.3"
-  - conda install --yes "six>=1.9.0" "ligo-segments>=1.0.0"
-  - conda install --yes "pytest>=2.8"
+  - "%PYTHON%\\python.exe -m pip install --upgrade pip"
 build_script:
-  - python -m pip install .
+  - "%PYTHON%\\python.exe -m pip install ."
 test_script:
-  - python setup.py test
+  - "%PYTHON%\\python.exe setup.py test"
