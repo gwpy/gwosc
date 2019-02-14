@@ -230,13 +230,16 @@ def event_gps(event, host=api.DEFAULT_URL):
         )
 
 
-def event_segment(event, version=None, host=api.DEFAULT_URL):
+def event_segment(event, detector=None, version=None, host=api.DEFAULT_URL):
     """Returns the GPS ``[start, stop)`` interval covered by an event dataset
 
     Parameters
     ----------
     event : `str`
         the name of the event
+
+    detector : `str`, optional
+        prefix of GW detector
 
     version : `int`, `None`, optional
         the version of the data release to use,
@@ -257,7 +260,9 @@ def event_segment(event, version=None, host=api.DEFAULT_URL):
     segment(1126257415, 1126261511)
     """
     data = api.fetch_catalog_event_json(event, host=host, version=version)
-    return utils.urllist_extent(map(itemgetter("url"), data["strain"]))
+    urls = [u["url"] for u in data["strain"] if
+            detector in {u["detector"], None}]
+    return utils.urllist_extent(urls)
 
 
 def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
