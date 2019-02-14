@@ -57,12 +57,18 @@ def test_find_datasets():
     assert 'tenyear' not in sets
     assert 'history' not in sets
 
+
+@pytest.mark.remote
+def test_find_datasets_detector():
     v1sets = datasets.find_datasets('V1')
     assert 'GW170817' in v1sets
     assert 'GW150914' not in v1sets
 
     assert datasets.find_datasets('X1', type="run") == []
 
+
+@pytest.mark.remote
+def test_find_datasets_type():
     runsets = datasets.find_datasets(type='run')
     assert 'O1' in runsets
     run_regex = re.compile(r'\A[OS]\d+(_16KHZ)?\Z')
@@ -144,12 +150,13 @@ def test_event_segment():
 
 @mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
     "strain": [
-        {"url": "https://test.com/X-X1-123-456.gwf"},
-        {"url": "https://test.com/X-X1-234-567.gwf"},
+        {"url": "https://test.com/X-X1-123-456.gwf", "detector": "X1"},
+        {"url": "https://test.com/X-X1-234-567.gwf", "detector": "Y1"},
     ],
 })
 def test_event_segment_local(fetch):
     assert datasets.event_segment("GW170817") == (123, 801)
+    assert datasets.event_segment("GW170817", detector="X1") == (123, 579)
 
 
 @pytest.mark.remote
