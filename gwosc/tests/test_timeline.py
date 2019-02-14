@@ -55,7 +55,6 @@ def test_timeline_url():
         timeline.timeline_url('X1', 1126259446, 1126259478)
 
 
-@pytest.mark.local
 @mock.patch('gwosc.timeline._find_dataset', return_value='S6')
 def test_timeline_url_local(find):
     assert timeline.timeline_url('L1_DATA', 0, 1, host='test') == (

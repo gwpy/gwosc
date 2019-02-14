@@ -20,12 +20,15 @@
 """
 
 import os.path
+import re
 from io import BytesIO
 
 try:
     from unittest import mock
+    from urllib.error import URLError
 except ImportError:  # python < 3
     import mock
+    from urllib2 import URLError
 
 import pytest
 
@@ -47,12 +50,14 @@ def check_json_url_list(urllist, keys={'detector', 'format', 'url'}):
 
 @pytest.mark.remote
 def test_fetch_json():
-    url = 'https://losc.ligo.org/archive/1126257414/1126261510/json/'
+    url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/json/'
     out = api.fetch_json(url)
     assert isinstance(out, dict)
     assert len(out['events']) == 1
     assert sorted(out['events']['GW150914']['detectors']) == ['H1', 'L1']
-    assert set(out['runs'].keys()) == {'tenyear', 'O1', 'O1_16KHZ'}
+    assert set(out['runs'].keys()).issubset(
+        {'tenyear', 'O1', 'O1_16KHZ', 'history'},
+    )
 
     # check errors (use legit URL that isn't JSON)
     url2 = os.path.dirname(os.path.dirname(url))
@@ -62,7 +67,6 @@ def test_fetch_json():
         "Failed to parse LOSC JSON from {!r}: ".format(url2))
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.urlopen', return_value=BytesIO(b'{"key": "value"}'))
 def test_fetch_json_local(_):
     url = 'anything'
@@ -77,10 +81,9 @@ def test_fetch_dataset_json():
     end = 934100000
     out = api.fetch_dataset_json(start, end)
     assert not out['events']
-    assert set(out['runs'].keys()) == {'tenyear', 'S6'}
+    assert set(out['runs'].keys()).issubset({'tenyear', 'S6', 'history'})
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_dataset_json_local(fetch):
     start = 934000000
@@ -99,7 +102,6 @@ def test_fetch_event_json():
     check_json_url_list(out['strain'])
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_event_json_local(fetch):
     api.fetch_event_json('GW150914')
@@ -119,9 +121,41 @@ def test_fetch_run_json():
     check_json_url_list(out['strain'])
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_run_json_local(fetch):
     api.fetch_run_json('S6', 'L1', 934000000, 934100000)
     fetch.assert_called_with(
         losc_url('archive/links/S6/L1/934000000/934100000/json/'))
+
+
+@pytest.mark.remote
+def test_fetch_catalog_event_json():
+    event = 'GW150914'
+    out = api.fetch_catalog_event_json(event)
+    assert int(out["GPS"]) == 1126259462
+    assert re.match(r"GW150914_R\d+", out["dataset"])
+    check_json_url_list(out["strain"])
+
+
+@mock.patch("gwosc.api.fetch_event_json")
+@mock.patch("gwosc.api.urlopen",
+            side_effect=[mock.MagicMock(), URLError("mock")])
+def test_fetch_catalog_event_json_local(urlopen, fej):
+    api.fetch_catalog_event_json("GW150914")
+    assert urlopen.call_count == 2  # two version queries, one JSON queries
+    urlopen.assert_any_call(losc_url("archive/GW150914_R1/json/"))
+    urlopen.assert_any_call(losc_url("archive/GW150914_R2/json/"))
+    fej.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
+
+
+@mock.patch("gwosc.api.fetch_event_json")
+def test_fetch_catalog_event_json_version(fetch):
+    api.fetch_catalog_event_json("GW150914_R1")
+    assert fetch.call_count == 1
+    fetch.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
+
+    fetch.reset_mock()
+
+    api.fetch_catalog_event_json("GW150914", version=10)
+    assert fetch.call_count == 1
+    fetch.assert_called_with("GW150914_R10", host=api.DEFAULT_URL)

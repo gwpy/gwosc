@@ -19,14 +19,28 @@
 """Locate files within a given interval on losc.ligo.org
 """
 
-from . import (api, urls as lurls, utils)
+import warnings
+
+from . import (
+    api,
+    datasets,
+    urls as lurls,
+    utils,
+)
 
 __all__ = ['get_urls', 'get_event_urls']
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
-def get_urls(detector, start, end, host=api.DEFAULT_URL,
-             tag=None, version=None, sample_rate=4096, format='hdf5'):
+def get_urls(
+        detector, start, end,
+        dataset=None,
+        tag=None,
+        version=None,
+        sample_rate=4096,
+        format='hdf5',
+        host=api.DEFAULT_URL,
+):
     """Fetch the metadata from LOSC regarding a given GPS interval
 
     Parameters
@@ -40,8 +54,11 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
     end : `int`
         the GPS end time of your query
 
-    host : `str`, optional
-        the URL of the remote LOSC server
+    dataset : `str`, `None`, optional
+        the name of the dataset to query, e.g. ``'GW150914'``
+
+    version : `int`, `None`, optional
+        the data-release version for the selected datasets
 
     sample_rate : `int`, optional, default : ``4096``
         the sampling rate (Hz) of files you want to find
@@ -49,8 +66,8 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
     format : `str`, optional, default: ``'hdf5'``
         the file format (extension) you want to find
 
-    duration : `int`, optional, default: ``4096``
-        the duration of files you want to find
+    host : `str`, optional
+        the URL of the remote LOSC server
 
     Returns
     -------
@@ -61,39 +78,42 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
     start = int(start)
     end = int(end)
 
-    metadata = api.fetch_dataset_json(start, end, host=host)
+    if tag is not None:
+        warnings.warn(
+            "the `tag` keyword to get_urls is deprecated, GWOSC no longer"
+            "releases multiple datasets for events, please use the `dataset` "
+            "and `version` keyword arguments to manually select the host "
+            "dataset for URLs",
+            DeprecationWarning,
+        )
 
-    # find dataset that provides required data
-    for dstype in sorted(metadata, key=lambda x: 0 if x == 'events' else 1):
+    dataset_metadata = {
+        "event":
+            lambda x: api.fetch_catalog_event_json(x, host=host),
+        "run":
+            lambda x: api.fetch_run_json(x, detector, start, end, host=host),
+    }
 
-        # work out how to get the event URLS
-        if dstype == 'events':
-            def _get_urls(dataset):
-                return api.fetch_event_json(dataset, host=host)['strain']
-        elif dstype == 'runs':
-            def _get_urls(dataset):
-                return api.fetch_run_json(dataset, detector, start, end,
-                                          host=host)['strain']
+    for dstype, _get_urls in dataset_metadata.items():
+        if dataset:
+            dsets = [dataset]
         else:
-            raise ValueError(
-                "Unrecognised LOSC dataset type {!r}".format(dstype))
-
-        for dataset in metadata[dstype]:
-            dsmeta = metadata[dstype][dataset]
-
-            # validate IFO is present
-            if detector not in dsmeta['detectors']:
-                continue
-
+            dsets = datasets.find_datasets(
+                type=dstype,
+                detector=detector,
+                segment=(start, end),
+                host=host,
+            )
+        for dataset in dsets:
             # get URL list for this dataset
-            urls = _get_urls(dataset)
+            urls = _get_urls(dataset)["strain"]
 
             # match URLs to request
             urls = lurls.match(
                 [u['url'] for u in lurls.sieve(
                     urls, detector=detector,
                     sampling_rate=sample_rate, format=format)],
-                start, end, tag=tag, version=version)
+                start, end, version=version)
 
             # if full span covered, return now
             if utils.full_coverage(urls, (start, end)):
@@ -104,7 +124,10 @@ def get_urls(detector, start, end, host=api.DEFAULT_URL,
 
 
 def get_event_urls(event, format='hdf5', sample_rate=4096, **match):
-    meta = api.fetch_event_json(event, host=match.pop('host', api.DEFAULT_URL))
+    meta = api.fetch_catalog_event_json(
+        event,
+        host=match.pop('host', api.DEFAULT_URL),
+    )
     sieve_kw = {k: match.pop(k) for k in list(match.keys()) if
                 k not in {'start', 'end', 'tag', 'version'}}
     return lurls.match(

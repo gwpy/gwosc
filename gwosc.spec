@@ -14,15 +14,24 @@ Source0:   https://pypi.io/packages/source/g/%{name}/%{name}-%{version}.tar.gz
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 
 BuildArch: noarch
+
+# rpmbuild dependencies
 BuildRequires: rpm-build
 BuildRequires: python-rpm-macros
+BuildRequires: python2-rpm-macros
 BuildRequires: python3-rpm-macros
+
+# build dependencies
 BuildRequires: python-setuptools
-BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python%{python3_version_nodots}-setuptools
+
+# runtime dependencies (required for %check)
 BuildRequires: python2-six
-BuildRequires: python%{python3_pkgversion}-six
+BuildRequires: python%{python3_version_nodots}-six
+
+# testing dependencies (required for %check)
 BuildRequires: python2-pytest
-BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python%{python3_version_nodots}-pytest
 BuildRequires: python2-mock
 
 %description
@@ -43,11 +52,11 @@ gravitational-wave observatories.
 
 # -- python-3X-ligotimegps
 
-%package -n python%{python3_pkgversion}-%{name}
+%package -n python%{python3_version_nodots}-%{name}
 Summary:  %{summary}
-Requires: python%{python3_pkgversion}-six
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
-%description -n python%{python3_pkgversion}-%{name}
+Requires: python%{python3_version_nodots}-six
+%{?python_provide:%python_provide python%{python3_version_nodots}-%{name}}
+%description -n python%{python3_version_nodots}-%{name}
 The `gwosc` package provides an interface to querying the open data
 releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
 gravitational-wave observatories.
@@ -77,7 +86,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc README.md
 %{python2_sitelib}/*
 
-%files -n python%{python3_pkgversion}-%{name}
+%files -n python%{python3_version_nodots}-%{name}
 %license LICENSE
 %doc README.md
 %{python3_sitelib}/*

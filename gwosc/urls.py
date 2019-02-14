@@ -19,21 +19,22 @@
 """Utilities for URL handling
 """
 
-import os.path
 import re
+from os.path import (basename, splitext)
 
 # LOSC filename re
 URL_REGEX = re.compile(
     r"\A((.*/)*(?P<obs>[^/]+)-"
-    r"(?P<ifo>[A-Z][0-9])_LOSC_"
+    r"(?P<ifo>[A-Z][0-9])_(L|GW)OSC_"
     r"((?P<tag>[^/]+)_)?"
-    r"(?P<samp>\d+)_"
-    r"(?P<version>V\d+)-"
+    r"(?P<samp>\d+(KHZ)?)_"
+    r"[RV](?P<version>\d+)-"
     r"(?P<strt>[^/]+)-"
     r"(?P<dur>[^/\.]+)\."
     r"(?P<ext>[^/]+))\Z"
 )
-VERSION_REGEX = re.compile(r'V\d+')
+
+VERSION_REGEX = re.compile(r'[RV]\d+')
 
 
 def sieve(urllist, **match):
@@ -67,15 +68,18 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
         if the start time of the URL is _after_ the end time of the
         request
     """
-    reg = URL_REGEX.match(os.path.basename(url)).groupdict()
-    if (tag and reg['tag'] != tag) or (version and reg['version'] != version):
+    reg = URL_REGEX.match(basename(url)).groupdict()
+    if (
+            (tag and reg['tag'] != tag) or
+            (version and int(reg['version']) != version)
+    ):
         return
 
     # match times
     if end is not None:
         gps = int(reg['strt'])
-        if gps >= end:  # too late, stop
-            raise StopIteration
+        if gps >= end:  # too late
+            return
 
     if start is not None:
         gps = int(reg['strt'])
@@ -83,7 +87,7 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
         if gps + dur <= start:  # too early
             return
 
-    return reg['tag'], int(reg['version'][1:])
+    return reg['tag'], int(reg['version'])
 
 
 def match(urls, start=None, end=None, tag=None, version=None):
@@ -117,19 +121,19 @@ def match(urls, start=None, end=None, tag=None, version=None):
     matched_tags = set()
 
     # sort URLs by duration, then start time, then ...
-    urls.sort(key=lambda u:
-              os.path.splitext(os.path.basename(u))[0].split('-')[::-1])
+    urls = sorted(
+        urls, key=lambda u: splitext(basename(u))[0].split('-')[::-1],
+    )
 
     # format version request
-    if version and not VERSION_REGEX.match(str(version)):
-        version = 'V{}'.format(int(version))
+    if VERSION_REGEX.match(str(version)):
+        version = version[1:]
+    if version is not None:
+        version = int(version)
 
     # loop URLS
     for url in urls:
-        try:
-            m = _match_url(url, start, end, tag=tag, version=version)
-        except StopIteration:
-            break
+        m = _match_url(url, start, end, tag=tag, version=version)
         if m is None:
             continue
 

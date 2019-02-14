@@ -39,7 +39,10 @@ tests_require = [
     'pytest>=2.8',
 ]
 if sys.version_info.major < 3:
-    tests_require.append('mock')
+    tests_require.extend((
+        'more-itertools < 6.0a0',  # pip doesn't pin version properly
+        'mock',
+    ))
 extras_require = {
     'docs': [
         'sphinx',

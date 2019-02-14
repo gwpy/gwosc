@@ -23,7 +23,7 @@ import os
 
 import pytest
 
-from ..api import fetch_event_json
+from ..api import fetch_catalog_event_json
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
@@ -33,7 +33,7 @@ os.environ.pop('https_proxy', None)
 
 
 def _event_urls(name):
-    return fetch_event_json(name)['strain']
+    return fetch_catalog_event_json(name)['strain']
 
 
 @pytest.fixture

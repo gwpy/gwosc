@@ -27,8 +27,8 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
 def test_url_segment():
-    url = 'X-TEST-123-456.ext'
-    assert utils.url_segment(url) == (123, 579)
+    seg = utils.url_segment('X-TEST-123-456.ext')
+    assert seg == (123, 579)
 
 
 @pytest.mark.parametrize('url, segment, result', [
@@ -43,13 +43,17 @@ def test_url_overlaps_segment(url, segment, result):
 
 @pytest.mark.remote
 @pytest.mark.parametrize('segment, result', [
-    ((1126257414, 1126257414+4096), True),
-    ((1126257413, 1126257414+4096), False),
-    ((1126257414, 1126257414+4097), False),
+    ((1126257415, 1126257415+4096), True),
+    ((1126257414, 1126257415+4096), False),
+    ((1126257415, 1126257415+4097), False),
 ])
 def test_full_coverage(gw150914_urls, segment, result):
     urls = [u['url'] for u in gw150914_urls]
     assert utils.full_coverage(urls, segment) is result
+
+
+def test_full_coverage_empty():
+    assert utils.full_coverage([], (0, 1)) is False
 
 
 @pytest.mark.parametrize('seg1, seg2, result', [

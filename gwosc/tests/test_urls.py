@@ -43,20 +43,23 @@ def test_sieve(gw150914_urls):
 def test_match(gw150914_urls, gw170817_urls):
     urls = [u['url'] for u in gw150914_urls]
     nfiles = len(urls)
-    matched = gwosc_urls.match(urls, version=1)
+    matched = gwosc_urls.match(urls, start=1126259500)  # after 32s files end
     assert len(matched) == nfiles // 2
     for url in matched:
-        assert '_V1-' in url
+        assert '_R1-' in url
 
-    # test GW170817 for multiple tags
-    urls = [u['url'] for u in gw170817_urls]
+
+def test_match_tags():
+    urls = [
+        "/path/to/X-X1_LOSC_C00_4KHZ_R1-0-10.gwf",
+        "/path/to/X-X1_LOSC_C01_4KHZ_R1-0-10.gwf",
+    ]
     with pytest.raises(ValueError) as exc:
         gwosc_urls.match(urls)
     assert str(exc.value).startswith('multiple LOSC URL tags')
 
-    matched = gwosc_urls.match(urls, tag='CLN')
-    for url in matched:
-        assert '_CLN_' in url
+    matched = gwosc_urls.match(urls, tag='C01')
+    assert matched == [urls[1]]
 
     assert not gwosc_urls.match(urls, tag='BLAH')
     assert not gwosc_urls.match(urls, start=1e12)
@@ -73,17 +76,22 @@ URLS = [
     {'url': 'Y-Y1_LOSC_TEST_16_V2-1-1.ext',
      'detector': 'Y1',
      'sampling_rate': 200},
+    {'url': 'Y-Y1_LOSC_TEST2_16_V2-1-1.ext',
+     'detector': 'Y1',
+     'sampling_rate': 200},
 ]
 
 
-@pytest.mark.local
 def test_sieve_local():
     assert list(gwosc_urls.sieve(URLS, detector='X1')) == URLS[:1]
     assert list(gwosc_urls.sieve(URLS, sample_rate=200)) == URLS[1:]
 
 
-@pytest.mark.local
 def test_match_local():
     urls = [u['url'] for u in URLS]
-    assert gwosc_urls.match(urls, start=0, end=1) == urls[:1]
-    assert gwosc_urls.match(urls, version=2) == urls[1:]
+    with pytest.raises(ValueError) as exc:
+        gwosc_urls.match(urls)
+    assert str(exc.value).startswith('multiple LOSC URL tags')
+    assert gwosc_urls.match(urls, tag="TEST", start=0, end=1) == [urls[0]]
+    assert gwosc_urls.match(urls, tag="TEST", version=2) == [urls[1]]
+    assert gwosc_urls.match(urls, tag="TEST2", version="R2") == [urls[2]]
