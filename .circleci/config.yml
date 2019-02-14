@@ -67,7 +67,7 @@ test: &test
   name: Test
   command: |
     set -x;
-    python${PYTHON_VERSION} -m pip install pytest pytest-cov;
+    python${PYTHON_VERSION} -m pip install --upgrade pytest pytest-cov;
     python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc;
 
 
