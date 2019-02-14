@@ -205,7 +205,7 @@ def fetch_catalog_event_json(event, version=None, host=DEFAULT_URL):
 
     # if user specified a version separately, use it
     if version is not None:
-        return fetch_event_json("{0}_R{1}".format(event, version))
+        return fetch_event_json("{0}_R{1}".format(event, version), host=host)
 
     # otherwise find all available versions and return highest
     # its inefficient, but it works..
@@ -220,7 +220,8 @@ def _find_catalog_event_versions(event, host=DEFAULT_URL):
     found = []
     while True:
         try:
-            resp = urlopen(_event_url("{0}_R{1}".format(event, vers), host=host))
+            resp = urlopen(_event_url("{0}_R{1}".format(event, vers),
+                                      host=host))
         except URLError:
             break
         else:

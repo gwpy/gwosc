@@ -25,8 +25,10 @@ from io import BytesIO
 
 try:
     from unittest import mock
+    from urllib.error import URLError
 except ImportError:  # python < 3
     import mock
+    from urllib2 import URLError
 
 import pytest
 
@@ -135,22 +137,25 @@ def test_fetch_catalog_event_json():
     check_json_url_list(out["strain"])
 
 
-@mock.patch("gwosc.api.fetch_event_json", side_effect=[1, ValueError()])
-def test_fetch_catalog_event_json_local(fetch):
+@mock.patch("gwosc.api.fetch_event_json")
+@mock.patch("gwosc.api.urlopen",
+            side_effect=[mock.MagicMock(), URLError("mock")])
+def test_fetch_catalog_event_json_local(urlopen, fej):
     api.fetch_catalog_event_json("GW150914")
-    assert fetch.call_count == 2  # two version queries, one JSON queries
-    fetch.assert_any_call("GW150914_R1")
-    fetch.assert_any_call("GW150914_R2")
+    assert urlopen.call_count == 2  # two version queries, one JSON queries
+    urlopen.assert_any_call(losc_url("archive/GW150914_R1/json/"))
+    urlopen.assert_any_call(losc_url("archive/GW150914_R2/json/"))
+    fej.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
 
 
 @mock.patch("gwosc.api.fetch_event_json")
 def test_fetch_catalog_event_json_version(fetch):
     api.fetch_catalog_event_json("GW150914_R1")
     assert fetch.call_count == 1
-    fetch.assert_called_with("GW150914_R1")
+    fetch.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
 
-    mock.reset_mock()
+    fetch.reset_mock()
 
     api.fetch_catalog_event_json("GW150914", version=10)
     assert fetch.call_count == 1
-    fetch.assert_called_with("GW150914_R10")
+    fetch.assert_called_with("GW150914_R10", host=api.DEFAULT_URL)
