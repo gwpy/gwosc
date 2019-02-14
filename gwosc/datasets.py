@@ -35,10 +35,10 @@ IGNORE = {
     "tenyear",
     "history",
 }
-CATALOGS = {
+CATALOGS = [
     "GWTC-1-confident",
     "GWTC-1-marginal",
-}
+]
 
 
 def _match_dataset(targetdetector, detectors, targetsegment, segment):
