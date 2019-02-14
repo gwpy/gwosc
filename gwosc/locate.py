@@ -95,14 +95,15 @@ def get_urls(
     }
 
     for dstype, _get_urls in dataset_metadata.items():
-        dsets = datasets.find_datasets(
-            type=dstype,
-            detector=detector,
-            segment=(start, end),
-            host=host,
-        )
-        if dataset and dataset not in dsets:
-            continue
+        if dataset:
+            dsets = [dataset]
+        else:
+            dsets = datasets.find_datasets(
+                type=dstype,
+                detector=detector,
+                segment=(start, end),
+                host=host,
+            )
         for dataset in dsets:
             # get URL list for this dataset
             urls = _get_urls(dataset)["strain"]
