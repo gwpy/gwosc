@@ -65,7 +65,6 @@ def test_fetch_json():
         "Failed to parse LOSC JSON from {!r}: ".format(url2))
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.urlopen', return_value=BytesIO(b'{"key": "value"}'))
 def test_fetch_json_local(_):
     url = 'anything'
@@ -83,7 +82,6 @@ def test_fetch_dataset_json():
     assert set(out['runs'].keys()).issubset({'tenyear', 'S6', 'history'})
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_dataset_json_local(fetch):
     start = 934000000
@@ -102,7 +100,6 @@ def test_fetch_event_json():
     check_json_url_list(out['strain'])
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_event_json_local(fetch):
     api.fetch_event_json('GW150914')
@@ -122,7 +119,6 @@ def test_fetch_run_json():
     check_json_url_list(out['strain'])
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_json')
 def test_fetch_run_json_local(fetch):
     api.fetch_run_json('S6', 'L1', 934000000, 934100000)
@@ -139,7 +135,6 @@ def test_fetch_catalog_event_json():
     check_json_url_list(out["strain"])
 
 
-@pytest.mark.local
 @mock.patch("gwosc.api.fetch_json", side_effect=[1, ValueError()])
 def test_fetch_catalog_event_json_local(fetch):
     api.fetch_catalog_event_json("GW150914")
@@ -148,7 +143,6 @@ def test_fetch_catalog_event_json_local(fetch):
     fetch.assert_any_call(losc_url("archive/GW150914_R2/json/"))
 
 
-@pytest.mark.local
 @mock.patch("gwosc.api.fetch_json")
 def test_fetch_catalog_event_json_version_local(fetch):
     api.fetch_catalog_event_json("GW150914", version=10)

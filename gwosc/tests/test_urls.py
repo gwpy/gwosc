@@ -49,7 +49,6 @@ def test_match(gw150914_urls, gw170817_urls):
         assert '_R1-' in url
 
 
-@pytest.mark.local
 def test_match_tags():
     urls = [
         "/path/to/X-X1_LOSC_C00_4KHZ_R1-0-10.gwf",
@@ -83,13 +82,11 @@ URLS = [
 ]
 
 
-@pytest.mark.local
 def test_sieve_local():
     assert list(gwosc_urls.sieve(URLS, detector='X1')) == URLS[:1]
     assert list(gwosc_urls.sieve(URLS, sample_rate=200)) == URLS[1:]
 
 
-@pytest.mark.local
 def test_match_local():
     urls = [u['url'] for u in URLS]
     with pytest.raises(ValueError) as exc:

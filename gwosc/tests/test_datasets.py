@@ -79,7 +79,6 @@ def test_find_datasets_segment():
     assert "GW170817" not in sets
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 @mock.patch('gwosc.api.fetch_catalog_json', return_value=CATALOG_JSON)
 @mock.patch(
@@ -110,7 +109,6 @@ def test_find_datasets_local(fcej, fcj, fdj):
     assert datasets.find_datasets(type='event', detector='V1') == []
 
 
-@pytest.mark.local
 @mock.patch(
     "gwosc.datasets._catalog_datasets",
     side_effect=[ValueError, []],
@@ -127,7 +125,6 @@ def test_event_gps():
     assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
     'GPS': 12345,
     'something else': None,
@@ -145,7 +142,6 @@ def test_event_segment():
     assert datasets.event_segment("GW170817") == (1187006835, 1187010931)
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
     "strain": [
         {"url": "https://test.com/X-X1-123-456.gwf"},
@@ -164,7 +160,6 @@ def test_event_at_gps():
     assert str(exc.value) == 'no event found within 0.1 seconds of 1187008882'
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_event_at_gps_local(fetch):
     assert datasets.event_at_gps(12345) == 'GW150914'
@@ -178,7 +173,6 @@ def test_event_detectors():
     assert datasets.event_detectors("GW170814") == {"H1", "L1", "V1"}
 
 
-@pytest.mark.local
 @mock.patch("gwosc.api.fetch_catalog_event_json", return_value={
     "strain": [{"detector": "A1"}, {"detector": "A1"}, {"detector": "B1"}],
 })
@@ -194,7 +188,6 @@ def test_run_segment():
     assert str(exc.value) == 'no run dataset found for \'S7\''
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_run_segment_local(fetch):
     assert datasets.run_segment('S1') == (0, 1)
@@ -210,7 +203,6 @@ def test_run_at_gps():
     assert str(exc.value) == 'no run dataset found containing GPS 0'
 
 
-@pytest.mark.local
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 def test_run_at_gps_local(fetch):
     assert datasets.run_at_gps(0) == 'S1'
