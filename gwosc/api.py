@@ -149,9 +149,7 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
     json
         the JSON data retrieved from LOSC and returned by `json.loads`
     """
-    url = '{}/archive/links/{}/{}/{:d}/{:d}/json/'.format(
-        host, run, detector, gpsstart, gpsend)
-    return fetch_json(url)
+    return fetch_json(_run_url(run, detector, gpsstart, gpsend, host=host))
 
 
 def fetch_catalog_json(catalog, host=DEFAULT_URL):
