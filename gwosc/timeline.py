@@ -18,9 +18,7 @@
 
 from operator import itemgetter
 
-from . import api
-from .datasets import IGNORE as IGNORED_DATASETS
-from .urls import sieve
+from . import (api, datasets, utils)
 
 
 def get_segments(flag, start, end, host=api.DEFAULT_URL):
@@ -59,53 +57,46 @@ def timeline_url(flag, start, end, host=api.DEFAULT_URL):
 
 
 def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
-    meta = api.fetch_dataset_json(start, end, host=host)
-    duration = end-start
 
+    # -- utility methods to resolve a (proper) dataset name and its segment
+
+    def _event_version_segment(event):
+        versions = api._find_catalog_event_versions(event, host=host)
+        last = versions[-1]
+        dataset = "{0}_R{1}".format(event, last)
+        metadata = api.fetch_event_json(event, host=host)
+        return (
+            dataset,
+            utils.urllist_extent(map(itemgetter("url"), metadata["strain"])),
+        )
+
+    def _run_segment(run):
+        return run, datasets.run_segment(run, host=host)
+
+    # -- match datasets
+
+    dataset_segments = [
+        ("event", _event_version_segment),
+        ("run", _run_segment),
+    ]
+
+    duration = end-start
     epochs = []
 
-    for type_ in meta:
-        for epoch, metadata in meta[type_].items():
-            if epoch in IGNORED_DATASETS:  # tenyear doesn't work with json API
-                continue
-
-            # filter on detector
-            if detector not in metadata['detectors']:
-                continue
-
-            # get dataset segment
-            if type_ == 'events':
-                segment = _event_segment(epoch, host=host, detector=detector)
-            elif type_ == 'runs':
-                segment = metadata['GPSstart'], metadata['GPSend']
-            else:
-                raise ValueError(
-                    "Unrecognised dataset type {!r}".format(type_))
-
-            # compare with request
+    for dstype, _dataset_segment in dataset_segments:
+        dsets = datasets.find_datasets(
+            type=dstype,
+            detector=detector,
+            segment=(start, end),
+            host=host,
+        )
+        for dataset in dsets:
+            dataset, segment = _dataset_segment(dataset)
             overlap = min(end, segment[1]) - max(start, segment[0])
-            epochs.append((epoch, duration-overlap))
+            epochs.append((dataset, duration-overlap))
 
     if not epochs:
         raise ValueError(
             "No datasets found matching [{}, {})".format(start, end))
 
     return sorted(epochs, key=itemgetter(1, 0))[0][0]
-
-
-def _event_segment(event, host=api.DEFAULT_URL, **match):
-    jdata = api.fetch_event_json(event, host=host)
-    seg = None
-    for fmeta in sieve(jdata['strain'], **match):
-        start = fmeta['GPSstart']
-        end = start + fmeta['duration']
-        if seg is None:  # first segment
-            seg = (start, end)
-            continue
-        seg = min(start, seg[0]), max(end, seg[1])
-
-    # fail on no match
-    if seg is None:
-        raise ValueError("No files matched for event {}".format(event))
-
-    return seg
