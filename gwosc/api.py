@@ -227,4 +227,6 @@ def _find_catalog_event_versions(event, host=DEFAULT_URL):
             resp.close()
         found.append(vers)
         vers += 1
+    if not found:
+        raise ValueError("no event datasets found for {!r}".format(event))
     return found
