@@ -97,4 +97,4 @@ def test_match_local():
     assert str(exc.value).startswith('multiple LOSC URL tags')
     assert gwosc_urls.match(urls, tag="TEST", start=0, end=1) == [urls[0]]
     assert gwosc_urls.match(urls, tag="TEST", version=2) == [urls[1]]
-    assert gwosc_urls.match(urls, tag="TEST2", version=2) == [urls[2]]
+    assert gwosc_urls.match(urls, tag="TEST2", version="R2") == [urls[2]]

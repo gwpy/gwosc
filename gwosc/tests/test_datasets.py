@@ -110,6 +110,15 @@ def test_find_datasets_local(fcej, fcj, fdj):
     assert datasets.find_datasets(type='event', detector='V1') == []
 
 
+@pytest.mark.local
+@mock.patch(
+    "gwosc.datasets._catalog_datasets",
+    side_effect=[ValueError, []],
+)
+def test_find_datasets_catalog_error(_):
+    assert datasets.find_datasets(type="catalog") == ["GWTC-1-marginal"]
+
+
 @pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.4
@@ -161,6 +170,20 @@ def test_event_at_gps_local(fetch):
     assert datasets.event_at_gps(12345) == 'GW150914'
     with pytest.raises(ValueError):
         datasets.event_at_gps(12349)
+
+
+@pytest.mark.remote
+def test_event_detectors():
+    assert datasets.event_detectors("GW150914") == {"H1", "L1"}
+    assert datasets.event_detectors("GW170814") == {"H1", "L1", "V1"}
+
+
+@pytest.mark.local
+@mock.patch("gwosc.api.fetch_catalog_event_json", return_value={
+    "strain": [{"detector": "A1"}, {"detector": "A1"}, {"detector": "B1"}],
+})
+def test_event_detectors_local(fcej):
+    assert datasets.event_detectors("test") == {"A1", "B1"}
 
 
 @pytest.mark.remote

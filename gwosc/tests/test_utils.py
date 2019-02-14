@@ -52,6 +52,10 @@ def test_full_coverage(gw150914_urls, segment, result):
     assert utils.full_coverage(urls, segment) is result
 
 
+def test_full_coverage_empty():
+    assert utils.full_coverage([], (0, 1)) is False
+
+
 @pytest.mark.parametrize('seg1, seg2, result', [
     ((10, 11), (0, 10), False),
     ((10, 11), (5, 11), True),

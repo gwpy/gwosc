@@ -61,6 +61,13 @@ def test_get_urls():
 
 
 @pytest.mark.remote
+def test_get_urls_deprecated_tag():
+    # test `tag` prints a warning
+    with pytest.warns(DeprecationWarning):
+        locate.get_urls("L1", 1187007040, 1187009088, tag="TEST")
+
+
+@pytest.mark.remote
 def test_get_event_urls(gw150914_urls):
     # find latest version by brute force
     latestv = sorted(
