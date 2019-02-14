@@ -53,7 +53,9 @@ def test_fetch_json():
     assert isinstance(out, dict)
     assert len(out['events']) == 1
     assert sorted(out['events']['GW150914']['detectors']) == ['H1', 'L1']
-    assert set(out['runs'].keys()).issubset({'tenyear', 'O1', 'O1_16KHZ', 'history'})
+    assert set(out['runs'].keys()).issubset(
+        {'tenyear', 'O1', 'O1_16KHZ', 'history'},
+    )
 
     # check errors (use legit URL that isn't JSON)
     url2 = os.path.dirname(os.path.dirname(url))
