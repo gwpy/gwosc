@@ -69,8 +69,7 @@ def test_find_datasets():
     for dset in runsets:
         assert run_regex.match(dset)
 
-    with pytest.raises(ValueError):
-        datasets.find_datasets(type='badtype')
+    assert datasets.find_datasets(type='badtype') == []
 
 
 @pytest.mark.remote

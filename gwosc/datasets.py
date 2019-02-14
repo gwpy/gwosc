@@ -35,28 +35,35 @@ IGNORE = {
     "tenyear",
     "history",
 }
-DATASET_TYPES = {
-    "run",
-    "event",
-    "catalog",
-}
 CATALOGS = {
     "GWTC-1-confident",
     "GWTC-1-marginal",
 }
 
 
+def _match_dataset(targetdetector, detectors, targetsegment, segment):
+    """Returns `True` if the dataset metadata matches the target
+    """
+    if targetdetector not in set(detectors) | {None}:
+        return False
+    if targetsegment is None or utils.segments_overlap(
+            targetsegment, segment):
+        return True
+
+
 def _run_datasets(detector=None, segment=None, host=api.DEFAULT_URL):
     meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)["runs"]
     for epoch, metadata in meta.items():
-        if (
-                epoch in IGNORE or
-                (detector and detector not in metadata['detectors']) or
-                (segment and not utils.segments_overlap(
-                    segment, (metadata['GPSstart'], metadata['GPSend'])))
-        ):
+        # ignore tenyear, etc...
+        if epoch in IGNORE:
             continue
-        yield epoch
+        if _match_dataset(
+                detector,
+                metadata['detectors'],
+                segment,
+                (metadata['GPSstart'], metadata['GPSend']),
+        ):
+            yield epoch
 
 
 def _catalog_datasets(
@@ -68,29 +75,37 @@ def _catalog_datasets(
     """Yields events from one or more catalogs
     """
     # fetch list of all events (adding MC prefix for marginal candidates)
-    events = ["MC{}".format(e) if catalog.endswith("-marginal") else e for
-              e in api.fetch_catalog_json(catalog, host=host)['data']]
+    events = api.fetch_catalog_json(catalog, host=host)['data']
+    if catalog.endswith("-marginal"):
+        events = ["MC{}".format(e) for e in events]
 
-    # if not filtering by detectors, just return now
+    # if not filtering, just return now
     if detector is None and segment is None:
         return events
 
-    # otherwise query for the detector set for all events, using threading
-    def _func(event):
-        data = api.fetch_catalog_event_json(event, host=host, version=None)
+    # NOTE: is is likely that in the future catalogs will be explicitly
+    #       versioned in the API, so we can use version properly
+    return _filter_events(events, detector, segment, None, host)
+
+
+def _filter_events(events, detector, segment, version, host):
+    """Filter a list of events based on metadata
+    """
+    def _fetch_event_data(event):
+        data = api.fetch_catalog_event_json(event, host=host, version=version)
         segment = utils.urllist_extent(map(itemgetter("url"), data["strain"]))
         detectors = set(url['detector'] for url in data['strain'])
         return (event, segment, detectors)
+
     pool = multiprocessing.dummy.Pool(len(events))
-    keep = []
-    for event, eseg, detset in pool.map(_func, events):
-        if (
-                (detector and detector not in detset) or
-                (segment and not utils.segments_overlap(segment, eseg))
+    for event, eseg, detset in pool.map(_fetch_event_data, events):
+        if _match_dataset(
+                detector,
+                detset,
+                segment,
+                eseg,
         ):
-            continue
-        keep.append(event)
-    return keep
+            yield event
 
 
 def find_datasets(
@@ -136,18 +151,11 @@ def find_datasets(
     ['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817',
      'LVT151012']
     """
-    # format type
-    if type and type not in DATASET_TYPES:
-        raise ValueError(
-            "unrecognised type {0!r}, select one of: {1}".format(
-                type, ", ".join(map(repr, DATASET_TYPES))))
-    if type and not type.endswith('s'):
-        type += 's'
-
     # get queries
-    needruns = type in {None, "runs"}
-    needcatalogs = type in {None, "catalogs"}
-    needevents = type in {None, "events"}
+    type = str(type).rstrip("s").lower()
+    needruns = type in {"none", "run"}
+    needcatalogs = type in {"none", "catalog"}
+    needevents = type in {"none", "event"}
 
     names = set()
 
