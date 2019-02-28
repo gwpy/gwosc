@@ -80,7 +80,7 @@ def get_urls(
 
     if tag is not None:
         warnings.warn(
-            "the `tag` keyword to get_urls is deprecated, GWOSC no longer"
+            "the `tag` keyword to get_urls is deprecated, GWOSC no longer "
             "releases multiple datasets for events, please use the `dataset` "
             "and `version` keyword arguments to manually select the host "
             "dataset for URLs",

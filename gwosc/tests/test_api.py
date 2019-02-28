@@ -129,6 +129,21 @@ def test_fetch_run_json_local(fetch):
 
 
 @pytest.mark.remote
+def test_fetch_catalog_json():
+    out = api.fetch_catalog_json("GWTC-1-confident")
+    assert "distance" in out["parameters"]
+    assert out["data"]["GW170817"]["tc"]["best"] == 1187008882.4
+
+
+@mock.patch("gwosc.api.fetch_json")
+def test_fetch_catalog_json_local(fetch):
+    api.fetch_catalog_json("GWTC-1-confident")
+    fetch.assert_called_with(
+        losc_url("catalog/GWTC-1-confident/filelist/")
+    )
+
+
+@pytest.mark.remote
 def test_fetch_catalog_event_json():
     event = 'GW150914'
     out = api.fetch_catalog_event_json(event)

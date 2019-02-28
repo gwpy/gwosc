@@ -27,7 +27,7 @@ from operator import itemgetter
 from six import raise_from
 from six.moves.urllib.error import URLError
 
-from . import (api, utils)
+from . import (api, utils, catalog as gwosc_catalog)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
@@ -64,48 +64,6 @@ def _run_datasets(detector=None, segment=None, host=api.DEFAULT_URL):
                 (metadata['GPSstart'], metadata['GPSend']),
         ):
             yield epoch
-
-
-def _catalog_datasets(
-        catalog,
-        detector=None,
-        segment=None,
-        host=api.DEFAULT_URL,
-):
-    """Yields events from one or more catalogs
-    """
-    # fetch list of all events (adding MC prefix for marginal candidates)
-    events = api.fetch_catalog_json(catalog, host=host)['data']
-    if catalog.endswith("-marginal"):
-        events = ["MC{}".format(e) for e in events]
-
-    # if not filtering, just return now
-    if detector is None and segment is None:
-        return events
-
-    # NOTE: is is likely that in the future catalogs will be explicitly
-    #       versioned in the API, so we can use version properly
-    return _filter_events(events, detector, segment, None, host)
-
-
-def _filter_events(events, detector, segment, version, host):
-    """Filter a list of events based on metadata
-    """
-    def _fetch_event_data(event):
-        data = api.fetch_catalog_event_json(event, host=host, version=version)
-        segment = utils.urllist_extent(map(itemgetter("url"), data["strain"]))
-        detectors = set(url['detector'] for url in data['strain'])
-        return (event, segment, detectors)
-
-    pool = multiprocessing.dummy.Pool(len(events))
-    for event, eseg, detset in pool.map(_fetch_event_data, events):
-        if _match_dataset(
-                detector,
-                detset,
-                segment,
-                eseg,
-        ):
-            yield event
 
 
 def find_datasets(
@@ -177,7 +135,7 @@ def find_datasets(
     if needcatalogs or needevents:
         for catalog in CATALOGS:
             try:
-                cnames = _catalog_datasets(
+                events = gwosc_catalog.events(
                     catalog,
                     detector=detector,
                     segment=segment,
@@ -190,7 +148,7 @@ def find_datasets(
                 names.add(catalog)
             # record events
             if needevents:
-                names.update(cnames)
+                names.update(events)
 
     return sorted(names)
 
