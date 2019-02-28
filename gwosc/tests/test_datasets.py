@@ -44,7 +44,14 @@ DATASET_JSON = {
 }
 CATALOG_JSON = {
     'data': {
-        'GW150914': {},
+        'GW150914': {
+            'files': {
+                'DataRevisionNum': 'R1',
+                'OperatingIFOs': "H1 L1",
+                'H1': {},
+                'L1': {},
+            },
+        },
     }
 }
 
@@ -71,7 +78,7 @@ def test_find_datasets_detector():
 def test_find_datasets_type():
     runsets = datasets.find_datasets(type='run')
     assert 'O1' in runsets
-    run_regex = re.compile(r'\A[OS]\d+(_16KHZ)?\Z')
+    run_regex = re.compile(r'\A[OS]\d+(_\d+KHZ)?(_[RV]\d+)?\Z')
     for dset in runsets:
         assert run_regex.match(dset)
 
@@ -116,7 +123,7 @@ def test_find_datasets_local(fcej, fcj, fdj):
 
 
 @mock.patch(
-    "gwosc.datasets._catalog_datasets",
+    "gwosc.catalog.events",
     side_effect=[ValueError, []],
 )
 def test_find_datasets_catalog_error(_):

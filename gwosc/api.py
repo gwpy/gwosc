@@ -152,6 +152,12 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
     return fetch_json(_run_url(run, detector, gpsstart, gpsend, host=host))
 
 
+def _catalog_url(catalog, host=DEFAULT_URL):
+    return "{}/catalog/{}/filelist/".format(
+        host, catalog,
+    )
+
+
 def fetch_catalog_json(catalog, host=DEFAULT_URL):
     """"Returns the JSON metadata for the given catalogue
 
@@ -169,10 +175,7 @@ def fetch_catalog_json(catalog, host=DEFAULT_URL):
         the JSON data retrieved from GWOSC and returnend by
         :func:`json.loads`
     """
-    url = "{}/catalog/{}/json/".format(
-        host, catalog,
-    )
-    return fetch_json(url)
+    return fetch_json(_catalog_url(catalog, host=host))
 
 
 def fetch_catalog_event_json(event, version=None, host=DEFAULT_URL):
