@@ -80,21 +80,23 @@ def get_urls(
 
     if tag is not None:
         warnings.warn(
-            "the `tag` keyword to get_urls is deprecated, GWOSC no longer"
+            "the `tag` keyword to get_urls is deprecated, GWOSC no longer "
             "releases multiple datasets for events, please use the `dataset` "
             "and `version` keyword arguments to manually select the host "
             "dataset for URLs",
             DeprecationWarning,
         )
 
-    dataset_metadata = {
-        "event":
-            lambda x: api.fetch_catalog_event_json(x, host=host),
-        "run":
-            lambda x: api.fetch_run_json(x, detector, start, end, host=host),
-    }
+    dataset_metadata = [
+        ("event",
+         lambda x: api.fetch_catalog_event_json(x, host=host),
+         ),
+        ("run",
+         lambda x: api.fetch_run_json(x, detector, start, end, host=host),
+         ),
+    ]
 
-    for dstype, _get_urls in dataset_metadata.items():
+    for dstype, _get_urls in dataset_metadata:
         if dataset:
             dsets = [dataset]
         else:
