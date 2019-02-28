@@ -35,9 +35,13 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 os.environ.pop('http_proxy', None)
 os.environ.pop('https_proxy', None)
 
+try:
+    autouseyield = pytest.yield_fixture(autouse=True)
+except AttributeError:  # pytest > 3.0.0
+    autouseyield = pytest.fixture(autouse=True)
 
 # force all tests to not rely on the catalog cache
-@pytest.fixture(autouse=True)
+@autouseyield
 def clear_catalog_cache():
     with mock.patch.dict("gwosc.catalog.CACHE", clear=True):
         yield
