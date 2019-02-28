@@ -40,6 +40,7 @@ try:
 except AttributeError:  # pytest > 3.0.0
     autouseyield = pytest.fixture(autouse=True)
 
+
 # force all tests to not rely on the catalog cache
 @autouseyield
 def clear_catalog_cache():
