@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.3.4
+%define version 0.4.1
 %define release 1
 
 Name:      %{name}
@@ -94,6 +94,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Thu Feb 28 2019 Duncan Macleod <duncan.macleod@ligo.org> - 0.4.1-1
+- development release to include catalogue parsing
+
 * Mon Oct 1 2018 Duncan Macleod <duncan.macleod@ligo.org>
 - 0.3.4 testing bug-fix release
 
