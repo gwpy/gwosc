@@ -87,14 +87,16 @@ def get_urls(
             DeprecationWarning,
         )
 
-    dataset_metadata = {
-        "event":
-            lambda x: api.fetch_catalog_event_json(x, host=host),
-        "run":
-            lambda x: api.fetch_run_json(x, detector, start, end, host=host),
-    }
+    dataset_metadata = [
+        ("event",
+         lambda x: api.fetch_catalog_event_json(x, host=host),
+        ),
+        ("run",
+         lambda x: api.fetch_run_json(x, detector, start, end, host=host),
+        ),
+    ]
 
-    for dstype, _get_urls in dataset_metadata.items():
+    for dstype, _get_urls in dataset_metadata:
         if dataset:
             dsets = [dataset]
         else:
