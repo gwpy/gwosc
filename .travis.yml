@@ -1,3 +1,4 @@
+dist: xenial
 language: python
 
 env:
@@ -9,6 +10,7 @@ python:
   - '3.4'
   - '3.5'
   - '3.6'
+  - '3.7'
   - 'nightly'
 
 before_install:
@@ -18,11 +20,14 @@ install:
   - python -m pip install .
 
 before_script:
-  - python -m pip install coveralls "pytest>=2.8" pytest-runner sphinx_rtd_theme numpydoc
+  - python -m pip install coveralls "pytest>=2.8" pytest-runner sphinx_rtd_theme numpydoc pytest-socket
 
 script:
   # run unit tests
   - coverage run ./setup.py test
+
+  # run unit tests again with --disable-socket to ensure that tests are marked properly
+  - python -m pytest --disable-socket -m "not remote"
 
   # build documentation
   - cd docs && make html; cd ../

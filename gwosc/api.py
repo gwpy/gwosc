@@ -18,11 +18,15 @@
 
 import contextlib
 import json
+import re
 
 from six.moves.urllib.request import urlopen
+from six.moves.urllib.error import URLError
 
-DEFAULT_URL = 'https://losc.ligo.org'
+DEFAULT_URL = "https://www.gw-openscience.org"
 MAX_GPS = 99999999999
+
+VERSIONED_EVENT_REGEX = re.compile(r"_[RV]\d+\Z")
 
 
 # -- JSON handling ------------------------------------------------------------
@@ -64,6 +68,10 @@ def fetch_json(url):
 
 # -- API calls ----------------------------------------------------------------
 
+def _dataset_url(start, end, host=DEFAULT_URL):
+    return "{}/archive/{:d}/{:d}/json/".format(host, start, end)
+
+
 def fetch_dataset_json(gpsstart, gpsend, host=DEFAULT_URL):
     """Returns the JSON metadata for all datasets matching the GPS interval
 
@@ -83,8 +91,11 @@ def fetch_dataset_json(gpsstart, gpsend, host=DEFAULT_URL):
     json
         the JSON data retrieved from LOSC and returned by `json.loads`
     """
-    url = '{}/archive/{:d}/{:d}/json/'.format(host, gpsstart, gpsend)
-    return fetch_json(url)
+    return fetch_json(_dataset_url(gpsstart, gpsend, host=host))
+
+
+def _event_url(event, host=DEFAULT_URL):
+    return "{}/archive/{}/json/".format(host, event)
 
 
 def fetch_event_json(event, host=DEFAULT_URL):
@@ -103,8 +114,13 @@ def fetch_event_json(event, host=DEFAULT_URL):
     json
         the JSON data retrieved from LOSC and returned by `json.loads`
     """
-    url = '{}/archive/{}/json/'.format(host, event)
-    return fetch_json(url)
+    return fetch_json(_event_url(event, host=host))
+
+
+def _run_url(run, detector, start, end, host=DEFAULT_URL):
+    return "{}/archive/links/{}/{}/{:d}/{:d}/json/".format(
+        host, run, detector, start, end,
+    )
 
 
 def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
@@ -133,6 +149,86 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
     json
         the JSON data retrieved from LOSC and returned by `json.loads`
     """
-    url = '{}/archive/links/{}/{}/{:d}/{:d}/json/'.format(
-        host, run, detector, gpsstart, gpsend)
-    return fetch_json(url)
+    return fetch_json(_run_url(run, detector, gpsstart, gpsend, host=host))
+
+
+def _catalog_url(catalog, host=DEFAULT_URL):
+    return "{}/catalog/{}/filelist/".format(
+        host, catalog,
+    )
+
+
+def fetch_catalog_json(catalog, host=DEFAULT_URL):
+    """"Returns the JSON metadata for the given catalogue
+
+    Parameters
+    ----------
+    catalog : `str`
+        the name of the event catalog, e.g. `GWTC-1-confident`
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    Returns
+    -------
+    json
+        the JSON data retrieved from GWOSC and returnend by
+        :func:`json.loads`
+    """
+    return fetch_json(_catalog_url(catalog, host=host))
+
+
+def fetch_catalog_event_json(event, version=None, host=DEFAULT_URL):
+    """Returns the JSON metadata for the given event in a catalog
+
+    This method queries for all available data-release versions, returning
+    the highest available version, unless ``version=<X>`` is specified.
+
+    Parameters
+    ----------
+    event : `str`
+        the name of the event to query
+
+    host : `str`, optional
+        the URL of the LOSC host to query, defaults to losc.ligo.org
+
+    version : `int`, `None`, optional
+        restrict query to a given data-release version
+
+    Returns
+    -------
+    json
+        the JSON data retrieved from LOSC and returned by `json.loads`
+    """
+    # if user gave a versioned event (e.g. GW150914_R1), use it directly
+    if VERSIONED_EVENT_REGEX.search(event):
+        return fetch_event_json(event, host=host)
+
+    # if user specified a version separately, use it
+    if version is not None:
+        return fetch_event_json("{0}_R{1}".format(event, version), host=host)
+
+    # otherwise find all available versions and return highest
+    # its inefficient, but it works..
+    versions = _find_catalog_event_versions(event, host=host)
+    return fetch_catalog_event_json(event, version=versions[-1], host=host)
+
+
+def _find_catalog_event_versions(event, host=DEFAULT_URL):
+    """List all available versions of a catalogue event
+    """
+    vers = 1
+    found = []
+    while True:
+        try:
+            resp = urlopen(_event_url("{0}_R{1}".format(event, vers),
+                                      host=host))
+        except URLError:
+            break
+        else:
+            resp.close()
+        found.append(vers)
+        vers += 1
+    if not found:
+        raise ValueError("no event datasets found for {!r}".format(event))
+    return found

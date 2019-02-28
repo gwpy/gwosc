@@ -44,7 +44,7 @@ def url_segment(url):
     _, _, s, e = base.split('-')
     s = int(s)
     e = int(e.split('.')[0])
-    return (s, s+e)
+    return s, s+e
 
 
 def url_overlaps_segment(url, segment):
@@ -68,6 +68,24 @@ def url_overlaps_segment(url, segment):
     return segments_overlap(useg, segment)
 
 
+def urllist_extent(urls):
+    """Returns the GPS `[start, end)` interval covered by a list or URLs
+
+    Parameters
+    ----------
+    urls : `list` of `str`
+        the list of URLs
+
+    Returns
+    -------
+    a, b : 2-`tuple` of int`
+        the GPS extent of the URL list
+    """
+    segs = map(url_segment, urls)
+    starts, ends = zip(*segs)
+    return min(starts), max(ends)
+
+
 def full_coverage(urls, segment):
     """Returns True if the list of URLS completely covers a GPS interval
 
@@ -78,12 +96,7 @@ def full_coverage(urls, segment):
     if not urls:
         return False
     # sort URLs by GPS timestamp
-    urlsegs = [url_segment(u) for u in urls]
-    starts, ends = zip(*urlsegs)
-    # extract segments for first and last files
-    a = min(starts)
-    b = max(ends)
-    # compare to given segment
+    a, b = urllist_extent(urls)
     return a <= segment[0] and b >= segment[1]
 
 
