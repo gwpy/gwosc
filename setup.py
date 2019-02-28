@@ -36,7 +36,7 @@ install_requires = [
     'six>=1.9.0',
 ]
 tests_require = [
-    'pytest>=2.8',
+    'pytest>=2.7.0',
 ]
 if sys.version_info.major < 3:
     tests_require.extend((
