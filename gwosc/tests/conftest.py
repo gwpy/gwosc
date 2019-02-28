@@ -20,6 +20,10 @@
 """
 
 import os
+try:
+    from unittest import mock
+except ImportError:  # python < 3
+    import mock
 
 import pytest
 
@@ -30,6 +34,13 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 # unset these variables to allow the tests to run with pybuild
 os.environ.pop('http_proxy', None)
 os.environ.pop('https_proxy', None)
+
+
+# force all tests to not rely on the catalog cache
+@pytest.fixture(autouse=True)
+def clear_catalog_cache():
+    with mock.patch.dict("gwosc.catalog.CACHE", clear=True):
+        yield
 
 
 def _event_urls(name):
