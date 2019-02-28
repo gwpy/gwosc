@@ -31,7 +31,7 @@ build:centos: &build-centos
     tar -xf gwosc-*.tar.gz;
     rm -rf gwosc-*.tar.gz;
     _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}');
-    mv gwosc-* gwosc-${_version};
+    mv gwosc-* gwosc-${_version} || true;
     tar -zcf gwosc-${_version}.tar.gz gwosc-${_version};
     rm -rf gwosc-${_version}/;
     # build src rpm
