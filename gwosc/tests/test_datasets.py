@@ -222,3 +222,22 @@ def test_run_at_gps_local(fetch):
     assert datasets.run_at_gps(0) == 'S1'
     with pytest.raises(ValueError):
         datasets.run_at_gps(10)
+
+
+@pytest.mark.remote
+def test_dataset_type():
+    assert datasets.dataset_type("O1") == "run"
+    assert datasets.dataset_type("GW150914") == "event"
+    assert datasets.dataset_type("GWTC-1-confident") == "catalog"
+    with pytest.raises(ValueError):
+        datasets.dataset_type("invalid")
+
+
+@mock.patch(
+    'gwosc.datasets.find_datasets',
+    side_effect=[["testrun"], [],  ["testevent"], [], [], []],
+)
+def test_dataset_type_local(find):
+    assert datasets.dataset_type("testevent") == "event"
+    with pytest.raises(ValueError):
+        datasets.dataset_type("invalid")

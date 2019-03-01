@@ -96,6 +96,10 @@ def get_urls(
          ),
     ]
 
+    if dataset:
+        dstype = datasets.dataset_type(dataset)
+        dataset_metadata = [(dstype, dict(dataset_metadata)[dstype])]
+
     for dstype, _get_urls in dataset_metadata:
         if dataset:
             dsets = [dataset]
