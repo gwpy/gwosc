@@ -371,3 +371,38 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
         if start <= gps < end:
             return run
     raise ValueError("no run dataset found containing GPS {0}".format(gps))
+
+
+def dataset_type(dataset, host=api.DEFAULT_URL):
+    """Returns the type of the named dataset
+
+    Parameters
+    ----------
+    dataset : `str`
+        The name of the dataset to match
+
+    host : `str`, optional
+        the URL of the LOSC host to query
+
+    Returns
+    -------
+    type : `str`
+        the type of the dataset, one of 'run', 'event', or 'catalog'
+
+    Raises
+    -------
+    ValueError
+        if this dataset cannot be matched
+
+    Examples
+    --------
+    >>> from gwosc.datasets import dataset_type
+    >>> dataset_type('O1')
+    'run'
+    """
+    for type_ in ("run", "catalog", "event"):
+        if dataset in find_datasets(type=type_):
+            return type_
+    raise ValueError(
+        "failed to determine type for dataset {0!r}".format(dataset),
+    )

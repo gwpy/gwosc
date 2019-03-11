@@ -96,6 +96,10 @@ def get_urls(
          ),
     ]
 
+    if dataset:
+        dstype = datasets.dataset_type(dataset)
+        dataset_metadata = [(dstype, dict(dataset_metadata)[dstype])]
+
     for dstype, _get_urls in dataset_metadata:
         if dataset:
             dsets = [dataset]
@@ -106,9 +110,9 @@ def get_urls(
                 segment=(start, end),
                 host=host,
             )
-        for dataset in dsets:
+        for dst in dsets:
             # get URL list for this dataset
-            urls = _get_urls(dataset)["strain"]
+            urls = _get_urls(dst)["strain"]
 
             # match URLs to request
             urls = lurls.match(
