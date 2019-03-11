@@ -1,3 +1,10 @@
+gwosc (0.4.2-1) unstable; urgency=low
+
+  * [#31] new function `gwosc.datasets.dataset_type`
+  * [#32] fixed critical bug in `gwosc.locate.get_urls`
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Mon, 11 Mar 2019 16:39:00 +0000
+
 gwosc (0.4.1-1) unstable; urgency=low
 
   * development release to include catalogue parsing
