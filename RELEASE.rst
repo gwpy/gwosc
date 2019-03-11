@@ -13,7 +13,12 @@ So, to release a new version of the package:
 
       $ git flow release start 1.0.0
 
-   and then ``publish`` it, allowing CI to run, and others to contribute:
+#. **Bump versions and add changelog entries in OS packaging files:**
+
+   - `/debian/changelog`
+   - `/gwosc.spec`
+
+#. **Publish the release**, allowing CI to run, and others to contribute:
 
    .. code-block:: bash
 
