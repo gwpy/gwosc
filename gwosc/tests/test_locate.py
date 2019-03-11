@@ -53,6 +53,9 @@ def test_get_urls():
         dataset="GW170817",
     )) == 2
 
+    # test for O1 data
+    assert len(locate.get_urls("L1", 1135136228, 1135140324)) == 2
+
     # assert no hits raises exception
     with pytest.raises(ValueError):  # no data in 1980
         locate.get_urls(detector, 0, 1)
