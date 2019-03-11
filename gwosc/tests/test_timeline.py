@@ -48,6 +48,7 @@ def test_get_segments(flag, start, end, result):
     assert timeline.get_segments(flag, start, end) == result
 
 
+@pytest.mark.remote
 def test_get_segments_long():
     assert len(timeline.get_segments('H1_DATA', 1126051217, 1137196817)) == 654
 
