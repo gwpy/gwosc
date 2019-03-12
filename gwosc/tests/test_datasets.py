@@ -92,6 +92,11 @@ def test_find_datasets_segment():
     assert "GW170817" not in sets
 
 
+@pytest.mark.remote
+def test_find_datasets_match():
+    assert "O1" not in datasets.find_datasets(match="GW")
+
+
 @mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
 @mock.patch('gwosc.api.fetch_catalog_json', return_value=CATALOG_JSON)
 @mock.patch(
