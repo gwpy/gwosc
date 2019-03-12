@@ -64,7 +64,7 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
         versions = api._find_catalog_event_versions(event, host=host)
         last = versions[-1]
         dataset = "{0}_R{1}".format(event, last)
-        metadata = api.fetch_event_json(event, host=host)
+        metadata = api.fetch_event_json(dataset, host=host)
         return (
             dataset,
             utils.urllist_extent(map(itemgetter("url"), metadata["strain"])),
@@ -91,7 +91,14 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
             host=host,
         )
         for dataset in dsets:
-            dataset, segment = _dataset_segment(dataset)
+            try:
+                dataset, segment = _dataset_segment(dataset)
+            except ValueError as exc:
+                if str(exc) == (
+                    "no event datasets found for {!r}".format(dataset)
+                ):
+                    continue
+                raise
             overlap = min(end, segment[1]) - max(start, segment[0])
             epochs.append((dataset, duration-overlap))
 
