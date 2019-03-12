@@ -22,6 +22,7 @@ Note: each of these methods deliberately excludes the 'tenyear' dataset.
 """
 
 import multiprocessing.dummy
+import re
 from operator import itemgetter
 
 from six import raise_from
@@ -70,6 +71,7 @@ def find_datasets(
         detector=None,
         type=None,
         segment=None,
+        match=None,
         host=api.DEFAULT_URL,
 ):
     """Find datasets available on the given GW open science host
@@ -86,6 +88,9 @@ def find_datasets(
     segment : 2-`tuple` of `int`, `None`, optional
         a GPS ``[start, stop)`` interval to restrict matches to;
         datasets will match if they overlap at any point
+
+    match : `str`, optional
+        regular expression string against which to match datasets
 
     host : `str`, optional
         the URL of the LOSC host to query, defaults to losc.ligo.org
@@ -149,6 +154,10 @@ def find_datasets(
             # record events
             if needevents:
                 names.update(events)
+
+    if match:
+        reg = re.compile(match)
+        return sorted(filter(reg.match, names))
 
     return sorted(names)
 
