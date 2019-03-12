@@ -1,3 +1,10 @@
+gwosc (0.4.3-1) unstable; urgency=low
+
+  * [#33] fixed bugs in `gwosc.timeline`
+  * [#34] added `match` keyword to `gwosc.datasets.find_datsets`
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Tue, 12 Mar 2019 07:19:00 +0000
+
 gwosc (0.4.2-1) unstable; urgency=low
 
   * [#31] new function `gwosc.datasets.dataset_type`
