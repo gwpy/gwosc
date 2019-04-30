@@ -19,8 +19,6 @@
 """Catalog-parsing functions
 """
 
-import json
-
 from . import (api, utils)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'

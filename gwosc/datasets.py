@@ -44,9 +44,7 @@ Similar queries are available for observing run datasets:
 'O1'
 """  # noqa: E501
 
-import multiprocessing.dummy
 import re
-from operator import itemgetter
 
 from six import raise_from
 from six.moves.urllib.error import URLError
