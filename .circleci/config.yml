@@ -106,7 +106,7 @@ aliases:
           # get OS name from CIRCLE_JOB name
           export IMAGE=$(python${PYTHON_VERSION} -c "print('${CIRCLE_JOB}'.split(':')[-2])")
           # install codecov
-          python${PYTHON_VERSION} -m pip install --progress-bar=off codecov
+          python${PYTHON_VERSION} -m pip install codecov
           # upload coverage
           python${PYTHON_VERSION} -m codecov --flags $(uname) python${PYTHON_VERSION/./} ${IMAGE}
 
@@ -156,7 +156,7 @@ jobs:
           name: Lint
           command: |
             set -ex;
-            python -m pip install --progress-bar=off "flake8>=3.7.0";
+            python -m pip install "flake8>=3.7.0";
             mkdir -pv test-reports;
             python -m flake8 --output-file test-reports/flake8.txt;
       - run:
@@ -164,7 +164,7 @@ jobs:
           when: always
           command: |
             set -ex;
-            python -m pip install --progress-bar=off flake8-junit-report;
+            python -m pip install flake8-junit-report;
             python -m junit_conversor test-reports/flake8.txt test-reports/junit.xml;
       - *store_test_results
       - *store_test_artifacts
