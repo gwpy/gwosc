@@ -38,6 +38,7 @@ install_requires = [
 tests_require = [
     'pytest>=2.7.0',
     'pytest-cov',
+    'pytest-socket',
 ]
 if sys.version_info.major < 3:
     tests_require.extend((
