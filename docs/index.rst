@@ -1,17 +1,24 @@
+=======
+ GWOSC
+=======
 
-GWOSC
-=====
-
-`gwosc` provides a Python interface to the open data releases from the international gravitational-wave detector network, including the LIGO and Virgo observatories.
+A python interface to the
+`Gravitational-Wave Open Science Center <https://gw-openscience.org>`_ archive.
 
 Installation
 ------------
 
-The module can be installed via ``pip``:
+``gwosc`` can be installed via `pip <https://pip.pypa.io>`_:
 
-::
+.. code-block:: shell
 
-   pip install gwosc
+   python -m pip install gwosc
+
+or `Conda <https://conda.io>`:
+
+.. code-block:: shell
+
+   conda install -c conda-forge gwosc
 
 Documentation
 -------------
@@ -22,3 +29,12 @@ Documentation
    datasets
    locate
    timeline
+   api
+
+Index
+-----
+
+.. toctree::
+
+* :ref:`genindex`
+* :ref:`modindex`

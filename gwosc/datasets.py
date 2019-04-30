@@ -16,10 +16,33 @@
 # You should have received a copy of the GNU General Public License
 # along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Functions for getting information about available datasets
-
-Note: each of these methods deliberately excludes the 'tenyear' dataset.
 """
+`gwosc.datasets` includes functions to query for available datasets.
+
+To search for all available datasets:
+
+>>> from gwosc import datasets
+>>> datasets.find_datasets()
+['GW150914', 'GW151226', 'GW170104', 'GW170608', 'GW170814', 'GW170817', 'LVT151012', 'O1', 'S5', 'S6']
+>>> datasets.find_datasets(detector='V1')
+['GW170814', 'GW170817']
+>>> datasets.find_datasets(type='run')
+['O1', 'S5', 'S6']
+
+To query for the GPS time of an event dataset (or vice-versa):
+
+>>> datasets.event_gps('GW170817')
+1187008882.43
+>>> datasets.event_at_gps(1187008882)
+'GW170817'
+
+Similar queries are available for observing run datasets:
+
+>>> datasets.run_segment('O1')
+(1126051217, 1137254417)
+>>> datasets.run_at_gps(1135136350)  # event_gps('GW151226')
+'O1'
+"""  # noqa: E501
 
 import multiprocessing.dummy
 import re
@@ -32,10 +55,12 @@ from . import (api, utils, catalog as gwosc_catalog)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
-IGNORE = {
+_IGNORE = {
     "tenyear",
     "history",
 }
+
+#: List of available catalogs
 CATALOGS = [
     "GWTC-1-confident",
     "GWTC-1-marginal",
@@ -53,10 +78,10 @@ def _match_dataset(targetdetector, detectors, targetsegment, segment):
 
 
 def _run_datasets(detector=None, segment=None, host=api.DEFAULT_URL):
-    meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)["runs"]
+    meta = api.fetch_dataset_json(0, api._MAX_GPS, host=host)["runs"]
     for epoch, metadata in meta.items():
         # ignore tenyear, etc...
-        if epoch in IGNORE:
+        if epoch in _IGNORE:
             continue
         if _match_dataset(
                 detector,
@@ -268,7 +293,7 @@ def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
     ValueError: no event found within 0.1 seconds of 1187008882
     """
     for event, meta in api.fetch_dataset_json(
-            0, api.MAX_GPS, host=host)['events'].items():
+            0, api._MAX_GPS, host=host)['events'].items():
         egps = meta['GPStime']
         if abs(egps - gps) <= tol:
             return event
@@ -334,7 +359,7 @@ def run_segment(run, host=api.DEFAULT_URL):
     ValueError: no run dataset found for 'Oh dear'
     """
     try:
-        meta = api.fetch_dataset_json(0, api.MAX_GPS, host=host)['runs'][run]
+        meta = api.fetch_dataset_json(0, api._MAX_GPS, host=host)['runs'][run]
     except KeyError as exc:
         raise ValueError('no run dataset found for {!r}'.format(exc.args[0]))
     return meta['GPSstart'], meta['GPSend']
@@ -373,8 +398,8 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
     ValueError: no run dataset found containing GPS 0
     """
     for run, meta in api.fetch_dataset_json(
-            0, api.MAX_GPS, host=host)['runs'].items():
-        if run in IGNORE:
+            0, api._MAX_GPS, host=host)['runs'].items():
+        if run in _IGNORE:
             continue
         start, end = meta['GPSstart'], meta['GPSend']
         if start <= gps < end:

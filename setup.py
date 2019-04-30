@@ -37,6 +37,7 @@ install_requires = [
 ]
 tests_require = [
     'pytest>=2.7.0',
+    'pytest-cov',
 ]
 if sys.version_info.major < 3:
     tests_require.extend((
@@ -47,8 +48,9 @@ extras_require = {
     'docs': [
         'sphinx',
         'sphinx_rtd_theme',
-        'numpydoc',
+        'sphinx-automodapi',
     ],
+    'tests': tests_require,
 }
 
 # get long description from README

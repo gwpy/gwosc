@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+:mod:`gwosc.api` provides the low-level interface functions
+that handle direct requests to the GWOSC host.
+"""
+
 import contextlib
 import json
 import re
@@ -23,10 +28,11 @@ import re
 from six.moves.urllib.request import urlopen
 from six.moves.urllib.error import URLError
 
-DEFAULT_URL = "https://www.gw-openscience.org"
-MAX_GPS = 99999999999
+_MAX_GPS = 99999999999
+_VERSIONED_EVENT_REGEX = re.compile(r"_[RV]\d+\Z")
 
-VERSIONED_EVENT_REGEX = re.compile(r"_[RV]\d+\Z")
+#: The default GWOSC host URL
+DEFAULT_URL = "https://www.gw-openscience.org"
 
 
 # -- JSON handling ------------------------------------------------------------
@@ -123,7 +129,7 @@ def _run_url(run, detector, start, end, host=DEFAULT_URL):
     )
 
 
-def fetch_run_json(run, detector, gpsstart=0, gpsend=MAX_GPS,
+def fetch_run_json(run, detector, gpsstart=0, gpsend=_MAX_GPS,
                    host=DEFAULT_URL):
     """Returns the JSON metadata for the given science run parameters
 
@@ -201,7 +207,7 @@ def fetch_catalog_event_json(event, version=None, host=DEFAULT_URL):
         the JSON data retrieved from LOSC and returned by `json.loads`
     """
     # if user gave a versioned event (e.g. GW150914_R1), use it directly
-    if VERSIONED_EVENT_REGEX.search(event):
+    if _VERSIONED_EVENT_REGEX.search(event):
         return fetch_event_json(event, host=host)
 
     # if user specified a version separately, use it
