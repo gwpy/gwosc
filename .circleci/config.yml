@@ -116,6 +116,7 @@ aliases:
         - *build-debian
         - *prep-test-debian
         - *test
+        - *codecov
         - *store_test_results
         - *store_test_artifacts
         - *store_deb_artifacts
@@ -126,6 +127,7 @@ aliases:
         - *build-centos
         - *prep-test-centos
         - *test
+        - *codecov
         - *store_test_results
         - *store_test_artifacts
         - *store_rpm_artifacts
