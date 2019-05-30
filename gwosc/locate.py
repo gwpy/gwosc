@@ -16,8 +16,32 @@
 # You should have received a copy of the GNU General Public License
 # along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Locate files within a given interval on losc.ligo.org
 """
+`gwosc.locate` provides functions to determine the file URLs containing
+data for a specific dataset.
+
+You can search for remote data URLS based on the event name:
+
+>>> from gwosc.locate import get_event_urls
+>>> get_event_urls('GW150914')
+['https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126257414-4096.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126257414-4096.hdf5']
+
+You can down-select the URLs using keyword arguments:
+
+>>> get_event_urls('GW150914', detector='L1', duration=32)
+['https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5']
+
+You can search for remote data URLs based on the GPS time interval as
+follows:
+
+>>> from gwosc.locate import get_urls
+>>> get_urls('L1', 968650000, 968660000)
+['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
+
+By default, this method will return the paths to HDF5 files for the 4 kHz
+sample-rate data, these can be specified as keyword arguments.
+For full information, see :func:`get_urls`.
+"""  # noqa: E501
 
 import warnings
 
@@ -41,7 +65,7 @@ def get_urls(
         format='hdf5',
         host=api.DEFAULT_URL,
 ):
-    """Fetch the metadata from LOSC regarding a given GPS interval
+    """Fetch the URLs from GWOSC regarding a given GPS interval
 
     Parameters
     ----------
@@ -130,6 +154,37 @@ def get_urls(
 
 
 def get_event_urls(event, format='hdf5', sample_rate=4096, **match):
+    """Fetch the URLs from GWOSC regarding a given event
+
+    Parameters
+    ----------
+    event : `str`
+        the ID of the event
+
+    format : `str`, optional, default: ``'hdf5'``
+        the file format (extension) you want to find
+
+    sample_rate : `int`, optional, default : ``4096``
+        the sampling rate (Hz) of files you want to find
+
+    host : `str`, optional
+        the URL of the remote LOSC server
+
+    start : `int`
+        the GPS start time of your query
+
+    end : `int`
+        the GPS end time of your query
+
+    version : `int`, `None`, optional
+        the data-release version for the selected datasets
+
+    Returns
+    -------
+    urls : `list` of `str`
+        the list of remote file URLs that contain data matching the
+        relevant parameters
+    """
     meta = api.fetch_catalog_event_json(
         event,
         host=match.pop('host', api.DEFAULT_URL),

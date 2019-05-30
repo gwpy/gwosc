@@ -1,0 +1,20 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: 2.7
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: 3.6
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: 3.7
+install:
+  - "%PYTHON%\\python.exe -m pip install --upgrade pip"
+build_script:
+  - "%PYTHON%\\python.exe -m pip install .[tests]"
+test_script:
+  - "%PYTHON%\\python.exe -m pytest --cov=gwosc --junitxml=junit.xml"
+after_test:
+  - "set _PYV=%PYTHON_VERSION:.=%"
+  - "%PYTHON%\\python.exe -m pip install codecov"
+  - "%PYTHON%\\python.exe -m codecov --flags Windows python%_PYV%"
+on_success:
+  - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\junit.xml))

@@ -17,23 +17,21 @@ before_install:
   - pip install pip setuptools --upgrade
 
 install:
-  - python -m pip install .
-
-before_script:
-  - python -m pip install coveralls "pytest>=2.8" pytest-runner sphinx_rtd_theme numpydoc pytest-socket
+  - python -m pip install .[docs,tests]
 
 script:
   # run unit tests
-  - coverage run ./setup.py test
+  - python -m pytest gwosc --cov=gwosc
 
   # run unit tests again with --disable-socket to ensure that tests are marked properly
-  - python -m pytest --disable-socket -m "not remote"
+  - python -m pytest gwosc --disable-socket -m "not remote"
 
   # build documentation
   - cd docs && make html; cd ../
 
 after_success:
-  - coveralls
+  - python -m pip install "codecov"
+  - python -m codecov --flags $(uname) python${TRAVIS_PYTHON_VERSION/./}
 
 deploy:
   - provider: pypi

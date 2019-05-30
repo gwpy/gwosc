@@ -1,0 +1,25 @@
+body {
+		font-family: "Helvetiva Neue","Helvetica",Arial,sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p.h2 {
+		font-weight: 300;
+		font-family: "Helvetiva Neue","Helvetica",Arial,sans-serif;
+}
+
+p.h2 {
+		font-size: 150%;
+		font-weight: 300;
+}
+
+.rst-content table.docutils tr td:first-child,
+.rst-content table.docutils tr td:first-child a code {
+		font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",Courier,monospace;
+		font-size: 12px;
+}
