@@ -96,6 +96,7 @@ aliases:
         command: |
           set -x;
           mkdir -pv test-reports;
+          python${PYTHON_VERSION} -m pip install --upgrade setuptools;
           python${PYTHON_VERSION} -m pip install --upgrade pytest pytest-cov;
           python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc --junitxml=test-reports/junit.xml;
 
