@@ -36,7 +36,8 @@ install_requires = [
     'six>=1.9.0',
 ]
 tests_require = [
-    'pytest>=2.7.0',
+    'pytest>=2.7.0 ; python_version > \'3.4\'',
+    'pytest>=2.7.0,<4.0 ; python_version <= \'3.4\'',
     'pytest-cov',
     'pytest-socket',
 ]
