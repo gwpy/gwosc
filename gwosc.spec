@@ -67,6 +67,8 @@ gravitational-wave observatories.
 %autosetup -n %{name}-%{version}
 # old setuptools does not support environment markers:
 sed -i "/ ; /s/ ;.*/\',/g" setup.py
+# remove new pytest
+sed -i "/pytest>=2.7.0 /d" setup.py
 
 %build
 %py2_build
