@@ -65,6 +65,8 @@ gravitational-wave observatories.
 
 %prep
 %autosetup -n %{name}-%{version}
+# old setuptools does not support environment markers:
+sed -i "/ ; /s/ ;.*/\',/g" setup.py
 
 %build
 %py2_build
