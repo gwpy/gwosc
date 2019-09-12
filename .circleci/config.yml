@@ -50,8 +50,8 @@ aliases:
           yum -y -q install \
               yum-utils \
               rpm-build \
-              python34 \
-              python3-rpm-macros;
+              python-srpm-macros \
+          ;
           # hack version number
           tar -xf gwosc-*.tar.gz;
           rm -rf gwosc-*.tar.gz;
