@@ -17,6 +17,7 @@ BuildArch: noarch
 
 # rpmbuild dependencies
 BuildRequires: rpm-build
+BuildRequires: python-srpm-macros
 BuildRequires: python2-rpm-macros
 BuildRequires: python3-rpm-macros
 
