@@ -36,7 +36,7 @@ page <https://gw-openscience.org/O1/>`__ (*Data Quality*).
 
 from operator import itemgetter
 
-from . import (api, datasets, utils)
+from . import (api, datasets)
 
 
 def get_segments(flag, start, end, host=api.DEFAULT_URL):
@@ -78,14 +78,17 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
 
     # -- utility methods to resolve a (proper) dataset name and its segment
 
-    def _event_version_segment(event):
-        versions = api._find_catalog_event_versions(event, host=host)
-        last = versions[-1]
-        dataset = "{0}_R{1}".format(event, last)
-        metadata = api.fetch_event_json(dataset, host=host)
+    def _event_segment(event):
+        raw = api._fetch_allevents_event_json(event, host=host)["events"]
+        dataset, meta = list(raw.items())[0]
         return (
             dataset,
-            utils.urllist_extent(map(itemgetter("url"), metadata["strain"])),
+            datasets.event_segment(
+                dataset,
+                catalog=meta["catalog.shortName"],
+                version=meta["version"],
+                host=host,
+            ),
         )
 
     def _run_segment(run):
@@ -94,7 +97,7 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
     # -- match datasets
 
     dataset_segments = [
-        ("event", _event_version_segment),
+        ("event", _event_segment),
         ("run", _run_segment),
     ]
 
@@ -102,13 +105,12 @@ def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
     epochs = []
 
     for dstype, _dataset_segment in dataset_segments:
-        dsets = datasets.find_datasets(
-            type=dstype,
-            detector=detector,
-            segment=(start, end),
-            host=host,
-        )
-        for dataset in dsets:
+        for dataset in datasets._iter_datasets(
+                type=dstype,
+                detector=detector,
+                segment=(start, end),
+                host=host,
+        ):
             try:
                 dataset, segment = _dataset_segment(dataset)
             except ValueError as exc:

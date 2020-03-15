@@ -22,6 +22,8 @@
 import re
 from os.path import (basename, splitext)
 
+from .utils import segments_overlap
+
 # LOSC filename re
 URL_REGEX = re.compile(
     r"\A((.*/)*(?P<obs>[^/]+)-"
@@ -37,21 +39,60 @@ URL_REGEX = re.compile(
 VERSION_REGEX = re.compile(r'[RV]\d+')
 
 
-def sieve(urllist, **match):
+def sieve(urllist, segment=None, **match):
     """Sieve a list of LOSC URL metadata dicts based on key, value pairs
 
-    This method simply matches keys from the ``match`` keywords with those
-    found in the JSON dicts for a file URL returned by the LOSC API.
+    Parameters
+    ----------
+    urllist : `list` of `dict`
+        the ``'strain'`` metadata list, as retrieved from the GWOSC
+        server
+
+    segment : `tuple` of `int`
+        a ``[start, stop)`` GPS segment against which to check overlap
+        for each URL
+
+    **match
+        other keywords match **exactly** against the corresponding key
+        in the `dict` for each URL
+
+    Yields
+    ------
+    dict :
+        each URL dict that matches the parameters is yielded, in the same
+        order as the input ``urllist``
     """
-    if 'sample_rate' in match and 'sampling_rate' not in match:
-        match['sampling_rate'] = match.pop('sample_rate')
+    # remove null keys
+    match = {key: value for key, value in match.items() if value is not None}
+
+    # sieve
     for urlmeta in urllist:
-        if any(match[key] != urlmeta[key] for key in match):
-            continue
+        try:
+            if any(match[key] != urlmeta[key] for key in match):
+                continue
+        except KeyError as exc:
+            raise TypeError(
+                "unrecognised match parameter: {}".format(str(exc))
+            )
+        if segment:  # check overlap
+            _start = urlmeta["GPSstart"]
+            thisseg = (_start, _start + urlmeta["duration"])
+            if not segments_overlap(segment, thisseg):
+                continue
         yield urlmeta
 
 
-def _match_url(url, start=None, end=None, tag=None, version=None):
+def _match_url(
+        url,
+        detector=None,
+        start=None,
+        end=None,
+        tag=None,
+        sample_rate=None,
+        version=None,
+        duration=None,
+        ext=None,
+):
     """Match a URL against requested parameters
 
     Returns
@@ -70,8 +111,13 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
     """
     reg = URL_REGEX.match(basename(url)).groupdict()
     if (
+            (detector and reg['ifo'] != detector) or
             (tag and reg['tag'] != tag) or
-            (version and int(reg['version']) != version)
+            (version and int(reg['version']) != version) or
+            (sample_rate and
+             float(reg["samp"].rstrip("KHZ")) * 1024 != sample_rate) or
+            (duration and float(reg["dur"]) != duration) or
+            (ext and reg["ext"] != ext)
     ):
         return
 
@@ -90,7 +136,17 @@ def _match_url(url, start=None, end=None, tag=None, version=None):
     return reg['tag'], int(reg['version'])
 
 
-def match(urls, start=None, end=None, tag=None, version=None):
+def match(
+        urls,
+        detector=None,
+        start=None,
+        end=None,
+        tag=None,
+        sample_rate=None,
+        version=None,
+        duration=None,
+        ext=None,
+):
     """Match LOSC URLs for a given [start, end) interval
 
     Parameters
@@ -133,7 +189,17 @@ def match(urls, start=None, end=None, tag=None, version=None):
 
     # loop URLS
     for url in urls:
-        m = _match_url(url, start, end, tag=tag, version=version)
+        m = _match_url(
+            url,
+            detector=detector,
+            start=start,
+            end=end,
+            tag=tag,
+            sample_rate=sample_rate,
+            version=version,
+            duration=duration,
+            ext=ext,
+        )
         if m is None:
             continue
 

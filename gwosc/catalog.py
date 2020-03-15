@@ -19,9 +19,17 @@
 """Catalog-parsing functions
 """
 
+import warnings
+
 from . import (api, utils)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
+
+warnings.warn(
+    "the gwosc.catalog module is deprecated and will be removed in "
+    "a future release",
+    DeprecationWarning,
+)
 
 CACHE = {}
 
@@ -37,7 +45,7 @@ def download(catalog, host=api.DEFAULT_URL):
     except KeyError:
         return CACHE.setdefault(
             catalog,
-            api.fetch_catalog_json(catalog, host=host)
+            api.fetch_legacy_catalog_json(catalog, host=host),
         )
 
 
@@ -59,7 +67,10 @@ def datasets(catalog, detector=None, segment=None, host=api.DEFAULT_URL):
         detectors = set(files["OperatingIFOs"].split())
         if detector not in detectors | {None}:
             continue
-        urls = [url for det in detectors for url in _nested_values(files[det])]
+        urls = [
+            url for det in detectors for
+            url in _nested_values(files[det])
+        ]
         if segment and not (
                 urls and
                 utils.segments_overlap(segment, utils.urllist_extent(urls))

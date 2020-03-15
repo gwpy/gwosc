@@ -52,7 +52,7 @@ from . import (
     utils,
 )
 
-__all__ = ['get_urls', 'get_event_urls']
+__all__ = ['get_urls', 'get_run_urls', 'get_event_urls']
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
@@ -111,39 +111,44 @@ def get_urls(
             DeprecationWarning,
         )
 
-    dataset_metadata = [
-        ("event",
-         lambda x: api.fetch_catalog_event_json(x, host=host),
-         ),
-        ("run",
-         lambda x: api.fetch_run_json(x, detector, start, end, host=host),
-         ),
-    ]
-
     if dataset:
-        dstype = datasets.dataset_type(dataset)
-        dataset_metadata = [(dstype, dict(dataset_metadata)[dstype])]
+        dstypes = (datasets.dataset_type(dataset),)
+    else:
+        dstypes = ("event", "run")
 
-    for dstype, _get_urls in dataset_metadata:
+    for dstype in dstypes:
         if dataset:
             dsets = [dataset]
         else:
-            dsets = datasets.find_datasets(
+            dsets = datasets._iter_datasets(
                 type=dstype,
                 detector=detector,
                 segment=(start, end),
+                version=version,
                 host=host,
             )
+
         for dst in dsets:
             # get URL list for this dataset
-            urls = _get_urls(dst)["strain"]
-
-            # match URLs to request
-            urls = lurls.match(
-                [u['url'] for u in lurls.sieve(
-                    urls, detector=detector,
-                    sampling_rate=sample_rate, format=format)],
-                start, end, version=version)
+            if dstype == "run":
+                urls = get_run_urls(
+                    dst,
+                    detector,
+                    start,
+                    end,
+                    host=host,
+                    sample_rate=sample_rate,
+                    format=format,
+                )
+            else:
+                urls = get_event_urls(
+                    dst,
+                    detector=detector,
+                    start=start,
+                    end=end,
+                    format=format,
+                    sample_rate=sample_rate,
+                )
 
             # if full span covered, return now
             if utils.full_coverage(urls, (start, end)):
@@ -153,13 +158,88 @@ def get_urls(
                      % (detector, start, end))
 
 
-def get_event_urls(event, format='hdf5', sample_rate=4096, **match):
+def get_run_urls(
+        run,
+        detector,
+        start,
+        end,
+        format='hdf5',
+        sample_rate=4096,
+        **match
+):
     """Fetch the URLs from GWOSC regarding a given event
 
     Parameters
     ----------
     event : `str`
         the ID of the event
+
+    detector : `str`, optional
+        the detector for files you want to find
+
+    start : `int`
+        the GPS start time of your query
+
+    end : `int`
+        the GPS end time of your query
+
+    format : `str`, optional, default: ``'hdf5'``
+        the file format (extension) you want to find
+
+    sample_rate : `int`, optional, default : ``4096``
+        the sampling rate (Hz) of files you want to find
+
+    host : `str`, optional
+        the URL of the remote LOSC server
+
+    version : `int`, `None`, optional
+        the data-release version for the selected datasets
+
+    Returns
+    -------
+    urls : `list` of `str`
+        the list of remote file URLs that contain data matching the
+        relevant parameters
+    """
+    # get the URL file list for this run segment
+    meta = api.fetch_run_json(
+        run,
+        detector,
+        gpsstart=start,
+        gpsend=end,
+        host=match.pop('host', api.DEFAULT_URL),
+    )
+
+    # filter
+    return _urls(lurls.sieve(
+        meta["strain"],
+        format=format,
+        sampling_rate=sample_rate,
+        **match
+    ))
+
+
+def get_event_urls(
+        event,
+        catalog=None,
+        version=None,
+        detector=None,
+        start=None,
+        end=None,
+        format='hdf5',
+        sample_rate=4096,
+        host=api.DEFAULT_URL,
+        **match
+):
+    """Fetch the URLs from GWOSC regarding a given event
+
+    Parameters
+    ----------
+    event : `str`
+        the ID of the event
+
+    detector : `str`, optional
+        the detector for files you want to find
 
     format : `str`, optional, default: ``'hdf5'``
         the file format (extension) you want to find
@@ -185,13 +265,35 @@ def get_event_urls(event, format='hdf5', sample_rate=4096, **match):
         the list of remote file URLs that contain data matching the
         relevant parameters
     """
-    meta = api.fetch_catalog_event_json(
+    # get the URL file list for this event
+    meta = list(api._fetch_allevents_event_json(
         event,
-        host=match.pop('host', api.DEFAULT_URL),
-    )
-    sieve_kw = {k: match.pop(k) for k in list(match.keys()) if
-                k not in {'start', 'end', 'tag', 'version'}}
-    return lurls.match(
-        [u['url'] for u in lurls.sieve(meta['strain'], format=format,
-                                       sample_rate=sample_rate, **sieve_kw)],
-        **match)
+        catalog=catalog,
+        version=version,
+        full=True,
+        host=host,
+    )["events"].values())[0]
+    strain = meta["strain"]
+
+    # format start and end as a segment
+    if start is None and end is None:
+        segment = None
+    else:
+        segment = (
+            -float('inf') if start is None else start,
+            +float('inf') if end is None else end,
+        )
+
+    # then filter on everything els
+    return _urls(lurls.sieve(
+        strain,
+        detector=detector,
+        format=format,
+        sampling_rate=sample_rate,
+        segment=segment,
+        **match
+    ))
+
+
+def _urls(strain):
+    return [u["url"] for u in strain]

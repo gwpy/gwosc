@@ -43,13 +43,16 @@ def test_url_overlaps_segment(url, segment, result):
 
 @pytest.mark.remote
 @pytest.mark.parametrize('segment, result', [
-    ((1126257415, 1126257415+4096), True),
-    ((1126257414, 1126257415+4096), False),
-    ((1126257415, 1126257415+4097), False),
+    ((0, 64), True),
+    ((1, 63), True),
+    ((-1, 63), False),
+    ((-1, 64), False),
+    ((0, 65), False),
+    ((1, 65), False),
+    ((-1, 64), False),
 ])
-def test_full_coverage(gw150914_urls, segment, result):
-    urls = [u['url'] for u in gw150914_urls]
-    assert utils.full_coverage(urls, segment) is result
+def test_full_coverage(mock_urls, segment, result):
+    assert utils.full_coverage(mock_urls, segment) is result
 
 
 def test_full_coverage_empty():

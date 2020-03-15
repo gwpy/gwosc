@@ -73,7 +73,7 @@ def urllist_extent(urls):
 
     Parameters
     ----------
-    urls : `list` of `str`
+    urls : `iterable` of `str`
         the list of URLs
 
     Returns
@@ -83,6 +83,16 @@ def urllist_extent(urls):
     """
     segs = map(url_segment, urls)
     starts, ends = zip(*segs)
+    return min(starts), max(ends)
+
+
+def strain_extent(strain):
+    """Returns the GPS `[start, end)` interval covered by a strain meta dict
+    """
+    starts, ends = zip(*[
+        (meta["GPSstart"], meta["GPSstart"] + meta["duration"]) for
+        meta in strain
+    ])
     return min(starts), max(ends)
 
 
