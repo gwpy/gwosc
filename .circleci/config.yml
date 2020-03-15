@@ -39,12 +39,11 @@ aliases:
         name: Build
         command: |
           set -x;
-          if [[ "${PYTHON_VERSION:0:1}" -eq 3 ]]; then PYTHON3="3"; fi
           apt-get -yqq update;
           apt-get -yqq install \
               dpkg-dev \
               devscripts \
-              python${PYTHON3}-pip \
+              python${PYTHON_VERSION:0:1}-pip \
           ;
           pushd $(mktemp -d -p .);
           tar -xf ../gwosc-*.tar.* --strip-components=1;
@@ -77,9 +76,11 @@ aliases:
           yum -y -q install \
               rpm-build \
               yum-utils \
+              epel-release \
+              epel-rpm-macros \
               python-srpm-macros \
-              python3-rpm-macros \
               python3-pip \
+              python3-rpm-macros \
           ;
           # rename this tarball to match the version in the spec file
           VERSION=$(tar -x --file gwosc-*.tar.* --strip-components=1 -O */gwosc.spec | grep "define version" | cut -d\  -f3)
@@ -201,10 +202,14 @@ jobs:
       - checkout
       - run:
           name: Build tarball
-          command: python setup.py --quiet sdist --dist-dir .
+          command: |
+            set -ex;
+            python setup.py --version > .version;
+            python setup.py --quiet sdist --dist-dir .;
       - persist_to_workspace:
           root: .
           paths:
+            - ".version"
             - "gwosc-*.tar.gz"
 
   flake8:
@@ -229,26 +234,12 @@ jobs:
       - *store_test_results
       - *store_test_artifacts
 
-  centos:7:2.7:
-    <<: *centos
-    docker:
-      - image: centos:7
-    environment:
-      PYTHON_VERSION: "2.7"
-
   centos:7:3.6:
     <<: *centos
     docker:
       - image: centos:7
     environment:
       PYTHON_VERSION: "3.6"
-
-  centos:8:2.7:
-    <<: *centos
-    docker:
-      - image: centos:8
-    environment:
-      PYTHON_VERSION: "2.7"
 
   centos:8:3.6:
     <<: *centos
@@ -257,26 +248,12 @@ jobs:
     environment:
       PYTHON_VERSION: "3.6"
 
-  debian:stretch:2.7:
-    <<: *debian
-    docker:
-      - image: debian:stretch
-    environment:
-      PYTHON_VERSION: "2.7"
-
   debian:stretch:3.5:
     <<: *debian
     docker:
       - image: debian:stretch
     environment:
       PYTHON_VERSION: "3.5"
-
-  debian:buster:2.7:
-    <<: *debian
-    docker:
-      - image: debian:buster
-    environment:
-      PYTHON_VERSION: "2.7"
 
   debian:buster:3.7:
     <<: *debian
@@ -285,26 +262,12 @@ jobs:
     environment:
       PYTHON_VERSION: "3.7"
 
-  debian:bullseye:2.7:
-    <<: *debian
-    docker:
-      - image: debian:bullseye
-    environment:
-      PYTHON_VERSION: "2.7"
-
   debian:bullseye:3.7:
     <<: *debian
     docker:
       - image: debian:bullseye
     environment:
       PYTHON_VERSION: "3.7"
-
-  python:2.7:
-    <<: *python
-    docker:
-      - image: python:2.7
-    environment:
-      PYTHON_VERSION: "2.7"
 
   python:3.5:
     <<: *python
@@ -354,37 +317,19 @@ workflows:
     jobs:
       - sdist
       - flake8
-      - centos:7:2.7:
-          requires:
-            - sdist
       - centos:7:3.6:
-          requires:
-            - sdist
-      - centos:8:2.7:
           requires:
             - sdist
       - centos:8:3.6:
           requires:
             - sdist
-      - debian:stretch:2.7:
-          requires:
-            - sdist
       - debian:stretch:3.5:
-          requires:
-            - sdist
-      - debian:buster:2.7:
           requires:
             - sdist
       - debian:buster:3.7:
           requires:
             - sdist
-      - debian:bullseye:2.7:
-          requires:
-            - sdist
       - debian:bullseye:3.7:
-          requires:
-            - sdist
-      - python:2.7:
           requires:
             - sdist
       - python:3.5:

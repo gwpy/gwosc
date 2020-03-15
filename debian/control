@@ -5,30 +5,13 @@ Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
 Section: python
 Priority: optional
 Standards-Version: 3.9.1
-X-Python-Version: >= 2.7
-X-Python3-Version: >= 3.4
-Build-Depends: debhelper (>= 9),
-               dh-python,
-               python-all,
-               python3-all,
-               python-setuptools,
-               python3-setuptools,
-               python-pytest,
-               python3-pytest,
-               python-mock,
-
-# -- python-gwosc --------------------------------------------------------------
-
-Package: python-gwosc
-Architecture: all
-Depends: ${misc:Depends},
-         ${python:Depends},
-Description: A python2 interface to the Gravitational-Wave Open Science Center data archive
- .
-           The `gwosc` package provides an interface to querying the open data
-           releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-           gravitational-wave observatories.
- .
+X-Python3-Version: >= 3.5
+Build-Depends:
+  debhelper (>= 9),
+  dh-python,
+  python3-all,
+  python3-setuptools,
+  python3-pytest,
 
 # -- python3-gwosc -------------------------------------------------------------
 

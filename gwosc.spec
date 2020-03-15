@@ -19,7 +19,6 @@ BuildArch: noarch
 BuildRequires: rpm-build
 BuildRequires: python-srpm-macros
 BuildRequires: python-rpm-macros
-BuildRequires: python2-rpm-macros
 BuildRequires: python3-rpm-macros
 
 # build dependencies
@@ -30,26 +29,14 @@ BuildRequires: python%{python3_pkgversion}-setuptools
 # NONE
 
 # testing dependencies (required for %check)
-BuildRequires: python2-pytest
 BuildRequires: python%{python3_pkgversion}-pytest
-BuildRequires: python2-mock
 
 %description
 The `gwosc` package provides an interface to querying the open data
 releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
 gravitational-wave observatories.
 
-# -- python2-ligotimegps
-
-%package -n python2-%{name}
-Summary:  %{summary}
-%{?python_provide:%python_provide python2-%{name}}
-%description -n python2-%{name}
-The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-gravitational-wave observatories.
-
-# -- python-3X-ligotimegps
+# -- python-3X-gwosc
 
 %package -n python%{python3_pkgversion}-%{name}
 Summary:  %{summary}
@@ -63,30 +50,18 @@ gravitational-wave observatories.
 
 %prep
 %autosetup -n %{name}-%{version}
-# old setuptools does not support environment markers:
-sed -i "/ ; /s/ ;.*/\',/g" setup.py
-# remove new pytest
-sed -i "/pytest>=2.7.0 /d" setup.py
 
 %build
-%py2_build
 %py3_build
 
 %check
-%{__python2} -m pytest --pyargs %{name} -m "not remote"
 %{__python3} -m pytest --pyargs %{name} -m "not remote"
 
 %install
-%py2_install
 %py3_install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-%files -n python2-%{name}
-%license LICENSE
-%doc README.md
-%{python2_sitelib}/*
 
 %files -n python%{python3_pkgversion}-%{name}
 %license LICENSE

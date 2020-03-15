@@ -35,16 +35,10 @@ if {'test'}.intersection(sys.argv):
 install_requires = [
 ]
 tests_require = [
-    'pytest>=2.7.0 ; python_version > \'3.4\'',
-    'pytest>=2.7.0,<4.0 ; python_version <= \'3.4\'',
+    'pytest>=2.7.0',
     'pytest-cov',
     'pytest-socket',
 ]
-if sys.version_info.major < 3:
-    tests_require.extend((
-        'more-itertools < 6.0a0',  # pip doesn't pin version properly
-        'mock',
-    ))
 extras_require = {
     'docs': [
         'sphinx',
@@ -73,12 +67,11 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Intended Audience :: Science/Research',
         'Natural Language :: English',
         'Topic :: Scientific/Engineering',

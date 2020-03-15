@@ -26,11 +26,7 @@ import json
 import logging
 import os
 import re
-
-try:
-    from urllib.request import urlopen
-except ImportError:  # python < 3
-    from urllib2 import urlopen
+from urllib.request import urlopen
 
 logger = logging.getLogger("gwosc.api")
 _loghandler = logging.StreamHandler()

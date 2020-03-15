@@ -21,11 +21,7 @@
 
 import os.path
 from io import BytesIO
-
-try:
-    from unittest import mock
-except ImportError:  # python < 3
-    import mock
+from unittest import mock
 
 import pytest
 
