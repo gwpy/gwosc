@@ -51,7 +51,7 @@ extras_require = {
         'sphinx_rtd_theme',
         'sphinx-automodapi',
     ],
-    'tests': tests_require,
+    'test': tests_require,
 }
 
 # get long description from README
