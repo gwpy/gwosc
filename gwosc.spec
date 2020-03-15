@@ -16,13 +16,11 @@ Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 BuildArch: noarch
 
 # rpmbuild dependencies
-BuildRequires: rpm-build
 BuildRequires: python-srpm-macros
 BuildRequires: python-rpm-macros
 BuildRequires: python3-rpm-macros
 
 # build dependencies
-BuildRequires: python-setuptools
 BuildRequires: python%{python3_pkgversion}-setuptools
 
 # runtime dependencies (required for %check)
