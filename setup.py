@@ -33,7 +33,6 @@ setup_requires = []
 if {'test'}.intersection(sys.argv):
     setup_requires.append('pytest_runner')
 install_requires = [
-    'six>=1.9.0',
 ]
 tests_require = [
     'pytest>=2.7.0 ; python_version > \'3.4\'',

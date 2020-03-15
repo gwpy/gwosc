@@ -27,8 +27,7 @@ BuildRequires: python-setuptools
 BuildRequires: python%{python3_pkgversion}-setuptools
 
 # runtime dependencies (required for %check)
-BuildRequires: python2-six
-BuildRequires: python%{python3_pkgversion}-six
+# NONE
 
 # testing dependencies (required for %check)
 BuildRequires: python2-pytest
@@ -44,7 +43,6 @@ gravitational-wave observatories.
 
 %package -n python2-%{name}
 Summary:  %{summary}
-Requires: python-six
 %{?python_provide:%python_provide python2-%{name}}
 %description -n python2-%{name}
 The `gwosc` package provides an interface to querying the open data
@@ -55,7 +53,6 @@ gravitational-wave observatories.
 
 %package -n python%{python3_pkgversion}-%{name}
 Summary:  %{summary}
-Requires: python%{python3_pkgversion}-six
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %description -n python%{python3_pkgversion}-%{name}
 The `gwosc` package provides an interface to querying the open data

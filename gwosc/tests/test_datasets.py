@@ -117,7 +117,7 @@ def test_event_gps_local(fetch):
     fetch.side_effect = ValueError('test')
     with pytest.raises(ValueError) as exc:
         datasets.event_gps('something')
-    assert str(exc.value) == 'no event dataset found for \'something\''
+    assert str(exc.value) == "no event dataset found for 'something'"
 
 
 @pytest.mark.remote

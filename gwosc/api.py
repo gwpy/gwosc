@@ -27,7 +27,10 @@ import logging
 import os
 import re
 
-from six.moves.urllib.request import urlopen
+try:
+    from urllib.request import urlopen
+except ImportError:  # python < 3
+    from urllib2 import urlopen
 
 logger = logging.getLogger("gwosc.api")
 _loghandler = logging.StreamHandler()

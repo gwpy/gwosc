@@ -47,8 +47,6 @@ Similar queries are available for observing run datasets:
 import re
 import warnings
 
-from six import raise_from
-
 from . import (
     api,
     urls,
@@ -330,10 +328,8 @@ def event_gps(event, catalog=None, version=None, host=api.DEFAULT_URL):
             host=host,
         )['GPS']
     except ValueError as exc:
-        raise_from(
-            ValueError('no event dataset found for {0!r}'.format(event)),
-            exc,
-        )
+        exc.args = ("no event dataset found for {!r}".format(event),)
+        raise
 
 
 def event_segment(
