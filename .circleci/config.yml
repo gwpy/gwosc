@@ -80,8 +80,11 @@ aliases:
               python3-rpm-macros \
               python3-pip \
           ;
+          # rename this tarball to match the version in the spec file
+          VERSION=$(tar -x --file gwosc-*.tar.* --strip-components=1 -O */gwosc.spec | grep "define version" | cut -d\  -f3)
+          mv gwosc-*.tar.gz gwosc-${VERSION}.tar.gz
           # build src rpm
-          SRPM=$(rpmbuild --define "_topdir $(pwd)" -ts ./gwosc-*.tar.* | cut -d\  -f2);
+          SRPM=$(rpmbuild --define "_topdir $(pwd)" -ts ./gwosc-*.tar.gz | cut -d\  -f2);
           # install build dependencies
           yum-builddep -y -q ${SRPM};
           # build binary rpm(s)
