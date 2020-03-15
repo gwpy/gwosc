@@ -1,19 +1,33 @@
-[![PyPI Release](https://badge.fury.io/py/gwosc.svg)](http://badge.fury.io/py/gwosc)
-[![Zenodo DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1196306.svg)](https://doi.org/10.5281/zenodo.1196306)
-[![License](https://img.shields.io/pypi/l/gwosc.svg)](https://choosealicense.com/licenses/mit/)
-![Python Versions](https://img.shields.io/pypi/pyversions/gwosc.svg)
-
-[![TravisCI Build](https://travis-ci.com/gwpy/gwosc.svg?branch=master)](https://travis-ci.com/gwpy/gwosc)
-[![Appveyor Build](https://ci.appveyor.com/api/projects/status/t1xsjb4kieunjp66?svg=true)](https://ci.appveyor.com/project/gwpy/gwosc)
-[![CircleCI Build](https://circleci.com/gh/gwpy/gwosc/tree/master.svg?style=svg)](https://circleci.com/gh/gwpy/gwosc/tree/master)
-[![Coverage Status](https://coveralls.io/repos/github/gwpy/gwosc/badge.svg?branch=master)](https://coveralls.io/github/gwpy/gwosc?branch=master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
+# `gwosc` client API
 
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-gravitational-wave observatories.
+releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+and Virgo gravitational-wave observatories.
+
+## Release status
+
+[![PyPI version](https://badge.fury.io/py/gwosc.svg)](http://badge.fury.io/py/gwosc)
+[![Conda version](https://img.shields.io/conda/vn/conda-forge/gwosc.svg)](https://anaconda.org/conda-forge/gwosc/)..
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1196306.svg)](https://doi.org/10.5281/zenodo.1196306)
+[![License](https://img.shields.io/pypi/l/gwosc.svg)](https://choosealicense.com/licenses/mit/)
+![Supported Python versions](https://img.shields.io/pypi/pyversions/gwosc.svg)
+
+## Development status
+
+[![Travis](https://img.shields.io/travis/com/gwpy/gwosc/master?label=Unix%20%28conda%29&logo=travis)](https://travis-ci.com/gwpy/gwosc)
+[![Circle](https://img.shields.io/circleci/project/github/gwpy/gwosc/master.svg?label=Linux%20%28other%29&logo=circleci)](https://circleci.com/gh/gwpy/gwosc)
+[![Appveyor](https://img.shields.io/appveyor/ci/gwpy/gwosc/master.svg?label=Windows%20%28conda%29&logo=appveyor)](https://ci.appveyor.com/project/gwpy/gwosc/branch/master)..
+[![Codecov](https://img.shields.io/codecov/c/gh/gwpy/gwosc?logo=codecov)](https://codecov.io/gh/gwpy/gwosc)
+[![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
+[![Documentation](https://readthedocs.org/projects/gwosc/badge/?version=latest)](https://gwosc.readthedocs.io/en/latest/?badge=latest)
+
+## Installation
 
 To install:
+
+    conda install -c conda-forge gwosc
+
+or
 
     pip install gwosc
 
@@ -56,14 +70,14 @@ You can search for remote data URLS based on the event name:
 ```python
 >>> from gwosc.locate import get_event_urls
 >>> get_event_urls('GW150914')
-['https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5', 'https://losc.ligo.org//s/events/GW150914/H-H1_LOSC_4_V2-1126257414-4096.hdf5', 'https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126257414-4096.hdf5']
+['https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126257415-4096.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126257415-4096.hdf5']
 ```
 
 You can down-select the URLs using keyword arguments:
 
 ```python
 >>> get_event_urls('GW150914', detector='L1', duration=32)
-['https://losc.ligo.org//s/events/GW150914/L-L1_LOSC_4_V2-1126259446-32.hdf5']
+['https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5']
 ```
 
 ## Locating data URLs by GPS interval
@@ -74,7 +88,7 @@ follows:
 ```python
 >>> from gwosc.locate import get_urls
 >>> get_urls('L1', 968650000, 968660000)
-['https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://losc.ligo.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
+['https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
 ```
 
 This arguments for this function are as follows
@@ -108,6 +122,6 @@ The output is a `list` of `(start, end)` 2-tuples which each represent a
 semi-open time interval.
 
 For documentation on what flags are available, for example for the O1
-science run, see [the O1 data release page](https://losc.ligo.org/O1/)
+science run, see [the O1 data release page](https://gw-openscience.org/O1/)
 (*Data Quality*).
 
