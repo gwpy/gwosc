@@ -39,11 +39,12 @@ aliases:
         name: Build
         command: |
           set -x;
+          if [[ "${PYTHON_VERSION:0:1}" -eq 3 ]]; then PYTHON3="3"; fi
           apt-get -yqq update;
           apt-get -yqq install \
               dpkg-dev \
               devscripts \
-              python${PYTHON_VERSION:0:1}-pip \
+              python${PYTHON3}-pip \
           ;
           pushd $(mktemp -d -p .);
           tar -xf ../gwosc-*.tar.* --strip-components=1;
