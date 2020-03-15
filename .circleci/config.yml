@@ -72,11 +72,11 @@ aliases:
         name: Build
         command: |
           set -x;
+          yum -y -q install epel-release;
           yum -y -q update;
           yum -y -q install \
               rpm-build \
               yum-utils \
-              epel-release \
               epel-rpm-macros \
               python-srpm-macros \
               python3-pip \
