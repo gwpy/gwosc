@@ -23,16 +23,28 @@ that handle direct requests to the GWOSC host.
 
 import contextlib
 import json
+import logging
+import os
 import re
 
 from six.moves.urllib.request import urlopen
-from six.moves.urllib.error import URLError
+
+logger = logging.getLogger("gwosc.api")
+_loghandler = logging.StreamHandler()
+_loghandler.setFormatter(
+    logging.Formatter(logging.BASIC_FORMAT),
+)
+logger.addHandler(_loghandler)
+logger.setLevel(int(os.getenv("GWOSC_LOG_LEVEL", logging.NOTSET)))
 
 _MAX_GPS = 99999999999
 _VERSIONED_EVENT_REGEX = re.compile(r"_[RV]\d+\Z")
 
 #: The default GWOSC host URL
 DEFAULT_URL = "https://www.gw-openscience.org"
+
+#: Cache of downloaded blobs
+JSON_CACHE = {}
 
 
 # -- JSON handling ------------------------------------------------------------
@@ -47,32 +59,34 @@ def fetch_json(url):
 
     Returns
     ------
-    json : `object`
+    data : `dict` or `list`
         the data fetched from ``url`` as parsed by :func:`json.loads`
 
     See also
     --------
     json.loads
         for details of the JSON parsing
-
-    Examples
-    --------
-    >>> from gwpy.io.losc import fetch_json
-    >>> fetch_json('https://losc.ligo.org/archive/1126257414/1126261510/json/')
     """
-    with contextlib.closing(urlopen(url)) as response:
-        data = response.read()
-        if isinstance(data, bytes):
-            data = data.decode('utf-8')
-        try:
-            return json.loads(data)
-        except ValueError as exc:
-            exc.args = ("Failed to parse LOSC JSON from %r: %s"
-                        % (url, str(exc)),)
-            raise
+    try:
+        return JSON_CACHE[url]
+    except KeyError:
+        logger.debug("fetching {}".format(url))
+        with contextlib.closing(urlopen(url)) as response:
+            data = response.read()
+            if isinstance(data, bytes):
+                data = data.decode('utf-8')
+            try:
+                return JSON_CACHE.setdefault(
+                    url,
+                    json.loads(data),
+                )
+            except ValueError as exc:
+                exc.args = ("Failed to parse LOSC JSON from %r: %s"
+                            % (url, str(exc)),)
+                raise
 
 
-# -- API calls ----------------------------------------------------------------
+# -- Run datasets -------------------------------------------------------------
 
 def _dataset_url(start, end, host=DEFAULT_URL):
     return "{}/archive/{:d}/{:d}/json/".format(host, start, end)
