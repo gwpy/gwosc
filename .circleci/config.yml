@@ -191,12 +191,12 @@ jobs:
     environment:
       PYTHON_VERSION: "2.7"
 
-  el7:3.4:
+  el7:3.6:
     <<: *centos
     docker:
       - image: ligo/base:el7
     environment:
-      PYTHON_VERSION: "3.4"
+      PYTHON_VERSION: "3.6"
 
 # -- workflow ---------------
 
@@ -215,6 +215,6 @@ workflows:
       - el7:2.7:
           requires:
             - sdist
-      - el7:3.4:
+      - el7:3.6:
           requires:
             - sdist
