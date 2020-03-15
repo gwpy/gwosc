@@ -256,7 +256,7 @@ def _fetch_allevents_event_json(
 
     # raise error with the right message
     msg = "failed to identify {} for event '{}'"
-    if catalog is None and version is None:
+    if catalog is None:
         msg = msg.format("catalog", event)
         if version is not None:
             msg += " at version {}".format(version)

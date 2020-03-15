@@ -157,3 +157,5 @@ def test_fetch_event_json_error():
         api.fetch_event_json("GW150914_R1", version=1)
     with pytest.raises(ValueError):
         api.fetch_event_json("GW150914_R1", catalog="test")
+    with pytest.raises(ValueError):
+        api.fetch_event_json("blah")
