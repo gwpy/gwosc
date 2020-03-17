@@ -1,6 +1,9 @@
 # -- gwosc source package ------------------------------------------------------
 
 Source: gwosc
+Homepage: https://gwosc.readthedocs.io
+Vcs-Browser: https://github.com/gwpy/gwosc
+Vcs-Git: https://github.com/gwpy/gwosc.git
 Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
 Section: python
 Priority: optional
@@ -17,11 +20,10 @@ Build-Depends:
 
 Package: python3-gwosc
 Architecture: all
-Depends: ${misc:Depends},
-         ${python3:Depends},
+Depends:
+  ${misc:Depends},
+  ${python3:Depends},
 Description: A python3 interface to the Gravitational-Wave Open Science Center data archive
- .
-           The `gwosc` package provides an interface to querying the open data
-           releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-           gravitational-wave observatories.
- .
+ The `gwosc` package provides an interface to querying the open data
+ releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+ and Virgo gravitational-wave observatories.

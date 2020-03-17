@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright Duncan Macleod 2019
+# Copyright (C) Cardiff University, 2018-2020
 #
 # This file is part of GWOSC.
 #

@@ -1,19 +1,21 @@
 %define name    gwosc
-%define version 0.4.2
-%define release 2
+%define version 0.5.0
+%define release 1
 
 Name:      %{name}
 Version:   %{version}
 Release:   %{release}%{?dist}
 Summary:   A python interface to the Gravitational-Wave Open Science Center data archive
 
-License:   GPLv3
-Url:       https://pypi.org/project/%{name}/
-Source0:   https://pypi.io/packages/source/g/%{name}/%{name}-%{version}.tar.gz
+License:   MIT
+Url:       https://gwosc.readthedocs.io
+Source0:   %pypi_source
 
+Packager:  Duncan Macleod <duncan.macleod@ligo.org>
 Vendor:    Duncan Macleod <duncan.macleod@ligo.org>
 
 BuildArch: noarch
+Prefix:    %{_prefix}
 
 # rpmbuild dependencies
 BuildRequires: python-srpm-macros
@@ -31,8 +33,8 @@ BuildRequires: python%{python3_pkgversion}-pytest
 
 %description
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-gravitational-wave observatories.
+releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+and Virgo gravitational-wave observatories.
 
 # -- python-3X-gwosc
 
@@ -41,8 +43,8 @@ Summary:  %{summary}
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %description -n python%{python3_pkgversion}-%{name}
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://losc.ligo.org> from the LIGO and Virgo
-gravitational-wave observatories.
+releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+and Virgo gravitational-wave observatories.
 
 # -- build steps
 
@@ -69,6 +71,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Tue Mar 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.0-1
+- drop support for python2
+
 * Tue Mar 12 2019 Duncan Macleod <duncan.macleod@ligo.org> - 0.4.3-1
 - bug fix release, see github releases for details
 
