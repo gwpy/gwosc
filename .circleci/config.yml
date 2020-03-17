@@ -15,13 +15,26 @@ aliases:
 
   - &store_test_results
       store_test_results:
-        path: test-reports
+        path: tests
 
   - &store_test_artifacts
       store_artifacts:
-        path: test-reports
+        path: tests
 
-  - &build-debian
+  - &install
+      run:
+        name: Install tarball
+        command: python -m pip install --progress-bar=off $(echo gwosc-*.tar.*)[test]
+
+  - &debian_configure
+      run:
+        name: Configure debian
+        command: |
+          set -x;
+          apt-get -yqq update;
+          apt-get -yqq install ca-certificates;
+
+  - &debian_build
       run:
         name: Build
         command: |
@@ -29,94 +42,135 @@ aliases:
           apt-get -yqq update;
           apt-get -yqq install \
               dpkg-dev \
-              devscripts;
+              devscripts \
+              python${PYTHON_VERSION:0:1}-pip \
+          ;
           pushd $(mktemp -d -p .);
-          tar -xf ../gwosc-*.tar.gz --strip-components=1;
+          tar -xf ../gwosc-*.tar.* --strip-components=1;
           # install build dependencies
           mk-build-deps --tool "apt-get -y" --install --remove;
           # build binary package
           dpkg-buildpackage -us -uc -b;
-          # mv and install
           popd;
+          ls *.deb | xargs -n1 dpkg --info;
+          # mv and install
           rm -rf tmp*;
-          dpkg --install python*-gwosc*.deb;
 
-  - &build-centos
+  - &debian_install
+      run:
+        name: Install
+        command: |
+          set -x;
+          DEB="python${PYTHON_VERSION:0:1}-gwosc*.deb";
+          dpkg --install ${DEB} || { \
+              apt-get -y -f install;
+              dpkg --install ${DEB};
+          };
+
+  - &centos_build
       run:
         name: Build
         command: |
           set -x;
+          yum -y -q install epel-release;
           yum -y -q update;
           yum -y -q install \
-              yum-utils \
               rpm-build \
+              yum-utils \
+              epel-rpm-macros \
               python-srpm-macros \
+              python3-pip \
+              python3-rpm-macros \
           ;
-          # hack version number
-          tar -xf gwosc-*.tar.gz;
-          rm -rf gwosc-*.tar.gz;
-          _version=$(grep "define version" gwosc-*/gwosc.spec | awk '{print $3}');
-          mv gwosc-* gwosc-${_version} || true;
-          tar -zcf gwosc-${_version}.tar.gz gwosc-${_version};
-          rm -rf gwosc-${_version}/;
+          # rename this tarball to match the version in the spec file
+          # since we use versioneer in setup.py, but not in the spec file
+          mkdir -pv _tmp_;
+          cd _tmp_;
+          VERSION=$(tar -x --file ../gwosc-*.tar.* --strip-components=1 -O */gwosc.spec | grep "define version" | cut -d\  -f3)
+          tar -xf ../gwosc-*.tar.*
+          rm -rf ../gwosc-*.tar.*;
+          mv -v gwosc-*/ gwosc-${VERSION} || true;
+          tar -zcf ../gwosc-${VERSION}.tar.gz gwosc-${VERSION};
+          rm -rf gwosc-${VERSION}/;
+          cd ..;
+          rm -rf _tmp_;
           # build src rpm
-          SRC_RPM=$(rpmbuild -ts gwosc*.tar.gz | cut -d\  -f2);
+          SRPM=$(rpmbuild --define "_topdir $(pwd)" -ts ./gwosc-*.tar.* | cut -d\  -f2);
           # install build dependencies
-          yum-builddep -y -q ${SRC_RPM};
+          yum-builddep -y -q ${SRPM};
           # build binary rpm(s)
-          rpmbuild --quiet --define "_rpmdir $(pwd)" --rebuild ${SRC_RPM};
-          # mv and install
-          mv noarch/*.rpm .;
-          rm -rf noarch;
-          yum -y -q --nogpgcheck localinstall *.rpm;
+          rpmbuild --define "_rpmdir $(pwd)" --rebuild ${SRPM};
+          # install
+          mv */*.rpm .;
+          for _rpm in *.rpm; do
+              echo "-- RPM summary for ${_rpm}";
+              echo "- Contents:"
+              rpm -qilp ${_rpm};
+              echo "- Provides:"
+              rpm -qp --provides ${_rpm};
+              echo "- Requires:"
+              rpm -qp --requires ${_rpm};
+          done;
 
-  - &prep-test-debian
+  - &centos_install
       run:
-        name: Prepare tests
+        name: Install
         command: |
           set -x;
-          apt-get -yqq install \
-              python-pip python3-pip \
-              python-pytest python3-pytest \
-              python-pytest-cov python3-pytest-cov;
-
-  - &prep-test-centos
-      run:
-        name: Prepare tests
-        command: |
-          set -x;
-          yum -y -q install \
-              python2-pip python34-pip \
-              pytest python34-pytest \
-              python2-pytest-cov python34-pytest-cov;
+          if [[ "${PYTHON_VERSION:0:1}" -eq 3 ]]; then
+              PYXY=$(rpm --eval "%{?python3_pkgversion}");
+          else
+              PYXY="${PYTHON_VERSION:0:1}";
+          fi;
+          yum -y --nogpgcheck localinstall ./python${PYXY}-gwosc*.rpm
 
   - &test
       run:
         name: Test
         command: |
           set -x;
-          mkdir -pv test-reports;
-          python${PYTHON_VERSION} -m pip install --upgrade setuptools;
-          python${PYTHON_VERSION} -m pip install --upgrade "pytest<4.0" pytest-cov "more-itertools < 6.0a0 ; python_version < '3'";
-          python${PYTHON_VERSION} -m pytest --pyargs gwosc --cov=gwosc --junitxml=test-reports/junit.xml;
+          # install test requirements
+          python${PYTHON_VERSION} -m pip install \
+              --requirement requirements.txt \
+              --upgrade \
+              --upgrade-strategy=only-if-needed \
+          ;
+          # run test suite
+          mkdir -pv tests;
+          pushd tests;
+          python${PYTHON_VERSION} -m pytest \
+              --cov gwosc \
+              --junitxml junit.xml \
+              --pyargs gwosc \
+          ;
+
+  - &coverage_report
+      run:
+        name: Coverage report
+        command: pushd tests && python${PYTHON_VERSION} -m coverage report --show-missing
 
   - &codecov
       run:
         name: Submit coverage to codecov
         command: |
-          # get OS name from CIRCLE_JOB name
+          set -x;
+          # get OS name from CIRCLE_JOB name (ignore if in a python image)
           export IMAGE=$(python${PYTHON_VERSION} -c "print('${CIRCLE_JOB}'.split(':')[-2])")
+          if [[ "${IMAGE}" == "python" ]]; then unset IMAGE; fi
           # install codecov
           python${PYTHON_VERSION} -m pip install codecov
           # upload coverage
-          python${PYTHON_VERSION} -m codecov --flags $(uname) python${PYTHON_VERSION/./} ${IMAGE}
+          python${PYTHON_VERSION} -m codecov --file tests/.coverage --flags $(uname) python${PYTHON_VERSION/./} ${IMAGE}
 
   - &debian
       steps:
+        - checkout
+        - *debian_configure
         - *attach_workspace
-        - *build-debian
-        - *prep-test-debian
+        - *debian_build
+        - *debian_install
         - *test
+        - *coverage_report
         - *codecov
         - *store_test_results
         - *store_test_artifacts
@@ -124,14 +178,27 @@ aliases:
 
   - &centos
       steps:
+        - checkout
         - *attach_workspace
-        - *build-centos
-        - *prep-test-centos
+        - *centos_build
+        - *centos_install
         - *test
+        - *coverage_report
         - *codecov
         - *store_test_results
         - *store_test_artifacts
         - *store_rpm_artifacts
+
+  - &python
+      steps:
+        - checkout
+        - *attach_workspace
+        - *install
+        - *test
+        - *coverage_report
+        - *codecov
+        - *store_test_results
+        - *store_test_artifacts
 
 # -- jobs -------------------
 
@@ -142,10 +209,16 @@ jobs:
       - image: python
     steps:
       - checkout
-      - run: python setup.py --quiet sdist --dist-dir .
+      - run:
+          name: Build tarball
+          command: |
+            set -ex;
+            python setup.py --version > .version;
+            python setup.py --quiet sdist --dist-dir .;
       - persist_to_workspace:
           root: .
           paths:
+            - ".version"
             - "gwosc-*.tar.gz"
 
   flake8:
@@ -157,46 +230,93 @@ jobs:
           name: Lint
           command: |
             set -ex;
-            python -m pip install "flake8>=3.7.0";
-            mkdir -pv test-reports;
-            python -m flake8 --output-file test-reports/flake8.txt;
+            python -m pip install --progress-bar=off "flake8>=3.7.0";
+            mkdir -pv tests;
+            python -m flake8 --output-file tests/flake8.txt;
       - run:
           name: Create flake8 report
           when: always
           command: |
             set -ex;
-            python -m pip install flake8-junit-report;
-            python -m junit_conversor test-reports/flake8.txt test-reports/junit.xml;
+            python -m pip install --progress-bar=off flake8-junit-report;
+            python -m junit_conversor tests/flake8.txt tests/junit.xml;
       - *store_test_results
       - *store_test_artifacts
 
-  debian:stretch:2.7:
-    <<: *debian
+  centos:7:3.6:
+    <<: *centos
     docker:
-      - image: ligo/base:stretch
+      - image: centos:7
     environment:
-      PYTHON_VERSION: "2.7"
+      PYTHON_VERSION: "3.6"
+
+  centos:8:3.6:
+    <<: *centos
+    docker:
+      - image: centos:8
+    environment:
+      PYTHON_VERSION: "3.6"
 
   debian:stretch:3.5:
     <<: *debian
     docker:
-      - image: ligo/base:stretch
+      - image: debian:stretch
     environment:
       PYTHON_VERSION: "3.5"
 
-  el7:2.7:
-    <<: *centos
+  debian:buster:3.7:
+    <<: *debian
     docker:
-      - image: ligo/base:el7
+      - image: debian:buster
     environment:
-      PYTHON_VERSION: "2.7"
+      PYTHON_VERSION: "3.7"
 
-  el7:3.4:
-    <<: *centos
+  debian:bullseye:3.7:
+    <<: *debian
     docker:
-      - image: ligo/base:el7
+      - image: debian:bullseye
     environment:
-      PYTHON_VERSION: "3.4"
+      PYTHON_VERSION: "3.7"
+
+  python:3.5:
+    <<: *python
+    docker:
+      - image: python:3.5
+    environment:
+      PYTHON_VERSION: "3.5"
+
+  python:3.6:
+    <<: *python
+    docker:
+      - image: python:3.6
+    environment:
+      PYTHON_VERSION: "3.6"
+
+  python:3.7:
+    <<: *python
+    docker:
+      - image: python:3.7
+    environment:
+      PYTHON_VERSION: "3.7"
+
+  python:3.8:
+    <<: *python
+    docker:
+      - image: python:3.8
+    environment:
+      PYTHON_VERSION: "3.8"
+
+  sphinx:
+    docker:
+      - image: python:3.7
+    steps:
+      - checkout
+      - run:
+          name: Install
+          command: python -m pip install --progress-bar=off .[docs]
+      - run:
+          name: Run sphinx-build
+          command: pushd docs && python -m sphinx -M html . _build -E -W
 
 # -- workflow ---------------
 
@@ -206,15 +326,31 @@ workflows:
     jobs:
       - sdist
       - flake8
-      - debian:stretch:2.7:
+      - centos:7:3.6:
+          requires:
+            - sdist
+      - centos:8:3.6:
           requires:
             - sdist
       - debian:stretch:3.5:
           requires:
             - sdist
-      - el7:2.7:
+      - debian:buster:3.7:
           requires:
             - sdist
-      - el7:3.4:
+      - debian:bullseye:3.7:
           requires:
             - sdist
+      - python:3.5:
+          requires:
+            - sdist
+      - python:3.6:
+          requires:
+            - sdist
+      - python:3.7:
+          requires:
+            - sdist
+      - python:3.8:
+          requires:
+            - sdist
+      - sphinx

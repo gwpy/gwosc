@@ -20,13 +20,11 @@
 """
 
 import os.path
-import re
 
 import pytest
 
 from .. import (
     locate,
-    urls as gwosc_urls,
     utils,
 )
 
@@ -76,33 +74,31 @@ def test_get_urls_deprecated_tag():
 
 
 @pytest.mark.remote
-def test_get_event_urls(gw150914_urls):
-    # find latest version by brute force
-    latestv = sorted(
-        gwosc_urls.URL_REGEX.match(
-            os.path.basename(u['url'])).groupdict()['version'] for
-        u in gw150914_urls)[-1]
-
-    event = 'GW150914'
-    urls = locate.get_event_urls(event)
-    v_regex = re.compile("_[RV]{}-".format(latestv))
+def test_get_event_urls():
+    urls = locate.get_event_urls("GW150914_R1", sample_rate=4096)
+    assert len(urls) == 4
     for url in urls:
-        assert url.endswith('.hdf5')  # default format
-        assert '_4KHZ_' in url  # default sample rate
-        assert v_regex.search(url)  # highest matched version
+        assert "_4KHZ" in url
 
-    urls = locate.get_event_urls(event, version=1)
-    v1_regex = re.compile("_[RV]1-")
-    for url in urls:
-        assert v1_regex.search(url)
+
+@pytest.mark.remote
+def test_get_event_urls_segment():
+    urls = locate.get_event_urls(
+        "GW150914_R1",
+        start=1126257415,
+        end=1126257425,
+    )
+    assert len(urls) == 2
+    for url in urls:  # check that these are the 4096-second files
+        assert "-4096." in url
 
 
 @pytest.mark.remote
 def test_get_urls_gw170104():
     # check that we can find the right URL from an event dataset for
-    # a GPS time that doesn't overlap with the event, and starts after
-    # the end of the 32-second files (this used to not work)
-    urls = locate.get_urls('L1', 1167558912.6, 1167559012.6, version=1)
+    # a GPS time that doesn't overlap with the event, and ends before
+    # the start of the 32-second files (this used to not work)
+    urls = locate.get_urls('L1', 1167558912.6, 1167559012.6)
     assert list(map(os.path.basename, urls)) == [
         "L-L1_GWOSC_4KHZ_R1-1167557889-4096.hdf5",
     ]

@@ -20,15 +20,8 @@
 """
 
 import os.path
-import re
 from io import BytesIO
-
-try:
-    from unittest import mock
-    from urllib.error import URLError
-except ImportError:  # python < 3
-    import mock
-    from urllib2 import URLError
+from unittest import mock
 
 import pytest
 
@@ -94,21 +87,6 @@ def test_fetch_dataset_json_local(fetch):
 
 
 @pytest.mark.remote
-def test_fetch_event_json():
-    event = 'GW150914'
-    out = api.fetch_event_json(event)
-    assert int(out['GPS']) == 1126259462
-    assert out['dataset'] == event
-    check_json_url_list(out['strain'])
-
-
-@mock.patch('gwosc.api.fetch_json')
-def test_fetch_event_json_local(fetch):
-    api.fetch_event_json('GW150914')
-    fetch.assert_called_with(losc_url('archive/GW150914/json/'))
-
-
-@pytest.mark.remote
 def test_fetch_run_json():
     run = 'S6'
     detector = 'L1'
@@ -129,48 +107,55 @@ def test_fetch_run_json_local(fetch):
 
 
 @pytest.mark.remote
+def test_fetch_cataloglist_json():
+    out = api.fetch_cataloglist_json()
+    assert "description" in out["GWTC-1-confident"]
+    assert "url" in out["GWTC-1-confident"]
+
+
+@mock.patch("gwosc.api.fetch_json")
+def test_fetch_cataloglist_json_local(fetch):
+    api.fetch_cataloglist_json()
+    fetch.assert_called_with(
+        losc_url("eventapi/json/")
+    )
+
+
+@pytest.mark.remote
 def test_fetch_catalog_json():
     out = api.fetch_catalog_json("GWTC-1-confident")
-    assert "distance" in out["parameters"]
-    assert out["data"]["GW170817"]["tc"]["best"] == 1187008882.4
+    events = out["events"]
+    assert events["GW170817_R1"]["GPS"] == 1187008882.4
 
 
 @mock.patch("gwosc.api.fetch_json")
 def test_fetch_catalog_json_local(fetch):
     api.fetch_catalog_json("GWTC-1-confident")
     fetch.assert_called_with(
-        losc_url("catalog/GWTC-1-confident/filelist/")
+        losc_url("eventapi/json/GWTC-1-confident/")
     )
 
 
 @pytest.mark.remote
-def test_fetch_catalog_event_json():
-    event = 'GW150914'
-    out = api.fetch_catalog_event_json(event)
-    assert int(out["GPS"]) == 1126259462
-    assert re.match(r"GW150914_R\d+", out["dataset"])
-    check_json_url_list(out["strain"])
+def test_fetch_event_json():
+    out = api.fetch_event_json("GW150914")
+    meta = out["events"]["GW150914_R1"]
+    assert int(meta["GPS"]) == 1126259462
+    assert meta["version"] == 3
 
 
-@mock.patch("gwosc.api.fetch_event_json")
-@mock.patch("gwosc.api.urlopen",
-            side_effect=[mock.MagicMock(), URLError("mock")])
-def test_fetch_catalog_event_json_local(urlopen, fej):
-    api.fetch_catalog_event_json("GW150914")
-    assert urlopen.call_count == 2  # two version queries, one JSON queries
-    urlopen.assert_any_call(losc_url("archive/GW150914_R1/json/"))
-    urlopen.assert_any_call(losc_url("archive/GW150914_R2/json/"))
-    fej.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
+@pytest.mark.remote
+def test_fetch_event_json_version():
+    out = api.fetch_event_json("GW150914_R1")["events"]["GW150914_R1"]
+    assert out["version"] == 3
+    assert out["catalog.shortName"] == "GWTC-1-confident"
 
 
-@mock.patch("gwosc.api.fetch_event_json")
-def test_fetch_catalog_event_json_version(fetch):
-    api.fetch_catalog_event_json("GW150914_R1")
-    assert fetch.call_count == 1
-    fetch.assert_called_with("GW150914_R1", host=api.DEFAULT_URL)
-
-    fetch.reset_mock()
-
-    api.fetch_catalog_event_json("GW150914", version=10)
-    assert fetch.call_count == 1
-    fetch.assert_called_with("GW150914_R10", host=api.DEFAULT_URL)
+@pytest.mark.remote
+def test_fetch_event_json_error():
+    with pytest.raises(ValueError):
+        api.fetch_event_json("GW150914_R1", version=1)
+    with pytest.raises(ValueError):
+        api.fetch_event_json("GW150914_R1", catalog="test")
+    with pytest.raises(ValueError):
+        api.fetch_event_json("blah")

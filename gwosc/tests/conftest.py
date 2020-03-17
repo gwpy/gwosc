@@ -20,14 +20,13 @@
 """
 
 import os
-try:
-    from unittest import mock
-except ImportError:  # python < 3
-    import mock
 
 import pytest
 
-from ..api import fetch_catalog_event_json
+from ..api import (
+    fetch_event_json,
+    fetch_run_json,
+)
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
@@ -41,22 +40,53 @@ except AttributeError:  # pytest > 3.0.0
     autouseyield = pytest.fixture(autouse=True)
 
 
-# force all tests to not rely on the catalog cache
-@autouseyield
-def clear_catalog_cache():
-    with mock.patch.dict("gwosc.catalog.CACHE", clear=True):
-        yield
+def _event_strain(name, **kwargs):
+    return list(
+        fetch_event_json(name, **kwargs)["events"].values()
+    )[0]["strain"]
 
 
-def _event_urls(name):
-    return fetch_catalog_event_json(name)['strain']
+@pytest.fixture(scope="module")
+def gw150914_strain():
+    return _event_strain('GW150914', version=3)
+
+
+@pytest.fixture(scope="module")
+def gw170817_strain():
+    return _event_strain('GW170817', version=2)
+
+
+@pytest.fixture(scope="module")
+def o1_strain():
+    return fetch_run_json("O1", "L1", 1126257415, 1126261511)["strain"]
 
 
 @pytest.fixture
-def gw150914_urls(scope='module'):
-    return _event_urls('GW150914')
+def mock_strain():
+    return [
+        {'url': 'X-X1_LOSC_TEST_4_V1-0-32.ext',
+         'GPSstart': 0,
+         'duration': 32,
+         'detector': 'X1',
+         'sampling_rate': 4096},
+        {'url': 'X-X1_LOSC_TEST_4_V1-32-32.ext',
+         'GPSstart': 32,
+         'duration': 32,
+         'detector': 'X1',
+         'sampling_rate': 4096},
+        {'url': 'Y-Y1_LOSC_TEST2_4_V1-0-32.ext',
+         'GPSstart': 0,
+         'duration': 32,
+         'detector': 'Y1',
+         'sampling_rate': 4096},
+        {'url': 'Y-Y1_LOSC_TEST2_16_V2-0-32.ext',
+         'GPSstart': 0,
+         'duration': 32,
+         'detector': 'Y1',
+         'sampling_rate': 16384},
+    ]
 
 
 @pytest.fixture
-def gw170817_urls(scope='module'):
-    return _event_urls('GW170817')
+def mock_urls(mock_strain):
+    return [u["url"] for u in mock_strain]

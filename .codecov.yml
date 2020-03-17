@@ -1,0 +1,3 @@
+fixes:
+  - "/usr/lib/python*/dist-packages::"
+  - "/usr/lib/python*/site-packages::"

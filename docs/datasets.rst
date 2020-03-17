@@ -9,5 +9,4 @@
 
 .. automodsumm:: gwosc.datasets
    :functions-only:
-   :skip: raise_from
    :toctree: reference/

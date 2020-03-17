@@ -20,10 +20,7 @@
 """
 
 import re
-try:
-    from unittest import mock
-except ImportError:  # python < 3
-    import mock
+from unittest import mock
 
 import pytest
 
@@ -97,44 +94,6 @@ def test_find_datasets_match():
     assert "O1" not in datasets.find_datasets(match="GW")
 
 
-@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
-@mock.patch('gwosc.api.fetch_catalog_json', return_value=CATALOG_JSON)
-@mock.patch(
-    'gwosc.api.fetch_catalog_event_json',
-    return_value={
-        "strain": [
-            {"url": "https://test.com/X-X1-123-456.gwf",
-             "detector": "L1",
-             },
-            {"url": "https://test.com/X-X1-234-567.gwf",
-             "detector": "L1",
-             },
-        ],
-    },
-)
-@mock.patch("gwosc.datasets.CATALOGS", ["GWTC-1-confident"])
-def test_find_datasets_local(fcej, fcj, fdj):
-    assert datasets.find_datasets() == [
-        "GW150914",
-        "GWTC-1-confident",
-        'S1',
-    ]
-    assert datasets.find_datasets(detector='V1') == [
-        "GWTC-1-confident",
-        "S1",
-    ]
-    assert datasets.find_datasets(type='event') == ['GW150914']
-    assert datasets.find_datasets(type='event', detector='V1') == []
-
-
-@mock.patch(
-    "gwosc.catalog.events",
-    side_effect=[ValueError, []],
-)
-def test_find_datasets_catalog_error(_):
-    assert datasets.find_datasets(type="catalog") == ["GWTC-1-marginal"]
-
-
 @pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.4
@@ -143,16 +102,19 @@ def test_event_gps():
     assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
-@mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
-    'GPS': 12345,
-    'something else': None,
-})
+@mock.patch(
+    'gwosc.api._fetch_allevents_event_json',
+    return_value={"events": {"GW150914": {
+        'GPS': 12345,
+        'something else': None,
+    }}},
+)
 def test_event_gps_local(fetch):
     assert datasets.event_gps('GW150914') == 12345
     fetch.side_effect = ValueError('test')
     with pytest.raises(ValueError) as exc:
         datasets.event_gps('something')
-    assert str(exc.value) == 'no event dataset found for \'something\''
+    assert str(exc.value) == "no event dataset found for 'something'"
 
 
 @pytest.mark.remote
@@ -160,15 +122,28 @@ def test_event_segment():
     assert datasets.event_segment("GW170817") == (1187006835, 1187010931)
 
 
-@mock.patch('gwosc.api.fetch_catalog_event_json', return_value={
-    "strain": [
-        {"url": "https://test.com/X-X1-123-456.gwf", "detector": "X1"},
-        {"url": "https://test.com/X-X1-234-567.gwf", "detector": "Y1"},
-    ],
-})
-def test_event_segment_local(fetch):
-    assert datasets.event_segment("GW170817") == (123, 801)
-    assert datasets.event_segment("GW170817", detector="X1") == (123, 579)
+@mock.patch(
+    'gwosc.api._fetch_allevents_event_json',
+    mock.MagicMock(return_value={"events": {"GW150914": {
+        "GPS": 12345,
+        "something else": None,
+        "strain": [
+            {
+                "GPSstart": 0,
+                "duration": 32,
+                "detector": "X1",
+            },
+            {
+                "GPSstart": 10,
+                "duration": 32,
+                "detector": "Y1",
+            },
+        ],
+    }}}),
+)
+def test_event_segment_local():
+    assert datasets.event_segment("GW170817") == (0, 42)
+    assert datasets.event_segment("GW170817", detector="Y1") == (10, 42)
 
 
 @pytest.mark.remote
@@ -179,8 +154,14 @@ def test_event_at_gps():
     assert str(exc.value) == 'no event found within 0.1 seconds of 1187008882'
 
 
-@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
-def test_event_at_gps_local(fetch):
+@mock.patch(
+    'gwosc.api.fetch_allevents_json',
+    mock.MagicMock(return_value={"events": {
+        "GW150914": {"GPS": 12345.5, "commonName": "GW150914"},
+        "GW150915": {"GPS": 12346.5, "commonName": "GW150915"},
+    }}),
+)
+def test_event_at_gps_local():
     assert datasets.event_at_gps(12345) == 'GW150914'
     with pytest.raises(ValueError):
         datasets.event_at_gps(12349)
@@ -192,10 +173,16 @@ def test_event_detectors():
     assert datasets.event_detectors("GW170814") == {"H1", "L1", "V1"}
 
 
-@mock.patch("gwosc.api.fetch_catalog_event_json", return_value={
-    "strain": [{"detector": "A1"}, {"detector": "A1"}, {"detector": "B1"}],
-})
-def test_event_detectors_local(fcej):
+@mock.patch(
+    "gwosc.api._fetch_allevents_event_json",
+    mock.MagicMock(return_value={
+        "events": {"test": {"strain": [
+            {"detector": "A1"},
+            {"detector": "B1"},
+        ]}},
+    }),
+)
+def test_event_detectors_local():
     assert datasets.event_detectors("test") == {"A1", "B1"}
 
 
@@ -207,8 +194,11 @@ def test_run_segment():
     assert str(exc.value) == 'no run dataset found for \'S7\''
 
 
-@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
-def test_run_segment_local(fetch):
+@mock.patch(
+    'gwosc.api.fetch_dataset_json',
+    mock.MagicMock(return_value=DATASET_JSON),
+)
+def test_run_segment_local():
     assert datasets.run_segment('S1') == (0, 1)
     with pytest.raises(ValueError):
         datasets.run_segment('S2')
@@ -222,8 +212,11 @@ def test_run_at_gps():
     assert str(exc.value) == 'no run dataset found containing GPS 0'
 
 
-@mock.patch('gwosc.api.fetch_dataset_json', return_value=DATASET_JSON)
-def test_run_at_gps_local(fetch):
+@mock.patch(
+    'gwosc.api.fetch_dataset_json',
+    mock.MagicMock(return_value=DATASET_JSON),
+)
+def test_run_at_gps_local():
     assert datasets.run_at_gps(0) == 'S1'
     with pytest.raises(ValueError):
         datasets.run_at_gps(10)
@@ -240,9 +233,9 @@ def test_dataset_type():
 
 @mock.patch(
     'gwosc.datasets.find_datasets',
-    side_effect=[["testrun"], [],  ["testevent"], [], [], []],
+    mock.MagicMock(side_effect=[["testrun"], [], ["testevent"], [], [], []]),
 )
-def test_dataset_type_local(find):
+def test_dataset_type_local():
     assert datasets.dataset_type("testevent") == "event"
     with pytest.raises(ValueError):
         datasets.dataset_type("invalid")

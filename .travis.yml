@@ -1,47 +1,58 @@
-dist: xenial
-language: python
+language: generic
 
-env:
-  global:
-    secure: "AJ+tw8SSIR1y+QF1purzxs9+2bt2GkJHL+wnrKbHexeM9rd5iGifuSrrJI4SvqUZ3DUHq1B3G4ipwH1IqYq0s/k04f9Q4B8/KQp2nQ+SIxrgEgwpqpqsPB3/eqBpXfJDZyzyIi3EHLHTiGnUMbDODZL1zQhCgKp+FCke8qI31btHkCecRwryzRJVcYBs9Y44SB1eh/80VYOl68RRZzwNeY+rt26lsrC4UcEfpftFNAoqkagQBtW4FbQtP2tlKmRP5UhFOSL9dnsNhNMg9s4Jo+/n1vWrD62W8wktOMia/PnsABXz3m6WUlnJbarOnHFI9mqYUiui2+BWMkWuHpsETUen/by5A18FPMFsuxogIhtmpgtDk21zUpU8BXa4dujN+2TQTkn1tnFvQfEXAyALULLkgHWZjk2Mn+kMCqx6FrbI5Ex6tX4EcEDWb/oYCdpIAh7+9/rP7hPKq0WChBc1r7q6wmPD4HvWOkqCt9kneLKRfZUc/1hSxupgBlj/CZgPf4cLlEDxQ+w/kCGFMZ6oQPIxZ/+6fuQAq2SInXAjVw34M6PAX0ex4hkDWkT7ikiaEc/0+VQeBIOFfMUWFj/c5PJ9F9ps9bJLT89aa11YzpU4Jar1hCDhZ6YR3koFMs2BLK5tMH9on/it/lF4mzqnA3TOfUBT+xsRYAReKsMtUMw="
-
-python:
-  - '2.7'
-  - '3.4'
-  - '3.5'
-  - '3.6'
-  - '3.7'
-  - 'nightly'
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      env: PYTHON_VERSION="3.5"
+    - os: linux
+      env: PYTHON_VERSION="3.6"
+    - os: linux
+      env: PYTHON_VERSION="3.7"
+    - os: linux
+      env: PYTHON_VERSION="3.8"
+    - os: osx
+      env: PYTHON_VERSION="3.5"
+    - os: osx
+      env: PYTHON_VERSION="3.6"
+    - os: osx
+      env: PYTHON_VERSION="3.7"
+    - os: osx
+      env: PYTHON_VERSION="3.8"
 
 before_install:
-  - pip install pip setuptools --upgrade
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+        curl -o miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh;
+    else
+        curl -o miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh;
+    fi
+  - bash miniconda.sh -b -p ${HOME}/miniconda
+  - source "${HOME}/miniconda/etc/profile.d/conda.sh"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
+  - travis_retry conda update --quiet --yes conda
+  - conda info --all
 
 install:
-  - python -m pip install .[docs,tests]
+  # create a conda environment including our requirements
+  - travis_retry conda create --quiet --name ci python=${PYTHON_VERSION} pip setuptools
+  - travis_retry conda activate ci
+  # install this version
+  - python -m pip install .
+  # install test requirements
+  - travis_retry conda install --quiet --yes --update-deps --name ci --file requirements.txt
+  # print package info
+  - conda list
 
 script:
-  # run unit tests
-  - python -m pytest gwosc --cov=gwosc
-
-  # run unit tests again with --disable-socket to ensure that tests are marked properly
-  - python -m pytest gwosc --disable-socket -m "not remote"
-
-  # build documentation
-  - cd docs && make html; cd ../
+  - python -m pytest -rs --verbose --cov gwosc --pyargs gwosc
 
 after_success:
-  - python -m pip install "codecov"
-  - python -m codecov --flags $(uname) python${TRAVIS_PYTHON_VERSION/./}
+  - travis_retry conda install --quiet --yes --name ci codecov
+  - python -m coverage report
+  - python -m codecov --flags $(uname) python${PYTHON_VERSION/./}
 
-deploy:
-  - provider: pypi
-    user: duncanmmacleod
-    password: ${PYPI_PASSWD}
-    distributions: sdist bdist_wheel
-    on:
-      branch: master
-      tags: true
-      python: '3.6'
-      repo: gwpy/gwosc
-
-cache: pip
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+cache:
+  pip: true
