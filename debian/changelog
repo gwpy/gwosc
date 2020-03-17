@@ -1,3 +1,9 @@
+gwosc (0.5.0-1) unstable; urgency=low
+
+  * drop support for python2
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Tue, 17 Mar 2020 10:00:00 +0000
+
 gwosc (0.4.3-1) unstable; urgency=low
 
   * [#33] fixed bugs in `gwosc.timeline`
