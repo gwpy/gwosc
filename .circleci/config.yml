@@ -67,6 +67,11 @@ aliases:
               dpkg --install ${DEB};
           };
 
+  - &debian_install_git
+      run:
+        name: Install git
+        command: apt-get -yqq install git
+
   - &centos_build
       run:
         name: Build
@@ -124,6 +129,11 @@ aliases:
           fi;
           yum -y --nogpgcheck localinstall ./python${PYXY}-gwosc*.rpm
 
+  - &centos_install_git
+      run:
+        name: Install git
+        command: yum -y -q install git
+
   - &test
       run:
         name: Test
@@ -171,6 +181,7 @@ aliases:
         - *debian_install
         - *test
         - *coverage_report
+        - *debian_install_git
         - *codecov
         - *store_test_results
         - *store_test_artifacts
@@ -184,6 +195,7 @@ aliases:
         - *centos_install
         - *test
         - *coverage_report
+        - *centos_install_git
         - *codecov
         - *store_test_results
         - *store_test_artifacts
