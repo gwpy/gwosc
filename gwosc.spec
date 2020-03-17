@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.5.0
+%define version 0.5.1
 %define release 1
 
 Name:      %{name}
@@ -71,6 +71,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Tue Mar 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.1-1
+- update to 0.5.1
+
 * Tue Mar 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.0-1
 - drop support for python2
 
