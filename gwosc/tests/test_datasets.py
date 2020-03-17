@@ -95,6 +95,14 @@ def test_find_datasets_match():
 
 
 @pytest.mark.remote
+def test_find_datasets_event_version_detector():
+    # this raises a ValueError with gwosc-0.5.0
+    sets = datasets.find_datasets(type='event', version=1, detector='L1')
+    assert "GW150914" in sets
+    assert "GW150914_R1" not in sets  # v3
+
+
+@pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.4
     with pytest.raises(ValueError) as exc:
