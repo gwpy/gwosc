@@ -87,6 +87,47 @@ def _catalog_datasets(host=api.DEFAULT_URL):
     return api.fetch_cataloglist_json(host=host).keys()
 
 
+def _match_event_dataset(
+        dataset,
+        catalog=None,
+        version=None,
+        detector=None,
+        segment=None,
+        host=api.DEFAULT_URL,
+):
+    # get strain file list (matching catalog and version)
+    full = True if (detector or segment) else False
+    try:
+        meta = _event_metadata(
+            dataset,
+            catalog=catalog,
+            version=version,
+            full=full,
+            host=host,
+        )
+    except ValueError:  # no dataset matching catalog and/or version
+        return False
+
+    if not full:  # detector=None, segment=None
+        return True
+    try:
+        strain = meta["strain"]
+    except KeyError:  # no strain file list for this dataset
+        return False
+
+    # match detector
+    if detector not in {None} | {u["detector"] for u in strain}:
+        return False
+
+    # match segment
+    if segment is None:
+        return True
+    if not strain:
+        return False
+    eseg = utils.strain_extent(urls.sieve(strain, detector=detector))
+    return utils.segments_overlap(segment, eseg)
+
+
 def _event_datasets(
         detector=None,
         segment=None,
@@ -100,31 +141,15 @@ def _event_datasets(
         host=host,
         full=full,
     )["events"].items():
-        if detector is not None:
-            detset = event_detectors(
-                dset,
-                catalog=catalog,
-                version=version,
-                host=host,
-            )
-            if detector not in detset:
-                continue
-        if segment is not None:
-            try:
-                eseg = event_segment(
-                    dset,
-                    detector=detector,
-                    catalog=catalog,
-                    version=version,
-                    host=api.DEFAULT_URL,
-                )
-            except ValueError as exc:  # no files
-                if "has no strain files" in str(exc):
-                    continue
-                raise
-            if not utils.segments_overlap(segment, eseg):
-                continue
-        events[dset] = meta
+        if _match_event_dataset(
+            dset,
+            detector=detector,
+            segment=segment,
+            catalog=catalog,
+            version=version,
+            host=host,
+        ):
+            events[dset] = meta
 
     def _rank_catalog(x):
         cat = x["catalog.shortName"].lower()
