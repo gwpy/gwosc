@@ -7,7 +7,7 @@ and Virgo gravitational-wave observatories.
 ## Release status
 
 [![PyPI version](https://badge.fury.io/py/gwosc.svg)](http://badge.fury.io/py/gwosc)
-[![Conda version](https://img.shields.io/conda/vn/conda-forge/gwosc.svg)](https://anaconda.org/conda-forge/gwosc/)..
+[![Conda version](https://img.shields.io/conda/vn/conda-forge/gwosc.svg)](https://anaconda.org/conda-forge/gwosc/)  
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1196306.svg)](https://doi.org/10.5281/zenodo.1196306)
 [![License](https://img.shields.io/pypi/l/gwosc.svg)](https://choosealicense.com/licenses/mit/)
 ![Supported Python versions](https://img.shields.io/pypi/pyversions/gwosc.svg)
@@ -16,7 +16,7 @@ and Virgo gravitational-wave observatories.
 
 [![Travis](https://img.shields.io/travis/com/gwpy/gwosc/master?label=Unix%20%28conda%29&logo=travis)](https://travis-ci.com/gwpy/gwosc)
 [![Circle](https://img.shields.io/circleci/project/github/gwpy/gwosc/master.svg?label=Linux%20%28other%29&logo=circleci)](https://circleci.com/gh/gwpy/gwosc)
-[![Appveyor](https://img.shields.io/appveyor/ci/gwpy/gwosc/master.svg?label=Windows%20%28conda%29&logo=appveyor)](https://ci.appveyor.com/project/gwpy/gwosc/branch/master)..
+[![Appveyor](https://img.shields.io/appveyor/ci/gwpy/gwosc/master.svg?label=Windows%20%28conda%29&logo=appveyor)](https://ci.appveyor.com/project/gwpy/gwosc/branch/master)  
 [![Codecov](https://img.shields.io/codecov/c/gh/gwpy/gwosc?logo=codecov)](https://codecov.io/gh/gwpy/gwosc)
 [![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
 [![Documentation](https://readthedocs.org/projects/gwosc/badge/?version=latest)](https://gwosc.readthedocs.io/en/latest/?badge=latest)
