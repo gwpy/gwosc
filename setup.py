@@ -84,6 +84,7 @@ setup(
     # content
     packages=find_packages(),
     # dependencies
+    python_requires=">=3.5",
     setup_requires=setup_requires,
     install_requires=install_requires,
     tests_require=tests_require,
