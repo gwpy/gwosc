@@ -71,6 +71,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Wed Mar 18 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.3-1
+- update to 0.5.2
+
 * Tue Mar 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.1-1
 - update to 0.5.1
 
