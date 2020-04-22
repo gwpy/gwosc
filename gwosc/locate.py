@@ -148,6 +148,7 @@ def get_urls(
                     end=end,
                     format=format,
                     sample_rate=sample_rate,
+                    version=version,
                 )
 
             # if full span covered, return now
