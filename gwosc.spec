@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.5.1
+%define version 0.5.3
 %define release 1
 
 Name:      %{name}
@@ -71,7 +71,10 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
-* Wed Mar 18 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.3-1
+* Wed Apr 22 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.3-1
+- update to 0.5.3
+
+* Wed Mar 18 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.2-1
 - update to 0.5.2
 
 * Tue Mar 17 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.1-1
