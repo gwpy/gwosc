@@ -20,6 +20,7 @@
 """
 
 import os.path
+from pathlib import Path
 
 import pytest
 
@@ -59,6 +60,14 @@ def test_get_urls():
         locate.get_urls(detector, 0, 1)
     with pytest.raises(ValueError):  # no Virgo data for S6
         locate.get_urls('V1', start, end)
+
+
+@pytest.mark.remote
+def test_get_urls_version():
+    """Regression test against version not being respected in get_urls
+    """
+    urls = locate.get_urls('L1', 1187008877, 1187008887, version=2)
+    assert Path(urls[0]).name == "L-L1_LOSC_CLN_4_V1-1187007040-2048.hdf5"
 
 
 @pytest.mark.remote
