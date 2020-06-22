@@ -34,11 +34,6 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 os.environ.pop('http_proxy', None)
 os.environ.pop('https_proxy', None)
 
-try:
-    autouseyield = pytest.yield_fixture(autouse=True)
-except AttributeError:  # pytest > 3.0.0
-    autouseyield = pytest.fixture(autouse=True)
-
 
 def _event_strain(name, **kwargs):
     return list(
