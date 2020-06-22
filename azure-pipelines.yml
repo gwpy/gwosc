@@ -1,0 +1,102 @@
+strategy:
+  matrix:
+    linux_python3.6:
+      imageName: 'ubuntu-latest'
+      PYTHON_VERSION: '3.6'
+    linux_python3.7:
+      imageName: 'ubuntu-latest'
+      PYTHON_VERSION: '3.7'
+    linux_python3.8:
+      imageName: 'ubuntu-latest'
+      PYTHON_VERSION: '3.8'
+    macos_python3.6:
+      imageName: 'macOS-latest'
+      PYTHON_VERSION: '3.6'
+    macos_python3.7:
+      imageName: 'macOS-latest'
+      PYTHON_VERSION: '3.7'
+    macos_python3.8:
+      imageName: 'macOS-latest'
+      PYTHON_VERSION: '3.8'
+    win_python3.6:
+      imageName: 'windows-latest'
+      PYTHON_VERSION: '3.6'
+    win_python3.7:
+      imageName: 'windows-latest'
+      PYTHON_VERSION: '3.7'
+    win_python3.8:
+      imageName: 'windows-latest'
+      PYTHON_VERSION: '3.8'
+
+pool:
+  vmImage: $(imageName)
+
+variables:
+  CONDA_PKGS_DIRS: $(Pipeline.Workspace)/.conda/pkgs
+
+steps:
+- task: Cache@2
+  inputs:
+    key: 'conda | "$(Agent.OS)" | "python${PYTHON_VERSION}"'
+    path: $(CONDA_PKGS_DIRS)
+    restoreKeys: |
+      conda | "$(Agent.OS)"
+  displayName: Cache Conda packages
+
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH (Linux)
+  condition: eq( variables['Agent.OS'], 'Linux' )
+
+- bash: |
+    echo "##vso[task.prependpath]$CONDA/bin"
+    sudo chown -R $USER $CONDA
+  displayName: Add conda to PATH (macOS)
+  condition: eq( variables['Agent.OS'], 'Darwin' )
+
+- powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+  displayName: Add conda to PATH (Windows)
+  condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+- bash: |
+    conda config --set always_yes yes
+    conda config --add channels conda-forge
+    conda info --all
+    conda config --show-sources
+    conda list --show-channel-urls
+  displayName: Configure Conda
+
+- bash: |
+    conda create --name ci --yes \
+        "python=${PYTHON_VERSION}" \
+        "pip" \
+        "setuptools" \
+    ;
+  displayName: "Create environment"
+
+- bash: conda install --quiet --yes --update-deps --name ci --file requirements.txt
+  displayName: "Install requirements"
+
+- bash: conda list --name ci
+  displayName: "List packages"
+
+- bash: |
+    source activate ci
+    python -m pytest -rs --verbose --cov gwosc --pyargs gwosc --junitxml=junit.xml --cov-report=xml --cov-report=html
+  displayName: "Run tests"
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: "junit.xml"
+    testRunTitle: "(Agent.OS) | Python $(PYTHON_VERSION)"
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+
+- bash: |
+    source activate ci
+    conda install --yes --quiet coverage
+    bash <(curl -s https://codecov.io/bash) -F $(Agent.OS) python${PYTHON_VERSION/./}
+  displayName: 'Upload to codecov.io'
