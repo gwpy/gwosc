@@ -226,11 +226,11 @@ def _iter_datasets(
 
     if needevents:
         for name in _matched(_event_datasets(
-            detector = detector,
-            segment = segment,
-            host = host,
-            version = version,
-            catalog = catalog
+            detector=detector,
+            segment=segment,
+            host=host,
+            version=version,
+            catalog=catalog
         )):
             yield name
 
