@@ -14,9 +14,8 @@ and Virgo gravitational-wave observatories.
 
 ## Development status
 
-[![Travis](https://img.shields.io/travis/com/gwpy/gwosc/master?label=Unix%20%28conda%29&logo=travis)](https://travis-ci.com/gwpy/gwosc)
-[![Circle](https://img.shields.io/circleci/project/github/gwpy/gwosc/master.svg?label=Linux%20%28other%29&logo=circleci)](https://circleci.com/gh/gwpy/gwosc)
-[![Appveyor](https://img.shields.io/appveyor/ci/gwpy/gwosc/master.svg?label=Windows%20%28conda%29&logo=appveyor)](https://ci.appveyor.com/project/gwpy/gwosc/branch/master)  
+[![Build Status](https://img.shields.io/azure-devops/build/gwpy/297c31c7-2ac2-4a0b-b7fa-ce07fb4eb6de/4/master?label=Python%20build&logo=azure-pipelines)](https://dev.azure.com/gwpy/gwosc/_build/latest?definitionId=4&branchName=master)
+[![Circle](https://img.shields.io/circleci/project/github/gwpy/gwosc/master.svg?label=Linux%20distro%20build&logo=circleci)](https://circleci.com/gh/gwpy/gwosc)  
 [![Codecov](https://img.shields.io/codecov/c/gh/gwpy/gwosc?logo=codecov)](https://codecov.io/gh/gwpy/gwosc)
 [![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
 [![Documentation](https://readthedocs.org/projects/gwosc/badge/?version=latest)](https://gwosc.readthedocs.io/en/latest/?badge=latest)
