@@ -12,6 +12,9 @@
 __pycache__/
 /.coverage
 .pytest_cache/
+/coverage.xml
+/junit*.xml
+/htmlcov/
 
 /docs/_build/
 /docs/reference/

@@ -98,5 +98,5 @@ steps:
 - bash: |
     source activate ci
     conda install --yes --quiet coverage
-    bash <(curl -s https://codecov.io/bash) -F $(Agent.OS) python${PYTHON_VERSION/./}
+    bash <(curl -s https://codecov.io/bash) -F $(Agent.OS),python${PYTHON_VERSION/./}
   displayName: 'Upload to codecov.io'
