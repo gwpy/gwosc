@@ -1,3 +1,2 @@
-fixes:
-  - "/usr/lib/python*/dist-packages::"
-  - "/usr/lib/python*/site-packages::"
+codecov:
+  token: 47c3fb14-f9d6-4c47-a069-25ad81536600

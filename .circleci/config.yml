@@ -201,17 +201,6 @@ aliases:
         - *store_test_artifacts
         - *store_rpm_artifacts
 
-  - &python
-      steps:
-        - checkout
-        - *attach_workspace
-        - *install
-        - *test
-        - *coverage_report
-        - *codecov
-        - *store_test_results
-        - *store_test_artifacts
-
 # -- jobs -------------------
 
 version: 2
@@ -290,34 +279,6 @@ jobs:
     environment:
       PYTHON_VERSION: "3.8"
 
-  python:3.5:
-    <<: *python
-    docker:
-      - image: python:3.5
-    environment:
-      PYTHON_VERSION: "3.5"
-
-  python:3.6:
-    <<: *python
-    docker:
-      - image: python:3.6
-    environment:
-      PYTHON_VERSION: "3.6"
-
-  python:3.7:
-    <<: *python
-    docker:
-      - image: python:3.7
-    environment:
-      PYTHON_VERSION: "3.7"
-
-  python:3.8:
-    <<: *python
-    docker:
-      - image: python:3.8
-    environment:
-      PYTHON_VERSION: "3.8"
-
   sphinx:
     docker:
       - image: python:3.7
@@ -351,18 +312,6 @@ workflows:
           requires:
             - sdist
       - debian:bullseye:3.8:
-          requires:
-            - sdist
-      - python:3.5:
-          requires:
-            - sdist
-      - python:3.6:
-          requires:
-            - sdist
-      - python:3.7:
-          requires:
-            - sdist
-      - python:3.8:
           requires:
             - sdist
       - sphinx
