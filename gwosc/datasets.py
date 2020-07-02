@@ -230,6 +230,7 @@ def _iter_datasets(
             segment=segment,
             host=host,
             version=version,
+            catalog=catalog,
         )):
             yield name
 
