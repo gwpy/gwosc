@@ -46,8 +46,8 @@ def test_fetch_json():
     url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/json/'
     out = api.fetch_json(url)
     assert isinstance(out, dict)
-    assert len(out['events']) == 1
-    assert sorted(out['events']['GW150914']['detectors']) == ['H1', 'L1']
+    assert len(out['events']) == 3
+    assert sorted(out['events']['GW150914-v1']['detectors']) == ['H1', 'L1']
     assert set(out['runs'].keys()).issubset(
         {'tenyear', 'O1', 'O1_16KHZ', 'history'},
     )
@@ -125,7 +125,7 @@ def test_fetch_cataloglist_json_local(fetch):
 def test_fetch_catalog_json():
     out = api.fetch_catalog_json("GWTC-1-confident")
     events = out["events"]
-    assert events["GW170817_R1"]["GPS"] == 1187008882.4
+    assert events["GW170817-v3"]["GPS"] == 1187008882.4
 
 
 @mock.patch("gwosc.api.fetch_json")
@@ -139,14 +139,14 @@ def test_fetch_catalog_json_local(fetch):
 @pytest.mark.remote
 def test_fetch_event_json():
     out = api.fetch_event_json("GW150914")
-    meta = out["events"]["GW150914_R1"]
+    meta = out["events"]["GW150914-v3"]
     assert int(meta["GPS"]) == 1126259462
     assert meta["version"] == 3
 
 
 @pytest.mark.remote
 def test_fetch_event_json_version():
-    out = api.fetch_event_json("GW150914_R1")["events"]["GW150914_R1"]
+    out = api.fetch_event_json("GW150914-v3")["events"]["GW150914-v3"]
     assert out["version"] == 3
     assert out["catalog.shortName"] == "GWTC-1-confident"
 
@@ -154,8 +154,8 @@ def test_fetch_event_json_version():
 @pytest.mark.remote
 def test_fetch_event_json_error():
     with pytest.raises(ValueError):
-        api.fetch_event_json("GW150914_R1", version=1)
+        api.fetch_event_json("GW150914-v3", version=1)
     with pytest.raises(ValueError):
-        api.fetch_event_json("GW150914_R1", catalog="test")
+        api.fetch_event_json("GW150914-v3", catalog="test")
     with pytest.raises(ValueError):
         api.fetch_event_json("blah")

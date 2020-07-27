@@ -56,7 +56,7 @@ CATALOG_JSON = {
 @pytest.mark.remote
 def test_find_datasets():
     sets = datasets.find_datasets()
-    for dset in ('S6', 'O1', 'GW150914', 'GW170817'):
+    for dset in ('S6', 'O1', 'GW150914-v1', 'GW170817-v3'):
         assert dset in sets
     assert 'tenyear' not in sets
     assert 'history' not in sets
@@ -65,8 +65,8 @@ def test_find_datasets():
 @pytest.mark.remote
 def test_find_datasets_detector():
     v1sets = datasets.find_datasets('V1')
-    assert 'GW170817' in v1sets
-    assert 'GW150914' not in v1sets
+    assert 'GW170817-v3' in v1sets
+    assert 'GW150914-v1' not in v1sets
 
     assert datasets.find_datasets('X1', type="run") == []
 
@@ -85,7 +85,7 @@ def test_find_datasets_type():
 @pytest.mark.remote
 def test_find_datasets_segment():
     sets = datasets.find_datasets(segment=(1126051217, 1137254417))
-    assert "GW150914" in sets
+    assert "GW150914-v1" in sets
     assert "GW170817" not in sets
 
 
@@ -98,8 +98,8 @@ def test_find_datasets_match():
 def test_find_datasets_event_version_detector():
     # this raises a ValueError with gwosc-0.5.0
     sets = datasets.find_datasets(type='event', version=1, detector='L1')
-    assert "GW150914" in sets
-    assert "GW150914_R1" not in sets  # v3
+    assert "GW150914-v1" in sets
+    assert "GW150914-v3" not in sets  # v3
 
 
 @pytest.mark.remote
@@ -233,7 +233,7 @@ def test_run_at_gps_local():
 @pytest.mark.remote
 def test_dataset_type():
     assert datasets.dataset_type("O1") == "run"
-    assert datasets.dataset_type("GW150914") == "event"
+    assert datasets.dataset_type("GW150914-v1") == "event"
     assert datasets.dataset_type("GWTC-1-confident") == "catalog"
     with pytest.raises(ValueError):
         datasets.dataset_type("invalid")

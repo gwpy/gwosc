@@ -25,7 +25,6 @@ import contextlib
 import json
 import logging
 import os
-import re
 from urllib.request import urlopen
 
 logger = logging.getLogger("gwosc.api")
@@ -37,7 +36,6 @@ logger.addHandler(_loghandler)
 logger.setLevel(int(os.getenv("GWOSC_LOG_LEVEL", logging.NOTSET)))
 
 _MAX_GPS = 99999999999
-_VERSIONED_EVENT_REGEX = re.compile(r"_[RV]\d+\Z")
 
 #: The default GWOSC host URL
 DEFAULT_URL = "https://www.gw-openscience.org"
