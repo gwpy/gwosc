@@ -49,7 +49,7 @@ def test_get_urls():
     # test fetch for GW170817 data
     assert len(locate.get_urls(
         'L1', 1187007040, 1187009088,
-        dataset="GW170817",
+        dataset="GW170817-v3",
     )) == 2
 
     # test for O1 data
@@ -84,7 +84,7 @@ def test_get_urls_deprecated_tag():
 
 @pytest.mark.remote
 def test_get_event_urls():
-    urls = locate.get_event_urls("GW150914_R1", sample_rate=4096)
+    urls = locate.get_event_urls("GW150914-v3", sample_rate=4096)
     assert len(urls) == 4
     for url in urls:
         assert "_4KHZ" in url
@@ -93,7 +93,7 @@ def test_get_event_urls():
 @pytest.mark.remote
 def test_get_event_urls_segment():
     urls = locate.get_event_urls(
-        "GW150914_R1",
+        "GW150914-v1",
         start=1126257415,
         end=1126257425,
     )

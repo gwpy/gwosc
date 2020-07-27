@@ -75,52 +75,18 @@ def timeline_url(flag, start, end, host=api.DEFAULT_URL):
 
 
 def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
-
-    # -- utility methods to resolve a (proper) dataset name and its segment
-
-    def _event_segment(event):
-        raw = api._fetch_allevents_event_json(event, host=host)["events"]
-        dataset, meta = list(raw.items())[0]
-        return (
-            dataset,
-            datasets.event_segment(
-                dataset,
-                catalog=meta["catalog.shortName"],
-                version=meta["version"],
-                host=host,
-            ),
-        )
-
-    def _run_segment(run):
-        return run, datasets.run_segment(run, host=host)
-
-    # -- match datasets
-
-    dataset_segments = [
-        ("event", _event_segment),
-        ("run", _run_segment),
-    ]
-
     duration = end-start
     epochs = []
 
-    for dstype, _dataset_segment in dataset_segments:
-        for dataset in datasets._iter_datasets(
-                type=dstype,
-                detector=detector,
-                segment=(start, end),
-                host=host,
-        ):
-            try:
-                dataset, segment = _dataset_segment(dataset)
-            except ValueError as exc:
-                if str(exc) == (
-                    "no event datasets found for {!r}".format(dataset)
-                ):
-                    continue
-                raise
-            overlap = min(end, segment[1]) - max(start, segment[0])
-            epochs.append((dataset, duration-overlap))
+    for run in datasets._iter_datasets(
+            type="run",
+            detector=detector,
+            segment=(start, end),
+            host=host,
+    ):
+        segment = datasets.run_segment(run, host=host)
+        overlap = min(end, segment[1]) - max(start, segment[0])
+        epochs.append((run, duration - overlap))
 
     if not epochs:
         raise ValueError(
