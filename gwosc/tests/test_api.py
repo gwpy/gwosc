@@ -20,7 +20,6 @@
 """
 
 import os.path
-from io import BytesIO
 from unittest import mock
 
 import pytest
@@ -60,9 +59,12 @@ def test_fetch_json():
         "Failed to parse LOSC JSON from {!r}: ".format(url2))
 
 
-@mock.patch('gwosc.api.urlopen', return_value=BytesIO(b'{"key": "value"}'))
-def test_fetch_json_local(_):
-    url = 'anything'
+def test_fetch_json_local(requests_mock):
+    url = 'http://anything'
+    requests_mock.get(
+        url,
+        json={"key": "value"},
+    )
     out = api.fetch_json(url)
     assert isinstance(out, dict)
     assert out['key'] == 'value'

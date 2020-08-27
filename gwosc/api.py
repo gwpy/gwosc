@@ -21,11 +21,10 @@
 that handle direct requests to the GWOSC host.
 """
 
-import contextlib
-import json
 import logging
 import os
-from urllib.request import urlopen
+
+import requests
 
 logger = logging.getLogger("gwosc.api")
 _loghandler = logging.StreamHandler()
@@ -46,7 +45,7 @@ JSON_CACHE = {}
 
 # -- JSON handling ------------------------------------------------------------
 
-def fetch_json(url):
+def fetch_json(url, **kwargs):
     """Fetch JSON data from a remote URL
 
     Parameters
@@ -54,10 +53,14 @@ def fetch_json(url):
     url : `str`
         the remote URL to fetch
 
+    **kwargs
+        other keyword arguments are passed directly to :func:`requests.get`
+
     Returns
     ------
     data : `dict` or `list`
-        the data fetched from ``url`` as parsed by :func:`json.loads`
+        the data fetched from ``url`` as parsed by
+        :meth:`requests.Response.json`
 
     See also
     --------
@@ -68,19 +71,16 @@ def fetch_json(url):
         return JSON_CACHE[url]
     except KeyError:
         logger.debug("fetching {}".format(url))
-        with contextlib.closing(urlopen(url)) as response:
-            data = response.read()
-            if isinstance(data, bytes):
-                data = data.decode('utf-8')
-            try:
-                return JSON_CACHE.setdefault(
-                    url,
-                    json.loads(data),
-                )
-            except ValueError as exc:
-                exc.args = ("Failed to parse LOSC JSON from %r: %s"
-                            % (url, str(exc)),)
-                raise
+        resp = requests.get(url, **kwargs)
+        try:
+            return JSON_CACHE.setdefault(
+                url,
+                resp.json(),
+            )
+        except ValueError as exc:
+            exc.args = ("Failed to parse LOSC JSON from %r: %s"
+                        % (url, str(exc)),)
+            raise
 
 
 # -- Run datasets -------------------------------------------------------------
@@ -165,7 +165,7 @@ def fetch_cataloglist_json(host=DEFAULT_URL):
     -------
     data : `dict` or `list`
         the JSON data retrieved from GWOSC and returned by
-        :func:`json.loads`
+        :meth:`requests.Response.json`
     """
     return fetch_json(_eventapi_url(host=host))
 
@@ -189,7 +189,7 @@ def fetch_catalog_json(catalog, host=DEFAULT_URL):
     -------
     data : `dict` or `list`
         the JSON data retrieved from GWOSC and returnend by
-        :func:`json.loads`
+        :meth:`requests.Response.json`
     """
     return fetch_json(_catalog_url(catalog, host=host))
 
@@ -216,7 +216,7 @@ def fetch_allevents_json(full=False, host=DEFAULT_URL):
     -------
     data : `dict` or `list`
         the JSON data retrieved from GWOSC and returned by
-        :func:`json.loads`
+        :meth:`requests.Response.json`
     """
     if full is None and _has_jsonfull_allevents(host=host):
         return fetch_json(_allevents_url(full=True, host=host))
@@ -339,6 +339,6 @@ def fetch_legacy_catalog_json(catalog, host=DEFAULT_URL):
     -------
     json
         the JSON data retrieved from GWOSC and returnend by
-        :func:`json.loads`
+        :meth:`requests.Response.json`
     """
     return fetch_json(_legacy_catalog_url(catalog, host=host))

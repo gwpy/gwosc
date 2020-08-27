@@ -33,11 +33,13 @@ setup_requires = []
 if {'test'}.intersection(sys.argv):
     setup_requires.append('pytest_runner')
 install_requires = [
+    'requests>=1.0.0',
 ]
 tests_require = [
     'pytest>=2.7.0',
     'pytest-cov',
     'pytest-socket',
+    'requests-mock>=1.5.0',
 ]
 extras_require = {
     'docs': [
