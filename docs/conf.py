@@ -106,6 +106,7 @@ html_sidebars = {
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'https://docs.python.org/': None,
+    'https://requests.readthedocs.io/en/stable/': None,
 }
 
 # Write automodsumm files to /docs/reference/

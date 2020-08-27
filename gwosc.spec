@@ -26,10 +26,13 @@ BuildRequires: python3-rpm-macros
 BuildRequires: python%{python3_pkgversion}-setuptools
 
 # runtime dependencies (required for %check)
-# NONE
+BuildRequires: python%{python3_pkgversion}-requests
 
 # testing dependencies (required for %check)
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 BuildRequires: python%{python3_pkgversion}-pytest
+BuildRequires: python%{python3_pkgversion}-requests-mock >= 1.5.0
+%endif
 
 %description
 The `gwosc` package provides an interface to querying the open data
@@ -55,7 +58,9 @@ and Virgo gravitational-wave observatories.
 %py3_build
 
 %check
+%if 0%{?rhel} == 0 || 0%{?rhel} >= 8
 %{__python3} -m pytest --pyargs %{name} -m "not remote"
+%endif
 
 %install
 %py3_install
