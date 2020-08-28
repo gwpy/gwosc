@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.5.5
+%define version 0.5.6
 %define release 1
 
 Name:      %{name}
@@ -76,6 +76,10 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Thu Aug 27 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.6-1
+- update to 0.5.6
+- add python3-requests-mock as a test requirement
+
 * Mon Jul 27 2020 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.5-1
 - update to 0.5.5
 
