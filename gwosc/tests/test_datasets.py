@@ -90,6 +90,12 @@ def test_find_datasets_event_version_detector():
     assert "GW150914-v3" not in sets  # v3
 
 
+@mock.patch("gwosc.datasets._run_datasets", return_value=[])
+def test_find_datasets_warning(_):
+    with pytest.warns(None):
+        datasets.find_datasets(type='run', version=1)
+
+
 @pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.4
