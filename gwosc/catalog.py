@@ -58,8 +58,8 @@ def datasets(catalog, detector=None, segment=None, host=api.DEFAULT_URL):
             url in _nested_values(files[det])
         ]
         if segment and not (
-                urls and
-                utils.segments_overlap(segment, utils.urllist_extent(urls))
+                urls
+                and utils.segments_overlap(segment, utils.urllist_extent(urls))
         ):
             continue
         datasets.append("{0}_{1}".format(event, revision))

@@ -57,11 +57,11 @@ def timeline_url(flag, start, end, host=api.DEFAULT_URL):
     detector = flag.split('_', 1)[0]
     dataset = _find_dataset(start, end, detector, host=host)
     return '{}/timeline/segments/json/{}/{}/{}/{}/'.format(
-        host, dataset, flag, start, end-start)
+        host, dataset, flag, start, end - start)
 
 
 def _find_dataset(start, end, detector, host=api.DEFAULT_URL):
-    duration = end-start
+    duration = end - start
     epochs = []
 
     for run in datasets._iter_datasets(
