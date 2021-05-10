@@ -11,7 +11,6 @@ import pytest
 
 from ..api import (
     fetch_event_json,
-    fetch_run_json,
 )
 
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
@@ -30,16 +29,6 @@ def _event_strain(name, **kwargs):
 @pytest.fixture(scope="module")
 def gw150914_strain():
     return _event_strain('GW150914', version=3)
-
-
-@pytest.fixture(scope="module")
-def gw170817_strain():
-    return _event_strain('GW170817', version=2)
-
-
-@pytest.fixture(scope="module")
-def o1_strain():
-    return fetch_run_json("O1", "L1", 1126257415, 1126261511)["strain"]
 
 
 @pytest.fixture

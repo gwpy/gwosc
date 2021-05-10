@@ -223,19 +223,20 @@ def _fetch_allevents_event_json(
     """
     allevents = fetch_allevents_json(full=full, host=host)["events"]
     matched = []
-    for dset, metadata in allevents.items():
-        name = metadata["commonName"]
-        if event not in {dset, name}:
-            continue
-        thisversion = metadata["version"]
-        if version is not None and thisversion != version:
-            continue
-        thiscatalog = metadata["catalog.shortName"]
-        if catalog is not None and thiscatalog != catalog:
-            continue
-        matched.append((dset, thisversion, metadata))
+
+    def _match(keyvalue):
+        dset, metadata = keyvalue
+        if event not in {dset, metadata["commonName"]}:
+            return
+        if version is not None and metadata["version"] != version:
+            return
+        if catalog is not None and metadata["catalog.shortName"] != catalog:
+            return
+        return True
+
+    matched = list(filter(_match, allevents.items()))
     if matched:
-        key, _, meta = sorted(matched, key=lambda x: x[1])[-1]
+        key, meta = sorted(matched, key=lambda x: x[1]["version"])[-1]
         return {"events": {key: meta}}
 
     # raise error with the right message
