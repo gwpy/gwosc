@@ -96,16 +96,17 @@ def _match_url(
         request
     """
     reg = URL_REGEX.match(basename(url)).groupdict()
-    if (
-            (detector and reg['ifo'] != detector) or
-            (tag and reg['tag'] != tag) or
-            (version and int(reg['version']) != version) or
-            (sample_rate and
-             float(reg["samp"].rstrip("KHZ")) * 1024 != sample_rate) or
-            (duration and float(reg["dur"]) != duration) or
-            (ext and reg["ext"] != ext)
+    for param, regvar in (
+        (detector, reg['ifo']),
+        (tag, reg['tag']),
+        (version, int(reg['version'])),
+        (sample_rate, float(reg["samp"].rstrip("KHZ")) * 1024),
+        (duration, float(reg["dur"]) != duration),
+        (ext, reg["ext"] != ext),
     ):
-        return
+        # if param was given and the regex value doesn't match, ignore this url
+        if param and regvar != param:
+            return
 
     # match times
     if end is not None:
