@@ -83,7 +83,7 @@ def _match_event_dataset(
         host=api.DEFAULT_URL,
 ):
     # get strain file list (matching catalog and version)
-    full = True if (detector or segment) else False
+    full = bool(detector or segment)
     try:
         meta = _event_metadata(
             dataset,
@@ -191,35 +191,32 @@ def _iter_datasets(
     if match:
         reg = re.compile(match)
 
-    def _matched(iter_):
+    def _yield_matches(iter_):
         for x in iter_:
             if not match or reg.search(x):
                 yield x
 
     # search for events and datasets
-    if needruns:
-        for name in _matched(_run_datasets(
+    for needthis, collection in (
+        (needruns, _run_datasets(
             detector=detector,
             host=host,
             segment=segment,
-        )):
-            yield name
-
-    if needcatalogs:
-        for name in _matched(_catalog_datasets(
+        )),
+        (needcatalogs, _catalog_datasets(
             host=host,
-        )):
-            yield name
-
-    if needevents:
-        for name in _matched(_event_datasets(
+        )),
+        (needevents, _event_datasets(
             detector=detector,
             segment=segment,
             host=host,
             version=version,
             catalog=catalog,
-        )):
-            yield name
+        )),
+    ):
+        if not needthis:
+            continue
+        yield from _yield_matches(collection)
 
 
 def find_datasets(
