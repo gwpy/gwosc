@@ -30,7 +30,7 @@ def url_segment(url):
     _, _, s, e = base.split('-')
     s = int(s)
     e = int(e.split('.')[0])
-    return s, s+e
+    return s, s + e
 
 
 def url_overlaps_segment(url, segment):
