@@ -99,7 +99,8 @@ def _match_event_dataset(
         return True
     try:
         strain = meta["strain"]
-    except KeyError:  # no strain file list for this dataset
+    except KeyError:  # pragma: no cover
+        # no strain file list for this dataset
         return False
 
     # match detector
@@ -388,7 +389,7 @@ def event_segment(
         host=host,
     )
 
-    if not data["strain"]:
+    if not data["strain"]:  # pragma: no cover
         raise ValueError(
             "event '{}' has no strain files".format(event),
         )
