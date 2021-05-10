@@ -58,6 +58,7 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 _IGNORE = {
     "tenyear",
     "history",
+    "oldhistory",
 }
 
 

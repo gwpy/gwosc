@@ -272,12 +272,12 @@ jobs:
     environment:
       PYTHON_VERSION: "3.7"
 
-  debian:bullseye:3.8:
+  debian:bullseye:3.9:
     <<: *debian
     docker:
       - image: debian:bullseye
     environment:
-      PYTHON_VERSION: "3.8"
+      PYTHON_VERSION: "3.9"
 
   sphinx:
     docker:
@@ -311,7 +311,7 @@ workflows:
       - debian:buster:3.7:
           requires:
             - sdist
-      - debian:bullseye:3.8:
+      - debian:bullseye:3.9:
           requires:
             - sdist
       - sphinx
