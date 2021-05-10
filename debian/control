@@ -18,6 +18,8 @@ Build-Depends:
   python3-requests,
   python3-requests-mock,
   python3-setuptools,
+  python3-setuptools-scm,
+  python3-wheel,
 
 # -- python3-gwosc -------------------------------------------------------------
 

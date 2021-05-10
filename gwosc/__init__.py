@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with GWOSC.  If not, see <http://www.gnu.org/licenses/>.
 
-from ._version import get_versions
 
-__version__ = get_versions()['version']
-__author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
+__author__ = "Duncan Macleod <duncan.macleod@ligo.org>"
+__license = "MIT"
 
-del get_versions
+try:
+    from ._version import version as __version__
+except ModuleNotFoundError:  # development mode
+    __version__ = ''

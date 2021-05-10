@@ -1,6 +1,0 @@
-pytest >= 2.7.0
-pytest-cov
-pytest-socket
-requests >= 1.0.0
-requests-mock >= 1.5.0
-setuptools

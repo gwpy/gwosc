@@ -32,5 +32,4 @@ ratings:
   - "**.py"
 
 exclude_paths:
-- "versioneer.py"
 - "gwosc/_version.py"
