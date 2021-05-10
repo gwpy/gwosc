@@ -59,7 +59,7 @@ and Virgo gravitational-wave observatories.
 
 %check
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 8
-%{__python3} -m pytest --pyargs %{name} -m "not remote"
+%{__python3} -m pytest --color=yes --pyargs %{name} -m "not remote"
 %endif
 
 %install
