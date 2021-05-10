@@ -1,5 +1,5 @@
 # filetypes to ignore
-*.pyc
+*.py[cod]
 .DS_store
 *.swp
 
@@ -16,5 +16,16 @@ __pycache__/
 /junit*.xml
 /htmlcov/
 
+# documentation files to ignore
 /docs/_build/
 /docs/reference/
+
+# debian files to ignore
+/debian/.debhelper/
+/debian/*.debhelper.log
+/debian/*.postinst.debhelper
+/debian/*.prerm.debhelper
+/debian/*.substvars
+/debian/*gwosc/
+/debian/files
+/.pybuild/
