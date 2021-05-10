@@ -23,10 +23,12 @@ BuildRequires: python-rpm-macros
 BuildRequires: python3-rpm-macros
 
 # build dependencies
-BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python%{python3_pkgversion}-setuptools >= 38.2.5
+BuildRequires: python%{python3_pkgversion}-setuptools_scm
+BuildRequires: python%{python3_pkgversion}-wheel
 
 # runtime dependencies (required for %check)
-BuildRequires: python%{python3_pkgversion}-requests
+BuildRequires: python%{python3_pkgversion}-requests >= 1.0.0
 
 # testing dependencies (required for %check)
 %if 0%{?rhel} == 0 || 0%{?rhel} >= 8

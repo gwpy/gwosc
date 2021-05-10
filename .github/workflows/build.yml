@@ -75,6 +75,15 @@ jobs:
 
     - name: Install dependencies
       run: |
+        python3 -c "
+        import configparser;
+        conf = configparser.ConfigParser();
+        conf.read('setup.cfg');
+        for opt in ('setup_requires', 'install_requires'):
+            print(conf['options'][opt].strip())
+        for extra in ('test',):
+            print(conf['options.extras_require'][extra].strip())
+        " | sort -u > requirements.txt
         conda install --quiet --yes --name test --file requirements.txt
 
     - name: Install GWOSC

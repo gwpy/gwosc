@@ -146,9 +146,8 @@ jobs:
         shell: bash -ex {0}
         run: |
           cd src
-          if [[ "${{ matrix.debian }}" == *backports ]]; then BACKPORTS="-t ${{ matrix.debian }}"; fi
           mk-build-deps \
-              --tool "apt-get -y -q ${BACKPORTS} -o Debug::pkgProblemResolver=yes --no-install-recommends" \
+              --tool "apt-get -y -q -o Debug::pkgProblemResolver=yes --no-install-recommends" \
               --install \
               --remove \
           ;
@@ -342,6 +341,12 @@ jobs:
               rpm-build \
               "dnf-command(builddep)" \
           ;
+
+      - name: Enable PowerTools
+        if: matrix.dist == 'centos'
+        run: |
+          dnf -y -q install "dnf-command(config-manager)"
+          dnf config-manager --set-enabled powertools
 
       - name: Install build dependencies
         if: matrix.dist != 'lscsoft'

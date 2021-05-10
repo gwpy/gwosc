@@ -1,0 +1,19 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "setuptools_scm[toml]>=3.4",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "gwosc/_version.py"
+
+[tool.pytest.ini_options]
+addopts = "-r a --color=yes"
+filterwarnings = [
+	"error",
+]
+markers = [
+	"remote",
+]
