@@ -24,7 +24,7 @@ on:
 
 jobs:
   conda:
-    name: Python ${{ matrix.python-version }} (${{ matrix.os }})
+    name: ${{ matrix.name || format('Python {0} ({1})', matrix.python-version, matrix.os) }}
 
     strategy:
       fail-fast: false
@@ -38,6 +38,11 @@ jobs:
           - 3.7
           - 3.8
           - 3.9
+        include:
+          - os: Ubuntu
+            name: "Disable socket"
+            python-version: "3"
+            pytest-addopts: "--disable-socket -m 'not remote'"
     runs-on: ${{ matrix.os }}-latest
 
     # this is needed for conda environments to activate automatically
@@ -93,6 +98,8 @@ jobs:
       run: conda list --name test
 
     - name: Run test suite
+      env:
+        PYTEST_ADDOPTS: ${{ matrix.pytest-addopts }}
       run: python -m pytest -ra --color yes --cov gwosc --pyargs gwosc --cov-report=xml --junitxml=pytest.xml
 
     - name: Coverage report
