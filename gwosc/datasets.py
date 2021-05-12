@@ -71,7 +71,7 @@ def _run_datasets(detector=None, segment=None, host=api.DEFAULT_URL):
 
 
 def _catalog_datasets(host=api.DEFAULT_URL):
-    return api.fetch_cataloglist_json(host=host).keys()
+    yield from api.fetch_cataloglist_json(host=host).keys()
 
 
 def _match_event_dataset(
