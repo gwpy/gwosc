@@ -1,3 +1,9 @@
+gwosc (0.5.8-1) unstable; urgency=low
+
+  * update to 0.5.8
+
+ -- Duncan Macleod <duncan.macleod@ligo.org>  Wed, 19 May 2021 10:41:00 +0100
+
 gwosc (0.5.7-1) unstable; urgency=low
 
   * update to 0.5.7
