@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.5.7
+%define version 0.5.8
 %define release 1
 
 Name:      %{name}
@@ -78,6 +78,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Wed May 19 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.8-1
+- update to 0.5.8
+
 * Wed May 12 2021 Duncan Macleod <duncan.macleod@ligo.org> - 0.5.7-1
 - update to 0.5.7
 - add setuptools-scm and wheel build requirements
