@@ -57,18 +57,6 @@ def test_get_urls_version():
 
 
 @pytest.mark.remote
-def test_get_urls_deprecated_tag():
-    # test `tag` prints a warning
-    pytest.deprecated_call(
-        locate.get_urls,
-        "L1",
-        1187007040,
-        1187009088,
-        tag="TEST",
-    )
-
-
-@pytest.mark.remote
 def test_get_event_urls():
     urls = locate.get_event_urls("GW150914-v3", sample_rate=4096)
     assert len(urls) == 4
