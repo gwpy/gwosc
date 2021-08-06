@@ -40,7 +40,7 @@ def get_segments(flag, start, end, host=api.DEFAULT_URL):
         the GPS end time of your query
 
     host : `str`, optional
-        the URL of the remote LOSC server
+        the URL of the remote GWOSC server
 
     Returns
     -------
