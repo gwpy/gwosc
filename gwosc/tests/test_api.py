@@ -131,6 +131,12 @@ def test_fetch_event_json():
 
 
 @pytest.mark.remote
+def test_fetch_event_json_with_hms_suffix():
+    out = api.fetch_event_json("GW190930")
+    assert list(out["events"].values())[0]["commonName"] == "GW190930_133541"
+
+
+@pytest.mark.remote
 def test_fetch_event_json_version():
     out = api.fetch_event_json("GW150914-v3")["events"]["GW150914-v3"]
     assert out["version"] == 3
@@ -138,10 +144,25 @@ def test_fetch_event_json_version():
 
 
 @pytest.mark.remote
-def test_fetch_event_json_error():
+def test_fetch_event_json_error_no_version():
     with pytest.raises(ValueError):
         api.fetch_event_json("GW150914-v3", version=1)
+
+
+@pytest.mark.remote
+def test_fetch_event_json_error_no_catalog():
     with pytest.raises(ValueError):
         api.fetch_event_json("GW150914-v3", catalog="test")
+
+
+@pytest.mark.remote
+def test_fetch_event_json_error_not_found():
     with pytest.raises(ValueError):
         api.fetch_event_json("blah")
+
+
+@pytest.mark.remote
+def test_fetch_event_json_error_multiple_names():
+    with pytest.raises(ValueError) as exc:
+        api.fetch_event_json("GW190521")
+    assert str(exc.value).startswith("multiple events matched for 'GW190521'")
