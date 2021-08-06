@@ -97,22 +97,15 @@ def get_urls(
             DeprecationWarning,
         )
 
-    if dataset:
-        dstypes = (datasets.dataset_type(dataset),)
-    else:
-        dstypes = ("event", "run")
-
-    for dstype in dstypes:
-        if dataset:
-            dsets = [dataset]
-        else:
-            dsets = datasets._iter_datasets(
-                type=dstype,
-                detector=detector,
-                segment=(start, end),
-                version=version,
-                host=host,
-            )
+    for dstype in ("event", "run"):
+        dsets = datasets._iter_datasets(
+            match=dataset,
+            type=dstype,
+            detector=detector,
+            segment=(start, end),
+            version=version,
+            host=host,
+        )
 
         for dst in dsets:
             # get URL list for this dataset
