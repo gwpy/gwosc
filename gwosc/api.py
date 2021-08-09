@@ -64,7 +64,7 @@ def fetch_json(url, **kwargs):
                 resp.json(),
             )
         except ValueError as exc:
-            exc.args = ("Failed to parse LOSC JSON from %r: %s"
+            exc.args = ("Failed to parse GWOSC JSON from %r: %s"
                         % (url, str(exc)),)
             raise
 
@@ -87,12 +87,13 @@ def fetch_dataset_json(gpsstart, gpsend, host=DEFAULT_URL):
         the GPS end of the desired interval
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
     data : `dict` or `list`
-        the JSON data retrieved from LOSC and returned by `json.loads`
+        the JSON data retrieved from GWOSC and returned by `json.loads`
     """
     return fetch_json(_dataset_url(gpsstart, gpsend, host=host))
 
@@ -122,12 +123,13 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=_MAX_GPS,
         the GPS end of the desired interval
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
     data : `dict` or `list`
-        the JSON data retrieved from LOSC and returned by `json.loads`
+        the JSON data retrieved from GWOSC and returned by `json.loads`
     """
     return fetch_json(_run_url(run, detector, gpsstart, gpsend, host=host))
 
@@ -169,7 +171,8 @@ def fetch_catalog_json(catalog, host=DEFAULT_URL):
         the name of the event catalog, e.g. `GWTC-1-confident`
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -196,7 +199,7 @@ def fetch_allevents_json(full=False, host=DEFAULT_URL):
     Parameters
     ----------
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to gw-openscience.org
+        the URL of the GWOSC host to query, defaults to gw-openscience.org
 
     Returns
     -------
@@ -291,12 +294,13 @@ def fetch_event_json(
         restrict query to a given data-release version
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
     data : `dict` or `list`
-        the JSON data retrieved from LOSC and returned by `json.loads`
+        the JSON data retrieved from GWOSC and returned by `json.loads`
     """
     return fetch_json(
         _event_url(event, catalog=catalog, version=version, host=host),
@@ -320,7 +324,8 @@ def fetch_legacy_catalog_json(catalog, host=DEFAULT_URL):
         the name of the event catalog, e.g. `GWTC-1-confident`
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------

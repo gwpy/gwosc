@@ -249,7 +249,8 @@ def find_datasets(
         regular expression string against which to match datasets
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -315,7 +316,8 @@ def event_gps(event, catalog=None, version=None, host=api.DEFAULT_URL):
         defaults to the highest available version
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -368,7 +370,8 @@ def event_segment(
         defaults to the highest available version
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -411,7 +414,8 @@ def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
         The GPS time to locate
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     tol : `float`, optional
         the search window (in seconds), default: ``1``
@@ -451,7 +455,8 @@ def event_detectors(event, catalog=None, version=None, host=api.DEFAULT_URL):
         the name of the event to query
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     version : `int`, `None`, optional
         the version of the data release to use,
@@ -490,7 +495,8 @@ def run_segment(run, host=api.DEFAULT_URL):
         the name of the run dataset to query
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -524,7 +530,8 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
         The GPS time to locate
 
     host : `str`, optional
-        the URL of the LOSC host to query, defaults to losc.ligo.org
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
 
     Returns
     -------
@@ -563,7 +570,7 @@ def dataset_type(dataset, host=api.DEFAULT_URL):
         The name of the dataset to match
 
     host : `str`, optional
-        the URL of the LOSC host to query
+        the URL of the GWOSC host to query
 
     Returns
     -------

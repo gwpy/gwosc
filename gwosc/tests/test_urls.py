@@ -66,7 +66,7 @@ def test_match_local(mock_urls):
 def test_match_local_tag_error(mock_urls):
     with pytest.raises(ValueError) as exc:
         gwosc_urls.match(mock_urls)
-    assert str(exc.value).startswith('multiple LOSC URL tags')
+    assert str(exc.value).startswith('multiple GWOSC URL tags')
 
 
 def test_match_empty():

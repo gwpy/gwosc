@@ -10,7 +10,7 @@ from os.path import (basename, splitext)
 
 from .utils import segments_overlap
 
-# LOSC filename re
+# GWOSC filename re
 URL_REGEX = re.compile(
     r"\A((.*/)*(?P<obs>[^/]+)-"
     r"(?P<ifo>[A-Z][0-9])_(L|GW)OSC_"
@@ -26,7 +26,7 @@ VERSION_REGEX = re.compile(r'[RV]\d+')
 
 
 def sieve(urllist, segment=None, **match):
-    """Sieve a list of LOSC URL metadata dicts based on key, value pairs
+    """Sieve a list of GWOSC URL metadata dicts based on key, value pairs
 
     Parameters
     ----------
@@ -134,7 +134,7 @@ def match(
         duration=None,
         ext=None,
 ):
-    """Match LOSC URLs for a given [start, end) interval
+    """Match GWOSC URLs for a given [start, end) interval
 
     Parameters
     ----------
@@ -198,7 +198,7 @@ def match(
     # if multiple file tags found, and user didn't specify, error
     if len(matched_tags) > 1:
         tags = ', '.join(map(repr, matched_tags))
-        raise ValueError("multiple LOSC URL tags discovered in dataset, "
+        raise ValueError("multiple GWOSC URL tags discovered in dataset, "
                          "please select one of: {}".format(tags))
 
     # extract highest version

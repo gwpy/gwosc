@@ -40,7 +40,7 @@ def test_fetch_json():
     with pytest.raises(ValueError) as exc:
         api.fetch_json(url2)
     assert str(exc.value).startswith(
-        "Failed to parse LOSC JSON from {!r}: ".format(url2))
+        "Failed to parse GWOSC JSON from {!r}: ".format(url2))
 
 
 def test_fetch_json_local(requests_mock):
