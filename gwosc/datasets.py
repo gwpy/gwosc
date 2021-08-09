@@ -332,17 +332,13 @@ def event_gps(event, catalog=None, version=None, host=api.DEFAULT_URL):
     >>> event_gps('GW123456')
     ValueError: no event dataset found for 'GW123456'
     """
-    try:
-        return _event_metadata(
-            event,
-            catalog=catalog,
-            version=version,
-            full=False,
-            host=host,
-        )['GPS']
-    except ValueError as exc:
-        exc.args = ("no event dataset found for {!r}".format(event),)
-        raise
+    return _event_metadata(
+        event,
+        catalog=catalog,
+        version=version,
+        full=False,
+        host=host,
+    )['GPS']
 
 
 def event_segment(

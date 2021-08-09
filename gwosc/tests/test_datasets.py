@@ -99,9 +99,6 @@ def test_find_datasets_warning(_):
 @pytest.mark.remote
 def test_event_gps():
     assert datasets.event_gps('GW170817') == 1187008882.4
-    with pytest.raises(ValueError) as exc:
-        datasets.event_gps('GW123456')
-    assert str(exc.value) == 'no event dataset found for \'GW123456\''
 
 
 @mock.patch(
@@ -113,10 +110,6 @@ def test_event_gps():
 )
 def test_event_gps_local(fetch):
     assert datasets.event_gps('GW150914') == 12345
-    fetch.side_effect = ValueError('test')
-    with pytest.raises(ValueError) as exc:
-        datasets.event_gps('something')
-    assert str(exc.value) == "no event dataset found for 'something'"
 
 
 @pytest.mark.remote

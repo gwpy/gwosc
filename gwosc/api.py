@@ -229,7 +229,11 @@ def _fetch_allevents_event_json(
 
     def _match(keyvalue):
         dset, metadata = keyvalue
-        if event not in {dset, metadata["commonName"]}:
+        if event not in {
+            dset,
+            metadata["commonName"],  # full name
+            metadata["commonName"].split("_", 1)[0],  # GWYYMMDD prefix
+        }:
             return
         if version is not None and metadata["version"] != version:
             return
@@ -238,11 +242,19 @@ def _fetch_allevents_event_json(
         return True
 
     matched = list(filter(_match, allevents.items()))
-    if matched:
+    names = set(x[1]["commonName"] for x in matched)
+    if matched and len(names) == 1:
         key, meta = sorted(matched, key=lambda x: x[1]["version"])[-1]
         return {"events": {key: meta}}
 
     # raise error with the right message
+    if len(names) > 1:
+        raise ValueError(
+            "multiple events matched for {!r}: '{}'".format(
+                event,
+                "', '".join(names),
+            ),
+        )
     msg = "failed to identify {} for event '{}'"
     if catalog is None:
         msg = msg.format("catalog", event)
