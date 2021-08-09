@@ -82,15 +82,26 @@ jobs:
           apt-get -y -q -q install \
               devscripts \
               dpkg-dev \
+              python3-minimal \
           ;
 
       - name: Create source package
         run: |
+          # extract tarball to src/
           mkdir src
           tar -xf ${TARBALL} -C src --strip-components=1
+          # get versions from the Python metadata and the Debian changelog
           PKG_VERSION=$(grep ^Version src/PKG-INFO | cut -d\  -f2)
-          # add changelog entry for this version
-          (cd src; dch --newversion ${PKG_VERSION}-9999 --controlmaint "ci build")
+          CHANGELOG_VERSION=$(dpkg-parsechangelog -l src/debian/changelog --show-field Version)
+          # and compare them:
+          USE_PKG_VERSION=$(python3 -c "print(str('${PKG_VERSION}' > '${CHANGELOG_VERSION}').lower())")
+          # if the package version is newer than the changelog version
+          # (standard dev update), we need to add a changelog entry
+          if ${USE_PKG_VERSION}; then
+              (cd src; dch --newversion ${PKG_VERSION}-9999 --controlmaint "ci build");
+          else
+              PKG_VERSION=${CHANGELOG_VERSION%%-*}
+          fi
           # rename tarball for debian orig
           _orig=$(
               basename ${TARBALL} | \
