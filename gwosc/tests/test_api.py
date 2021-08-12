@@ -162,7 +162,13 @@ def test_fetch_event_json_error_not_found():
 
 
 @pytest.mark.remote
+def test_fetch_event_json_exact_match():
+    data, = list(api.fetch_event_json("GW190521")["events"].values())
+    assert data["commonName"] == "GW190521"
+
+
+@pytest.mark.remote
 def test_fetch_event_json_error_multiple_names():
     with pytest.raises(ValueError) as exc:
-        api.fetch_event_json("GW190521")
-    assert str(exc.value).startswith("multiple events matched for 'GW190521'")
+        api.fetch_event_json("GW190828")
+    assert str(exc.value).startswith("multiple events matched for 'GW190828'")
