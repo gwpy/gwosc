@@ -33,7 +33,7 @@ def test_fetch_json():
     assert isinstance(out, dict)
     assert len(out['events']) == 3
     assert sorted(out['events']['GW150914-v1']['detectors']) == ['H1', 'L1']
-    assert {'tenyear', 'O1', 'O1_16KHZ', 'history'}.issubset(set(out['runs']))
+    assert {'O1', 'O1_16KHZ', 'history'}.issubset(set(out['runs']))
 
     # check errors (use legit URL that isn't JSON)
     url2 = os.path.dirname(os.path.dirname(url))
@@ -60,7 +60,7 @@ def test_fetch_dataset_json():
     end = 934100000
     out = api.fetch_dataset_json(start, end)
     assert not out['events']
-    assert {"tenyear", "S6", "history"}.issubset(set(out['runs']))
+    assert {"S6", "history"}.issubset(set(out['runs']))
 
 
 @mock.patch('gwosc.api.fetch_json')
