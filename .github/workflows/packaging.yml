@@ -62,9 +62,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     env:
@@ -128,9 +128,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     env:
@@ -195,9 +195,9 @@ jobs:
       fail-fast: false
       matrix:
         debian:
-          - stretch-backports
-          - buster
-          - bullseye
+          - oldstable
+          - stable
+          - testing
     runs-on: ubuntu-latest
     container: debian:${{ matrix.debian }}
     steps:
@@ -221,14 +221,14 @@ jobs:
   lint-debian:
     name: Lint Debian packages
     runs-on: ubuntu-latest
-    container: debian
+    container: debian:stable
     needs:
       - debian-binary
     steps:
       - name: Download debian package
         uses: actions/download-artifact@v2
         with:
-          name: deb-buster
+          name: deb-stable
 
       - name: Install lintian
         run: |

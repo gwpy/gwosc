@@ -10,11 +10,5 @@ export PYBUILD_TEST_PYTEST = 1
 # but don't run tests requiring network
 export PYBUILD_TEST_ARGS = --color=yes -m 'not remote'
 
-# but skip all tests if debian stretch (can't satisfy requests-mock >=1.5.0)
-DEB_CODENAME = $(shell lsb_release --codename --short)
-ifneq (,$(findstring stretch,$(DEB_CODENAME)))
-export PYBUILD_DISABLE = test
-endif
-
 %:
 	dh $@ --with python3 --buildsystem=pybuild
