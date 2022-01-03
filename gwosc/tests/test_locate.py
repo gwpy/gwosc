@@ -7,6 +7,7 @@
 
 import os.path
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
@@ -85,3 +86,15 @@ def test_get_urls_gw170104():
     assert list(map(os.path.basename, urls)) == [
         "L-L1_GWOSC_4KHZ_R1-1167557889-4096.hdf5",
     ]
+
+
+@mock.patch('gwosc.datasets._iter_datasets',
+            return_value=["GW150914-v1", "O1"])
+@mock.patch('gwosc.locate.get_event_urls')
+@mock.patch('gwosc.utils.full_coverage', return_value=True)
+def test_get_urls_host(mock_iter_dsets, mock_get_event_urls, mock_full_cov):
+    # check that get_event_urls is passed the host keyword
+    locate.get_urls('H1', 1167558912.6, 1167559012.6, host="testhost")
+    args, kwargs = mock_get_event_urls.call_args
+    assert "host" in kwargs
+    assert kwargs["host"] == "testhost"

@@ -120,6 +120,7 @@ def get_urls(
                     start=start,
                     end=end,
                     format=format,
+                    host=host,
                     sample_rate=sample_rate,
                     version=version,
                 )
