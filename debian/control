@@ -2,8 +2,8 @@
 
 Source: gwosc
 Homepage: https://gwosc.readthedocs.io
-Vcs-Browser: https://github.com/gwpy/gwosc
-Vcs-Git: https://github.com/gwpy/gwosc.git
+Vcs-Browser: https://git.ligo.org/duncanmmacleod/gwosc
+Vcs-Git: https://git.ligo.org/duncanmmacleod/gwosc.git
 Maintainer: Duncan Macleod <duncan.macleod@ligo.org>
 Section: python
 Priority: optional

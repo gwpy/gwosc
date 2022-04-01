@@ -14,9 +14,8 @@ and Virgo gravitational-wave observatories.
 
 ## Development status
 
-[![Build status](https://github.com/gwpy/gwosc/actions/workflows/build.yml/badge.svg)](https://github.com/gwpy/gwosc/actions/workflows/build.yml)
-[![Codecov](https://codecov.io/gh/gwpy/gwosc/branch/main/graph/badge.svg?token=A0b4PysQYA)](https://codecov.io/gh/gwpy/gwosc)
-[![Maintainability](https://api.codeclimate.com/v1/badges/234aad1c71f0642d3e60/maintainability)](https://codeclimate.com/github/gwpy/gwosc/maintainability)
+[![Build status](https://git.ligo.org/duncanmmacleod/gwosc/badges/main/pipeline.svg)](https://git.ligo.org/duncanmmacleod/gwosc/-/pipelines)
+![Code coverage](https://git.ligo.org/duncanmmacleod/gwosc/badges/main/coverage.svg)
 [![Documentation](https://readthedocs.org/projects/gwosc/badge/?version=latest)](https://gwosc.readthedocs.io/en/latest/?badge=latest)
 
 ## Installation

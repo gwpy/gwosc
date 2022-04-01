@@ -1,0 +1,35 @@
+# ---------------------------
+# Code Quality workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    file:
+      # https://computing.docs.ligo.org/gitlab-ci-templates/python/
+      - python.yml
+
+# -- code quality -----------
+#
+# These jobs check the code for
+# quality issues
+#
+
+flake8:
+  stage: Code quality
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:flake8
+    - .python:flake8
+  needs: []
+  before_script:
+    # pick requirements out of the setup.cfg
+    - |
+      REQUIREMENTS=$(python -c "
+      from configparser import ConfigParser;
+      cp = ConfigParser();
+      cp.read('setup.cfg');
+      print(cp['options.extras_require']['lint'].strip())")
+    # install things
+    - !reference [".python:flake8", before_script]
+  # code quality issues should present a global 'warning'
+  allow_failure: true

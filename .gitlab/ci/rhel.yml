@@ -1,0 +1,156 @@
+# ---------------------------
+# RHEL packaging workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    # https://computing.docs.ligo.org/gitlab-ci-templates/rhel/
+    file: rhel.yml
+  # local test template
+  - local: /.gitlab/ci/test.yml
+
+# -- macros
+
+.el7:
+  image: igwn/base:el7-testing
+  variables:
+    EPEL: "true"
+
+.el8:
+  image: igwn/base:el8-testing
+  variables:
+    EPEL: "true"
+
+# -- source packages --------
+#
+# These jobs make src RPMs
+#
+
+.srpm:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/rhel/#.rhel:srpm
+    - .rhel:srpm
+  stage: Source packages
+  needs:
+    - tarball
+  variables:
+    TARBALL: "gwosc-*.tar.*"
+  before_script:
+    - !reference [".rhel:srpm", "before_script"]
+    # hack the spec file to use the correct package version
+    - tar --file ${TARBALL} --wildcards --strip-components 1 --get gwosc*/*.spec gwosc*/PKG-INFO
+    - PKG_VERSION=$(grep ^Version PKG-INFO | cut -d\  -f2)
+    - sed -i 's|define version\( *\)\(.*\)|define unmangled_version '${PKG_VERSION}'\n%define version '${PKG_VERSION/-/+}'|' *.spec
+    - sed -i 's|pypi_source|pypi_source %{name} %{unmangled_version}|' *.spec
+  script:
+    - rpmbuild -bs
+          --define "_srcrpmdir ${CI_PROJECT_DIR}"
+          --define "_sourcedir ${CI_PROJECT_DIR}"
+          *.spec
+
+srpm:el7:
+  extends:
+    - .srpm
+    - .el7
+
+srpm:el8:
+  extends:
+    - .srpm
+    - .el8
+
+# -- binary packages --------
+#
+# These jobs generate binary RPMs
+# from the src RPMs
+#
+
+.rpm:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/rhel/#.rhel:rpm
+    - .rhel:rpm
+  stage: Binary packages
+  variables:
+    SRPM: "gwosc-*.src.rpm"
+
+rpm:el7:
+  extends:
+    - .rpm
+    - .el7
+  needs:
+    - srpm:el7
+
+rpm:el8:
+  extends:
+    - .rpm
+    - .el8
+  needs:
+    - srpm:el8
+
+# -- test -------------------
+
+.test:el:
+  extends:
+    # see /.gitlab/ci/test.yml
+    - .test
+  before_script:
+    # set up yum caching
+    - !reference [".rhel:base", before_script]
+    # configure EPEL
+    - yum -y -q install epel-release && yum -y -q install epel-rpm-macros
+    # install testing dependencies
+    - PY3=$(rpm --eval '%{?python3_pkgversion:%{python3_pkgversion}}%{!?python3_pkgversion:3}')
+    - yum -y -q install
+          findutils
+          python${PY3}-coverage
+          python${PY3}-pytest
+          python${PY3}-pytest-cov
+          python${PY3}-requests-mock
+    # install our package(s)
+    - yum -y -q install *.rpm
+
+test:el7:
+  extends:
+    - .test:el
+    - .el7
+  needs:
+    - rpm:el7
+  variables:
+    # there is no requests_mock for EL7, so skip the tests that use it
+    PYTEST_OPTIONS: "-ra -v --pyargs gwosc --color yes -k 'not test_api"
+
+test:el8:
+  extends:
+    - .test:el
+    - .el8
+  needs:
+    - rpm:el8
+
+# -- lint -------------------
+#
+# These jobs check the code
+# for quality issues
+#
+
+.rpmlint:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/rhel/#.rhel:lint
+    - .rhel:lint
+  stage: Code quality
+  variables:
+    GIT_STRATEGY: fetch
+    RPMLINT_OPTIONS: '--info --file .rpmlintrc'
+
+rpmlint:el7:
+  extends:
+    - .rpmlint
+    - .el7
+  needs:
+    - rpm:el7
+
+rpmlint:el8:
+  extends:
+    - .rpmlint
+    - .el8
+  needs:
+    - rpm:el8

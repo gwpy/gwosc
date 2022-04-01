@@ -1,0 +1,21 @@
+stages:
+  - Source distribution
+  - Source packages
+  - Binary packages
+  - Testing
+  - Documentation
+  - Code quality
+
+include:
+  # tarball
+  - local: '/.gitlab/ci/dist.yml'
+  # RHEL packaging
+  - local: '/.gitlab/ci/rhel.yml'
+  # Debian packaging
+  - local: '/.gitlab/ci/debian.yml'
+  # Python tests
+  - local: '/.gitlab/ci/python.yml'
+  # Code quality
+  - local: '/.gitlab/ci/analysis.yml'
+  # Documentation
+  - local: '/.gitlab/ci/docs.yml'

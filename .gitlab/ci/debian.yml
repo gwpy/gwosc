@@ -1,0 +1,165 @@
+# ---------------------------
+# Debian packaging workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    # https://computing.docs.ligo.org/gitlab-ci-templates/debian/
+    file: debian.yml
+  # local test template
+  - local: /.gitlab/ci/test.yml
+
+# -- macros
+
+.buster:
+  image: igwn/base:buster
+
+.bullseye:
+  image: igwn/base:bullseye
+
+# -- source packages --------
+#
+# These jobs make DSC packages
+#
+
+.dsc:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/debian/#.debian:dsc
+    - .debian:dsc
+  stage: Source packages
+  needs:
+    - tarball
+  variables:
+    TARBALL: "gwosc-*.tar.*"
+  before_script:
+    - !reference [".debian:dsc", "before_script"]
+    - apt-get -yqq install devscripts dpkg-dev
+    # -- hack the tarball so that setuptools-scm version matches
+    #    the debian changelog
+    - tar -zxf ${TARBALL}
+    # get versions from the Python metadata and the Debian changelog
+    - PKG_VERSION=$(grep ^Version gwosc-*/PKG-INFO | cut -d\  -f2)
+    - CHANGELOG_VERSION=$(dpkg-parsechangelog -l gwosc-*/debian/changelog --show-field Version)
+    # and compare them:
+    - USE_PKG_VERSION=$(python3 -c "print(str('${PKG_VERSION}' > '${CHANGELOG_VERSION}').lower())")
+    # if the package version is newer than the changelog version
+    # (standard dev update), we need to add a changelog entry
+    - if ${USE_PKG_VERSION}; then
+          (cd gwosc-*/; dch --newversion ${PKG_VERSION}-9999 --controlmaint "ci build");
+      fi
+    # repack the tarball
+    - tar -zcf ${TARBALL} */
+
+dsc:buster:
+  extends:
+    - .dsc
+    - .buster
+
+dsc:bullseye:
+  extends:
+    - .dsc
+    - .bullseye
+
+# -- binary packages --------
+#
+# These jobs generate DEB
+# binary packages from the
+# DSC sources packages
+#
+
+.deb:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/debian/#.debian:deb
+    - .debian:deb
+  stage: Binary packages
+  variables:
+    DSC: "gwosc_*.dsc"
+
+deb:buster:
+  extends:
+    - .deb
+    - .buster
+  needs:
+    - dsc:buster
+
+deb:bullseye:
+  extends:
+    - .deb
+    - .bullseye
+  needs:
+    - dsc:bullseye
+
+# -- test -------------------
+
+.test:debian:
+  extends:
+    # see /.gitlab/ci/test.yml
+    - .test
+    # https://computing.docs.ligo.org/gitlab-ci-templates/debian/#.debian:base
+    - .debian:base
+  before_script:
+    # set up apt
+    - !reference [".debian:base", before_script]
+    # setup local apt repository
+    - apt-get -y -q -q install local-apt-repository
+    - mkdir -pv /srv/local-apt-repository
+    # fill our local apt repo and rebuild it
+    - mv -v *.deb /srv/local-apt-repository
+    - /usr/lib/local-apt-repository/rebuild
+    - apt-get -y -q update
+    # install our package(s)
+    - apt-cache policy python3-gwosc
+    - apt-cache show python3-gwosc
+    - apt-get -y install python3-gwosc
+    # install testing dependencies
+    - apt-get -y -q install
+          findutils
+          python3-coverage
+          python3-pytest
+          python3-pytest-cov
+          python3-requests-mock
+
+test:buster:
+  extends:
+    - .test:debian
+    - .buster
+  needs:
+    - deb:buster
+
+test:bullseye:
+  extends:
+    - .test:debian
+    - .bullseye
+  needs:
+    - deb:bullseye
+
+# -- lint -------------------
+#
+# These jobs check the code
+# for quality issues
+#
+
+.lintian:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/debian/#.debian:lint
+    - .debian:lint
+  stage: Code quality
+  variables:
+    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug --fail-on-warnings --allow-root --pedantic"
+
+lintian:buster:
+  extends:
+    - .lintian
+    - .buster
+  needs:
+    - deb:buster
+
+lintian:bullseye:
+  extends:
+    - .lintian
+    - .bullseye
+  needs:
+    - deb:bullseye
+  variables:
+    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug,groff-message --fail-on warning --allow-root --pedantic"

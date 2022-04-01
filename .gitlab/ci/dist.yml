@@ -1,0 +1,26 @@
+# ---------------------------
+# Distribution workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/
+    file: python.yml
+
+# -- dist -------------------
+#
+# This job makes the gwosc-X.Y.Z.tar.gz
+# distribution and uploads it as a job
+# artifact
+#
+
+tarball:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:build
+    - .python:build
+  image: python:3
+  stage: Source distribution
+  variables:
+    SDIST: "true"
+    WHEEL: "false"
