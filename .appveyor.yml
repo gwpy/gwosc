@@ -1,0 +1,37 @@
+image: Visual Studio 2022
+environment:
+  global:
+    MINICONDA: C:\Miniconda38-x64
+  matrix:
+    - PYTHON_VERSION: 3.8
+    - PYTHON_VERSION: 3.9
+    - PYTHON_VERSION: 3.10
+install:
+  - "set PATH=%MINICONDA%\\condabin;%PATH%"
+  - call "%MINICONDA%\\Scripts\\activate.bat"
+  - conda config --set always_yes yes
+  - conda config --set channel_priority strict
+  - conda config --add channels conda-forge
+  - appveyor-retry conda create --quiet --yes --name ci
+        "pip"
+        "pytest"
+        "pytest-cov"
+        "python=%PYTHON_VERSION%"
+        "requests>1.0.0"
+        "setuptools>=38.2.5"
+  - conda activate ci
+  - conda info --all
+  - conda list
+build_script:
+  - python -m pip install .[test]
+test_script:
+  - python -m pytest
+        --color yes
+        --code-highlight yes
+        --cov gwosc
+        --junitxml junit.xml
+        --pyargs gwosc
+        -ra
+        --verbose
+on_finish:
+  - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\junit.xml))

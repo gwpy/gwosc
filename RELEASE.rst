@@ -32,9 +32,9 @@ To release a new version of the package:
       git tag --sign vX.Y.Z
       git push --signed=if-asked origin vX.Y.Z
 
-#. **Draft a release on GitHub**
+#. **Draft a release on GitLab**
 
-   * Go to https://github.com/gwpy/gwosc/releases/new
+   * Go to https://git.ligo.org/duncanmmacleod/gwosc/-/releases
    * Use ``vX.Y.Z`` as the *Tag version*
    * Use X.Y.Z as the *Release title*
    * Copy the tag message into the text box to serve as release notes
@@ -42,6 +42,5 @@ To release a new version of the package:
 #. **Upload the new release to pypi**::
 
       rm -rf dist/*
-      python setup.py sdist bdist_wheel
-      gpg --armor --detach-sign dist/gwosc-X.Y.Z.tar.gz
-      twine upload dist/gwosc-X.Y.Z.*
+      python3 -m build --sdist --wheel
+      twine upload --sign dist/gwosc-X.Y.Z.*

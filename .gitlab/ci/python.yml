@@ -1,0 +1,76 @@
+# ---------------------------
+# Python workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/
+    file: python.yml
+  # local test template
+  - local: /.gitlab/ci/test.yml
+
+# -- build ------------------
+#
+# this job builds the wheel
+# distribution
+#
+
+wheel:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:build
+    - .python:build
+  image: python:3
+  stage: Binary packages
+  variables:
+    SDIST: "false"
+    WHEEL: "true"
+
+# -- test -------------------
+#
+# These jobs run the tests
+#
+
+.test:pip:
+  extends:
+    # see /.gitlab/ci/test.yml
+    - .test
+  needs:
+    - wheel
+  before_script:
+    # resolve wildcard in wheel so we specify an extra
+    - WHEEL=$(echo gwosc-*.whl)
+    - INSTALL_TARGET="${WHEEL}[test]"
+    # configure from template
+    - !reference [".python:pytest", before_script]
+
+test:python3.6:
+  extends:
+    - .test:pip
+  image: python:3.6
+
+test:python3.7:
+  extends:
+    - .test:pip
+  image: python:3.7
+
+test:python3.8:
+  extends:
+    - .test:pip
+  image: python:3.8
+
+test:python3.9:
+  extends:
+    - .test:pip
+  image: python:3.9
+
+test:python3.10:
+  extends:
+    - .test:pip
+  image: python:3.10
+
+test:python3.10:remote:
+  extends:
+    - test:python3.10
+  variables:
+    PYTEST_OPTIONS: "-ra -v --pyargs gwosc --disable-socket -m 'not remote'"

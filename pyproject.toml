@@ -9,6 +9,20 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 write_to = "gwosc/_version.py"
 
+[tool.coverage.paths]
+source = [
+	"gwosc/",
+	"/usr/lib/python*/*-packages/gwosc/",
+	"/usr/local/lib/python*/*-packages/gwosc/",
+]
+
+[tool.coverage.run]
+source = ["gwosc"]
+omit = [
+	"gwosc/_version.py",
+	"setup.py",
+]
+
 [tool.pytest.ini_options]
 addopts = "-r a --color=yes"
 filterwarnings = [

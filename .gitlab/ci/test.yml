@@ -1,0 +1,48 @@
+# ---------------------------
+# Testing workflow
+# ---------------------------
+
+include:
+  # https://computing.docs.ligo.org/gitlab-ci-templates/
+  - project: computing/gitlab-ci-templates
+    file:
+      # https://computing.docs.ligo.org/gitlab-ci-templates/python/
+      - python.yml
+
+# test template used in other jobs
+# see python.yml for example
+
+.test:
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:pytest
+    - .python:pytest
+  stage: Testing
+  variables:
+    # target for coverage
+    COVERAGE_TARGET: "gwosc"
+    # don't need the git repo
+    GIT_STRATEGY: none
+    # configure pytest
+    PYTEST_OPTIONS: "-ra -v --pyargs gwosc --color yes"
+    # use python3
+    PYTHON: "python3"
+  # upload coverage database to be aggregated later
+  artifacts:
+    paths:
+      - .coverage*
+  # disable coverage total parsing, this is reported by
+  # the coverage job
+  coverage: null
+
+# -- coverage ---------------
+#
+# This job combinces the individual
+# coverage reports from each job
+# to make a proper coverage result
+#
+
+coverage:
+  stage: .post
+  extends:
+    # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:coverage-combine
+    - .python:coverage-combine
