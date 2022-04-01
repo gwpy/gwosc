@@ -92,7 +92,7 @@ def test_find_datasets_event_version_detector():
 
 @mock.patch("gwosc.datasets._run_datasets", return_value=[])
 def test_find_datasets_warning(_):
-    with pytest.warns(None):
+    with pytest.warns(UserWarning):
         datasets.find_datasets(type='run', version=1)
 
 
