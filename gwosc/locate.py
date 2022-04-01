@@ -35,8 +35,6 @@ sample-rate data, these can be specified as keyword arguments.
 For full information, see :func:`get_urls`.
 """  # noqa: E501
 
-import warnings
-
 from . import (
     api,
     datasets,
@@ -51,7 +49,6 @@ __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 def get_urls(
         detector, start, end,
         dataset=None,
-        tag=None,
         version=None,
         sample_rate=4096,
         format='hdf5',
@@ -93,15 +90,6 @@ def get_urls(
     """
     start = int(start)
     end = int(end)
-
-    if tag is not None:
-        warnings.warn(
-            "the `tag` keyword to get_urls is deprecated, GWOSC no longer "
-            "releases multiple datasets for events, please use the `dataset` "
-            "and `version` keyword arguments to manually select the host "
-            "dataset for URLs",
-            DeprecationWarning,
-        )
 
     for dstype in ("event", "run"):
         dsets = datasets._iter_datasets(
