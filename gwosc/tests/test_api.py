@@ -5,8 +5,9 @@
 """Tests for :mod:`gwosc.api`
 """
 
-import os.path
 from unittest import mock
+
+from requests import RequestException
 
 import pytest
 
@@ -35,12 +36,13 @@ def test_fetch_json():
     assert sorted(out['events']['GW150914-v1']['detectors']) == ['H1', 'L1']
     assert {'O1', 'O1_16KHZ', 'history'}.issubset(set(out['runs']))
 
+
+@pytest.mark.remote
+def test_fetch_json_error():
     # check errors (use legit URL that isn't JSON)
-    url2 = os.path.dirname(os.path.dirname(url))
-    with pytest.raises(ValueError) as exc:
-        api.fetch_json(url2)
-    assert str(exc.value).startswith(
-        "Failed to parse GWOSC JSON from {!r}: ".format(url2))
+    url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/'
+    with pytest.raises((RequestException, ValueError)):
+        api.fetch_json(url)
 
 
 def test_fetch_json_local(requests_mock):
