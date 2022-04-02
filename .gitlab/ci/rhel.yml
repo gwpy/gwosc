@@ -117,7 +117,7 @@ test:el7:
     - rpm:el7
   variables:
     # there is no requests_mock for EL7, so skip the tests that use it
-    PYTEST_OPTIONS: "-ra -v --pyargs gwosc --color yes -k 'not test_api"
+    PYTEST_OPTIONS: "-ra -v --pyargs gwosc --color yes -k 'not test_api'"
 
 test:el8:
   extends:

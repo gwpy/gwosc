@@ -58,15 +58,11 @@ def fetch_json(url, **kwargs):
     except KeyError:
         logger.debug("fetching {}".format(url))
         resp = requests.get(url, **kwargs)
-        try:
-            return JSON_CACHE.setdefault(
-                url,
-                resp.json(),
-            )
-        except ValueError as exc:
-            exc.args = ("Failed to parse GWOSC JSON from %r: %s"
-                        % (url, str(exc)),)
-            raise
+        resp.raise_for_status()
+        return JSON_CACHE.setdefault(
+            url,
+            resp.json(),
+        )
 
 
 # -- Run datasets -------------------------------------------------------------
