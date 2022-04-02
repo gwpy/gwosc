@@ -26,10 +26,22 @@ include:
     PYTEST_OPTIONS: "-ra -v --pyargs gwosc --color yes"
     # use python3
     PYTHON: "python3"
+  script:
+    # ignore _version.py in coverage
+    - |
+      cat > .coveragerc << EOF
+      [run]
+      omit =
+          */_version.py
+      EOF
+    # run the tests
+    - !reference [".python:pytest", script]
   # upload coverage database to be aggregated later
   artifacts:
     paths:
       - .coverage*
+    exclude:
+      - .coveragerc
   # disable coverage total parsing, this is reported by
   # the coverage job
   coverage: null
