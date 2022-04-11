@@ -34,7 +34,7 @@ To release a new version of the package:
 
 #. **Draft a release on GitLab**
 
-   * Go to https://git.ligo.org/duncanmmacleod/gwosc/-/releases
+   * Go to https://git.ligo.org/gwosc/client/-/releases
    * Use ``vX.Y.Z`` as the *Tag version*
    * Use X.Y.Z as the *Release title*
    * Copy the tag message into the text box to serve as release notes
