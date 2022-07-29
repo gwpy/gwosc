@@ -321,32 +321,3 @@ def fetch_event_json(
     return fetch_json(
         _event_url(event, catalog=catalog, version=version, host=host),
     )
-
-
-# -- legacy
-
-def _legacy_catalog_url(catalog, host=DEFAULT_URL):
-    return "{}/catalog/{}/filelist/".format(
-        host, catalog,
-    )
-
-
-def fetch_legacy_catalog_json(catalog, host=DEFAULT_URL):
-    """"Returns the JSON metadata for the given catalogue
-
-    Parameters
-    ----------
-    catalog : `str`
-        the name of the event catalog, e.g. `GWTC-1-confident`
-
-    host : `str`, optional
-        the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
-
-    Returns
-    -------
-    json
-        the JSON data retrieved from GWOSC and returnend by
-        :meth:`requests.Response.json`
-    """
-    return fetch_json(_legacy_catalog_url(catalog, host=host))
