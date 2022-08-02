@@ -21,6 +21,11 @@ flake8:
     # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:flake8
     - .python:flake8
   needs: []
+  variables:
+    # don't fail the pipeline because of linting issues,
+    # these are presented in the code-quality box in the
+    # merge_request UI
+    FLAKE8_OPTIONS: "--exit-zero"
   before_script:
     # pick requirements out of the setup.cfg
     - |
@@ -31,5 +36,3 @@ flake8:
       print(cp['options.extras_require']['lint'].strip())")
     # install things
     - !reference [".python:flake8", before_script]
-  # code quality issues should present a global 'warning'
-  allow_failure: true
