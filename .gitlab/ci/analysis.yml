@@ -28,11 +28,13 @@ flake8:
     FLAKE8_OPTIONS: "--exit-zero"
   before_script:
     # pick requirements out of the setup.cfg
+    - python -m pip install setuptools
     - |
       REQUIREMENTS=$(python -c "
-      from configparser import ConfigParser;
-      cp = ConfigParser();
-      cp.read('setup.cfg');
-      print(cp['options.extras_require']['lint'].strip())")
+      import shlex
+      from setuptools import Distribution
+      dist = Distribution()
+      dist.parse_config_files()
+      print(shlex.join(dist.extras_require['lint']))")
     # install things
     - !reference [".python:flake8", before_script]
