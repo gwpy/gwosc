@@ -122,6 +122,7 @@ def get_urls(
                     format=format,
                     sample_rate=sample_rate,
                     version=version,
+                    host=host,
                 )
 
             # if full span covered, return now
