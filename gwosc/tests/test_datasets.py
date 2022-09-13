@@ -37,6 +37,25 @@ CATALOG_JSON = {
         },
     }
 }
+EVENT_JSON = {
+    'events': {
+        'mock-event-1': {
+            'GPS': 1240215503.0,
+            'luminosity_distance': 159.0,
+            'mass_1_source': 1.74,
+        },
+        'mock-event-2': {
+            'GPS': 1240215503.0,
+            'luminosity_distance': 160.0,
+            'mass_1_source': 2.0,
+        },
+        'mock-event-3': {
+            'GPS': 1240215503.0,
+            'luminosity_distance': 150.0,
+            'mass_1_source': 2.1,
+        }
+    }
+}
 
 
 @pytest.mark.remote
@@ -234,3 +253,26 @@ def test_dataset_type_local():
     assert datasets.dataset_type("testevent") == "event"
     with pytest.raises(ValueError):
         datasets.dataset_type("invalid")
+
+
+@pytest.mark.remote
+def test_query_events():
+    events = datasets.query_events(
+        select=["10 <= luminosity-distance <= 200"]
+    )
+    assert 'GW190425-v1' in events
+    assert 'GW190425-v2' in events
+    assert 'GW190425_081805-v3' in events
+
+
+@mock.patch(
+    'gwosc.api.fetch_filtered_events_json',
+    mock.MagicMock(return_value=EVENT_JSON),
+)
+def test_query_events_local():
+    events = datasets.query_events(
+        select=["mass-1-source >= 1.4", "10 <= luminosity-distance <= 200"]
+    )
+    assert 'mock-event-1' in events
+    assert 'mock-event-2' in events
+    assert 'mock-event-2' in events

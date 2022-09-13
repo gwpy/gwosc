@@ -271,6 +271,117 @@ def _fetch_allevents_event_json(
     raise ValueError(msg)
 
 
+def _select_to_query(select):
+    import re
+    from urllib.parse import urlencode
+    # Captures strings of the form `1.44 <= param <= 5.0`
+    two_ops = re.compile(
+        r"^\s*(?P<val1>[\d.+-eE]+)\s*(?P<op1>[<>=]{2})\s*(?P<param>[\w-]+)"
+        r"\s*(?P<op2>[<>=]+)\s*(?P<val2>[\d.+-eE]+)\s*$"
+    )
+    # Captures strings of the form `param <= 5.0`
+    one_op = re.compile(
+        r"^\s*(?P<param>[\w-]+)\s*(?P<op>[<>=]{2})\s*(?P<val>[\d.+-eE]+)\s*$"
+    )
+
+    allowed_operators = set((">=", "=>", "<=", "=<"))
+    allowed_parameters = [
+        "gps-time",
+        "mass-1-source",
+        "mass-2-source",
+        "network-matched-filter-snr",
+        "luminosity-distance",
+        "chi-eff",
+        "total-mass-source",
+        "chirp-mass",
+        "chirp-mass-source",
+        "redshift",
+        "far",
+        "p-astro",
+        "final-mass-source",
+    ]
+    queries = []
+    for s in select:
+        m = two_ops.match(s)
+        if m is not None:
+            md = m.groupdict()
+            op1, op2 = md["op1"], md["op2"]
+            if not set((op1, op2)).issubset(allowed_operators):
+                raise ValueError(f"Unknown operators: {s}")
+            param, val1, val2 = md["param"], md["val1"], md["val2"]
+            if param not in allowed_parameters:
+                raise ValueError(
+                    f"Unrecognized parameter: {param}.\n"
+                    f"Use one of:\n{allowed_parameters}"
+                )
+            if ">" in op1:
+                queries.append((f"max-{param}", val1))
+            if "<" in op1:
+                queries.append((f"min-{param}", val1))
+            if ">" in op2:
+                queries.append((f"min-{param}", val2))
+            if "<" in op2:
+                queries.append((f"max-{param}", val2))
+            continue
+        m = one_op.match(s)
+        if m is not None:
+            md = m.groupdict()
+            op = md["op"]
+            if not set((op,)).issubset(allowed_operators):
+                raise ValueError(f"Unknown operator: {s}")
+            param, val = md["param"], md["val"]
+            if param not in allowed_parameters:
+                raise ValueError(
+                    f"Unrecognized parameter: {param}.\n"
+                    f"Use one of:\n{allowed_parameters}"
+                )
+            if ">" in op:
+                queries.append((f"min-{param}", val))
+            if "<" in op:
+                queries.append((f"max-{param}", val))
+            continue
+        raise ValueError(f"Could not parse: {s}")
+    return urlencode(queries)
+
+
+def _query_events_url(select, host=DEFAULT_URL):
+    return "{}/eventapi/json/query/show?{}".format(
+        host, _select_to_query(select)
+    )
+
+
+def fetch_filtered_events_json(select, host=DEFAULT_URL):
+    """"Return the JSON metadata for the events constrained by select
+
+    Parameters
+    ----------
+    select : `list-like`
+        a list of range constrains for the events.
+        All ranges should have inclusive ends (<= and >= operators).
+
+    host : `str`, optional
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
+
+    Returns
+    -------
+    data : `dict` or `list`
+        the JSON data retrieved from GWOSC and returnend by
+        :meth:`requests.Response.json`
+
+    Example
+    -------
+    >>> fetch_filtered_events_json(
+    ...     select=[
+    ...         "mass-1-source <= 5",
+    ...         "mass-2-source =< 10",
+    ...         "10 <= luminosity-distance <= 100",
+    ...     ]
+    ... )
+    """
+    return fetch_json(_query_events_url(select, host=host))
+
+
 def _event_url(
         event,
         catalog=None,
