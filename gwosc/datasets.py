@@ -634,10 +634,9 @@ def query_events(select, host=api.DEFAULT_URL):
         For a full description of all parameters see
         https://www.gwosc.org/apidocs/#event5
     """
-    events = list(
+    return list(
         api.fetch_filtered_events_json(
             select=select,
             host=host,
         )["events"].keys()
     )
-    return events
