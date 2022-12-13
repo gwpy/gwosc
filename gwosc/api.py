@@ -9,6 +9,8 @@ that handle direct requests to the GWOSC host.
 
 import logging
 import os
+import re
+from urllib.parse import urlencode
 
 import requests
 
@@ -272,8 +274,8 @@ def _fetch_allevents_event_json(
 
 
 def _select_to_query(select):
-    import re
-    from urllib.parse import urlencode
+    """Parse select string and translate into URL GET parameters"""
+
     # Captures strings of the form `1.44 <= param <= 5.0`
     two_ops = re.compile(
         r"^\s*(?P<val1>[\d.+-eE]+)\s*(?P<op1>[<>=]{2})\s*(?P<param>[\w-]+)"
