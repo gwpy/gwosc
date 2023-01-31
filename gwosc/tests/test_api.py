@@ -134,32 +134,35 @@ def test_fetch_filtered_events_json():
 
 
 @mock.patch("gwosc.api.fetch_json")
-def test_fetch_filtered_events_json_local(fetch):
-    good_selects = [
-        "10 <= luminosity-distance <= 200",
-        "10 =< luminosity-distance <= 200",
-        "200 >= luminosity-distance >= 10",
-        "10 <=  luminosity-distance   =< 200",
-        "10<=luminosity-distance<=200",
-        "  200 >=  luminosity-distance => 10   ",
-        " 200 =>luminosity-distance=>10",
-    ]
-    for gs in good_selects:
-        api.fetch_filtered_events_json(select=[gs])
-        (called_url,), kwargs = fetch.call_args
-        assert "max-luminosity-distance=200" in called_url
-        assert "min-luminosity-distance=10" in called_url
-        fetch.reset_mock()
+@pytest.mark.parametrize("select", [
+    "10 <= luminosity-distance <= 200",
+    "10 =< luminosity-distance <= 200",
+    "200 >= luminosity-distance >= 10",
+    "10 <=  luminosity-distance   =< 200",
+    "10<=luminosity-distance<=200",
+    "  200 >=  luminosity-distance => 10   ",
+    " 200 =>luminosity-distance=>10",
+])
+def test_fetch_filtered_events_json_local(select, fetch):
+    api.fetch_filtered_events_json(select=[select])
+    (called_url,), kwargs = fetch.call_args
+    assert "max-luminosity-distance=200" in called_url
+    assert "min-luminosity-distance=10" in called_url
 
-    bad_selects = [
-        "100 <= luminosity-distance",
-        "gps-time < 100",
-        "gps-time  = > 100",
-        "unknown-param <= 100",
-    ]
-    for bs in bad_selects:
-        with pytest.raises(ValueError):
-            api.fetch_filtered_events_json(select=[bs])
+
+@mock.patch("gwosc.api.fetch_json")
+@pytest.mark.parametrize("select", [
+    "100 <= luminosity-distance",
+    "gps-time < 100",
+    "gps-time  = > 100",
+    "unknown-param <= 100",
+])
+def test_fetch_filtered_events_json_bad_local(select, fetch):
+    with pytest.raises(
+        ValueError,
+        match="Could not parse:",
+    ):
+        api.fetch_filtered_events_json(select=[select])
 
 
 @pytest.mark.remote
