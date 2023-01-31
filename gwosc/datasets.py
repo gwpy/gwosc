@@ -601,38 +601,52 @@ def dataset_type(dataset, host=api.DEFAULT_URL):
 def query_events(select, host=api.DEFAULT_URL):
     """Return a list of events filtered by the parameters in `select`
 
-        Parameters
-        ----------
-        select : `list[str]`
-            A list of strings where each element is a range constrain on the
-            event parmeters.
-            All ranges should have inclusive ends (<= and => operators).
+    Parameters
+    ----------
+    select : `list` of `str`
+        A list of strings where each element is a range constrain on the
+        event parameters.
+        All ranges should have inclusive ends (<= and => operators).
 
+    host : `str`, optional
+        the URL of the GWOSC host to query
 
-        host : `str`, optional
-            the URL of the GWOSC host to query
+    Examples
+    --------
+    >>> from gwosc.datasets import query_events
+    >>> query_events(
+    ...     select=[
+    ...         "mass-1-source >= 1.4",
+    ...         "200 >= luminosity-distance >= 100",
+    ...     ]
+    ... )
+    ['GW190425-v1', 'GW190425-v2', 'GW190425_081805-v3']
 
-        Examples
-        --------
-        >>> from gwosc.datasets import query_events
-        >>> query_events(
-        ...     select=[
-        ...         "mass-1-source >= 1.4",
-        ...         "200 >= luminosity-distance >= 100",
-        ...     ]
-        ... )
-        ['GW190425-v1', 'GW190425-v2', 'GW190425_081805-v3']
+    Notes
+    -----
+    Operators:
 
-        Notes
-        -----
-        Operators: `<=`, `=>` (or `=<`, `>=`)
-        Parameters: `gps-time`,
-        `mass-1-source`, `mass-2-source`, `network-matched-filter-snr`,
-        `luminosity-distance`, `chi-eff`, `total-mass-source`, `chirp-mass`,
-        `chirp-mass-source`, `redshift`, `far`, `p-astro`, `final-mass-source`.
+    - `<=` (or `=<`)
+    - `=>` (or `>=`)
+    
+    Parameters:
 
-        For a full description of all parameters see
-        https://www.gwosc.org/apidocs/#event5
+    - ``gps-time`,
+    - ``mass-1-source``,
+    - ``mass-2-source``,
+    - ``network-matched-filter-snr``,
+    - ``luminosity-distance``,
+    - ``chi-eff``,
+    - ``total-mass-source``,
+    - ``chirp-mass``,
+    - ``chirp-mass-source``,
+    - ``redshift``,
+    - ``far``,
+    - ``p-astro``,
+    - ``final-mass-source``
+
+    For a full description of all parameters see
+    https://www.gwosc.org/apidocs/#event5
     """
     return list(
         api.fetch_filtered_events_json(
