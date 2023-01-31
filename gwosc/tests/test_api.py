@@ -162,7 +162,7 @@ def test_fetch_filtered_events_json_bad_local(fetch, select):
     with pytest.raises(
         ValueError,
         match="Could not parse"
-        ):
+    ):
         api.fetch_filtered_events_json(select=[select])
 
 
