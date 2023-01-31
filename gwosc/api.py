@@ -295,13 +295,13 @@ def _parse_two_ops(compiled_m):
     op1, op2 = md["op1"], md["op2"]
     if not set((op1, op2)).issubset(_ALLOWED_OPS):
         raise ValueError(
-            f"Could not parse select string.\n"
-            f"Unknown operators: {s}"
-            )
+            "Could not parse select string.\n"
+            "Unknown operators."
+        )
     param, val1, val2 = md["param"], md["val1"], md["val2"]
     if param not in _ALLOWED_PARAMS:
         raise ValueError(
-            f"Could not parse select string.\n"
+            "Could not parse select string.\n"
             f"Unrecognized parameter: {param}.\n"
             f"Use one of:\n{_ALLOWED_PARAMS}"
         )
@@ -322,9 +322,9 @@ def _parse_one_op(compiled_m):
     op = md["op"]
     if not set((op,)).issubset(_ALLOWED_OPS):
         raise ValueError(
-            f"Could not parse select string.\n"
-            f"Unknown operator: {s}"
-            )
+            "Could not parse select string.\n"
+            "Unknown operator."
+        )
     param, val = md["param"], md["val"]
     if param not in _ALLOWED_PARAMS:
         raise ValueError(
