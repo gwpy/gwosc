@@ -628,7 +628,7 @@ def query_events(select, host=api.DEFAULT_URL):
 
     - `<=` (or `=<`)
     - `=>` (or `>=`)
-    
+
     Parameters:
 
     - ``gps-time`,
