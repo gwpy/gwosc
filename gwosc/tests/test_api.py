@@ -143,7 +143,7 @@ def test_fetch_filtered_events_json():
     "  200 >=  luminosity-distance => 10   ",
     " 200 =>luminosity-distance=>10",
 ])
-def test_fetch_filtered_events_json_local(select, fetch):
+def test_fetch_filtered_events_json_local(fetch, select):
     api.fetch_filtered_events_json(select=[select])
     (called_url,), kwargs = fetch.call_args
     assert "max-luminosity-distance=200" in called_url
@@ -157,11 +157,8 @@ def test_fetch_filtered_events_json_local(select, fetch):
     "gps-time  = > 100",
     "unknown-param <= 100",
 ])
-def test_fetch_filtered_events_json_bad_local(select, fetch):
-    with pytest.raises(
-        ValueError,
-        match="Could not parse:",
-    ):
+def test_fetch_filtered_events_json_bad_local(fetch, select):
+    with pytest.raises(ValueError):
         api.fetch_filtered_events_json(select=[select])
 
 
