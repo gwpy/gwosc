@@ -10,7 +10,6 @@ that handle direct requests to the GWOSC host.
 import logging
 import os
 import re
-from urllib.parse import urlencode
 
 import requests
 
@@ -77,6 +76,8 @@ def fetch_json(url, **kwargs):
     except KeyError:
         logger.debug("fetching {}".format(url))
         resp = requests.get(url, **kwargs)
+        print(resp.url)
+        print(**kwargs)
         resp.raise_for_status()
         return JSON_CACHE.setdefault(
             url,
@@ -305,15 +306,15 @@ def _parse_two_ops(compiled_m):
             f"Unrecognized parameter: {param}.\n"
             f"Use one of:\n{_ALLOWED_PARAMS}"
         )
-    queries = []
+    queries = {}
     if ">" in op1:
-        queries.append((f"max-{param}", val1))
+        queries[f"max-{param}"] = val1
     if "<" in op1:
-        queries.append((f"min-{param}", val1))
+        queries[f"min-{param}"] = val1
     if ">" in op2:
-        queries.append((f"min-{param}", val2))
+        queries[f"min-{param}"] = val2
     if "<" in op2:
-        queries.append((f"max-{param}", val2))
+        queries[f"max-{param}"] = val2
     return queries
 
 
@@ -332,11 +333,11 @@ def _parse_one_op(compiled_m):
             f"Unrecognized parameter: {param}.\n"
             f"Use one of:\n{_ALLOWED_PARAMS}"
         )
-    queries = []
+    queries = {}
     if ">" in op:
-        queries.append((f"min-{param}", val))
+        queries[f"min-{param}"] = val
     if "<" in op:
-        queries.append((f"max-{param}", val))
+        queries[f"max-{param}"] = val
     return queries
 
 
@@ -353,7 +354,7 @@ def _select_to_query(select):
         r"^\s*(?P<param>[\w-]+)\s*(?P<op>[<>=]{2})\s*(?P<val>[\d.+-eE]+)\s*$"
     )
 
-    queries = []
+    queries = {}
     for s in select:
         for regex, _parse in (
             (one_op, _parse_one_op),
@@ -361,16 +362,17 @@ def _select_to_query(select):
         ):
             m = regex.match(s)
             if m is not None:
-                queries.extend(_parse(m))
+                queries.update(_parse(m))
                 break
         else:
             raise ValueError(f"Could not parse select string: {s}")
-    return urlencode(queries)
+    return queries
 
 
 def _query_events_url(select, host=DEFAULT_URL):
-    return "{}/eventapi/json/query/show?{}".format(
-        host, _select_to_query(select)
+    return (
+        "{}/eventapi/json/query/show".format(host),
+        _select_to_query(select),
     )
 
 
@@ -403,7 +405,8 @@ def fetch_filtered_events_json(select, host=DEFAULT_URL):
     ...     ]
     ... )
     """
-    return fetch_json(_query_events_url(select, host=host))
+    url, payload = _query_events_url(select, host=host)
+    return fetch_json(url, params=payload)
 
 
 def _event_url(
