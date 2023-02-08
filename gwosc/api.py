@@ -31,24 +31,9 @@ DEFAULT_URL = "https://www.gw-openscience.org"
 JSON_CACHE = {}
 
 _ALLOWED_OPS = set((">=", "=>", "<=", "=<"))
-_ALLOWED_PARAMS = [
-    "gps-time",
-    "mass-1-source",
-    "mass-2-source",
-    "network-matched-filter-snr",
-    "luminosity-distance",
-    "chi-eff",
-    "total-mass-source",
-    "chirp-mass",
-    "chirp-mass-source",
-    "redshift",
-    "far",
-    "p-astro",
-    "final-mass-source",
-]
-
 
 # -- JSON handling ------------------------------------------------------------
+
 
 def fetch_json(url, **kwargs):
     """Fetch JSON data from a remote URL
@@ -150,6 +135,14 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=_MAX_GPS,
 
 
 # -- EventAPI catalogs -------------------------------------------------------
+
+def _allowed_params_url(host=DEFAULT_URL):
+    return "{}/eventapi/json/query/params/".format(host)
+
+
+def fetch_allowed_params_json(host=DEFAULT_URL):
+    return fetch_json(_allowed_params_url(host=host))
+
 
 def _eventapi_url(full=False, host=DEFAULT_URL):
     j = "jsonfull" if full else "json"
@@ -290,7 +283,8 @@ def _fetch_allevents_event_json(
     raise ValueError(msg)
 
 
-def _parse_two_ops(compiled_m):
+def _parse_two_ops(compiled_m, host=DEFAULT_URL):
+    allowed_params = fetch_allowed_params_json(host=host)
     md = compiled_m.groupdict()
     op1, op2 = md["op1"], md["op2"]
     if not set((op1, op2)).issubset(_ALLOWED_OPS):
@@ -299,11 +293,11 @@ def _parse_two_ops(compiled_m):
             "Unknown operators."
         )
     param, val1, val2 = md["param"], md["val1"], md["val2"]
-    if param not in _ALLOWED_PARAMS:
+    if param not in allowed_params:
         raise ValueError(
             "Could not parse select string.\n"
             f"Unrecognized parameter: {param}.\n"
-            f"Use one of:\n{_ALLOWED_PARAMS}"
+            f"Use one of:\n{allowed_params}"
         )
     queries = []
     if ">" in op1:
@@ -317,7 +311,8 @@ def _parse_two_ops(compiled_m):
     return queries
 
 
-def _parse_one_op(compiled_m):
+def _parse_one_op(compiled_m, host=DEFAULT_URL):
+    allowed_params = fetch_allowed_params_json(host=host)
     md = compiled_m.groupdict()
     op = md["op"]
     if not set((op,)).issubset(_ALLOWED_OPS):
@@ -326,11 +321,11 @@ def _parse_one_op(compiled_m):
             "Unknown operator."
         )
     param, val = md["param"], md["val"]
-    if param not in _ALLOWED_PARAMS:
+    if param not in allowed_params:
         raise ValueError(
             f"Could not parse select string.\n"
             f"Unrecognized parameter: {param}.\n"
-            f"Use one of:\n{_ALLOWED_PARAMS}"
+            f"Use one of:\n{allowed_params}"
         )
     queries = []
     if ">" in op:
@@ -340,7 +335,7 @@ def _parse_one_op(compiled_m):
     return queries
 
 
-def _select_to_query(select):
+def _select_to_query(select, host=DEFAULT_URL):
     """Parse select string and translate into URL GET parameters"""
 
     # Captures strings of the form `1.44 <= param <= 5.0`
@@ -361,7 +356,7 @@ def _select_to_query(select):
         ):
             m = regex.match(s)
             if m is not None:
-                queries.extend(_parse(m))
+                queries.extend(_parse(m, host=host))
                 break
         else:
             raise ValueError(f"Could not parse select string: {s}")
@@ -370,7 +365,7 @@ def _select_to_query(select):
 
 def _query_events_url(select, host=DEFAULT_URL):
     return "{}/eventapi/json/query/show?{}".format(
-        host, _select_to_query(select)
+        host, _select_to_query(select, host=host)
     )
 
 

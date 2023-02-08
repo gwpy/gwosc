@@ -16,6 +16,23 @@ from .. import api
 __author__ = 'Duncan Macleod <duncan.macleod@ligo.org>'
 
 
+_ALLOWED_PARAMS = [
+    "gps-time",
+    "mass-1-source",
+    "mass-2-source",
+    "network-matched-filter-snr",
+    "luminosity-distance",
+    "chi-eff",
+    "total-mass-source",
+    "chirp-mass",
+    "chirp-mass-source",
+    "redshift",
+    "far",
+    "p-astro",
+    "final-mass-source",
+]
+
+
 def losc_url(path):
     return '{0}/{1}'.format(api.DEFAULT_URL, path)
 
@@ -133,6 +150,10 @@ def test_fetch_filtered_events_json():
     assert "GW190425-v1" in events
 
 
+@mock.patch(
+    'gwosc.api.fetch_allowed_params_json',
+    mock.MagicMock(return_value=_ALLOWED_PARAMS),
+)
 @mock.patch("gwosc.api.fetch_json")
 @pytest.mark.parametrize("select", [
     "10 <= luminosity-distance <= 200",
@@ -150,6 +171,10 @@ def test_fetch_filtered_events_json_local(fetch, select):
     assert "min-luminosity-distance=10" in called_url
 
 
+@mock.patch(
+    'gwosc.api.fetch_allowed_params_json',
+    mock.MagicMock(return_value=_ALLOWED_PARAMS),
+)
 @mock.patch("gwosc.api.fetch_json")
 @pytest.mark.parametrize("select", [
     "100 <= luminosity-distance",
