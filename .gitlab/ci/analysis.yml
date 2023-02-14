@@ -21,15 +21,20 @@ flake8:
     # https://computing.docs.ligo.org/gitlab-ci-templates/python/#.python:flake8
     - .python:flake8
   needs: []
+  variables:
+    # don't fail the pipeline because of linting issues,
+    # these are presented in the code-quality box in the
+    # merge_request UI
+    FLAKE8_OPTIONS: "--exit-zero"
   before_script:
     # pick requirements out of the setup.cfg
+    - python -m pip install setuptools
     - |
       REQUIREMENTS=$(python -c "
-      from configparser import ConfigParser;
-      cp = ConfigParser();
-      cp.read('setup.cfg');
-      print(cp['options.extras_require']['lint'].strip())")
+      import shlex
+      from setuptools import Distribution
+      dist = Distribution()
+      dist.parse_config_files()
+      print(shlex.join(dist.extras_require['lint']))")
     # install things
     - !reference [".python:flake8", before_script]
-  # code quality issues should present a global 'warning'
-  allow_failure: true
