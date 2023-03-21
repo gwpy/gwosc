@@ -125,6 +125,48 @@ def test_fetch_catalog_json_local(fetch):
 
 
 @pytest.mark.remote
+def test_fetch_filtered_events_json():
+    out = api.fetch_filtered_events_json(
+        select=["10 <= luminosity-distance <= 200"]
+    )
+    events = out["events"]
+    assert "GW190425-v1" in events
+
+
+@mock.patch("gwosc.api.fetch_json")
+@pytest.mark.parametrize("select", [
+    "10 <= luminosity-distance <= 200",
+    "10 =< luminosity-distance <= 200",
+    "200 >= luminosity-distance >= 10",
+    "10 <=  luminosity-distance   =< 200",
+    "10<=luminosity-distance<=200",
+    "  200 >=  luminosity-distance => 10   ",
+    " 200 =>luminosity-distance=>10",
+])
+def test_fetch_filtered_events_json_local(fetch, select):
+    api.fetch_filtered_events_json(select=[select])
+    (called_url,), kwargs = fetch.call_args
+    assert "max-luminosity-distance=200" in called_url
+    assert "min-luminosity-distance=10" in called_url
+
+
+@mock.patch("gwosc.api.fetch_json")
+@pytest.mark.parametrize("select", [
+    "100 <= luminosity-distance",
+    "gps-time < 100",
+    "gps-time  = > 100",
+    "unknown-param <= 100",
+    "c0mpl3telyR4nd-m",
+])
+def test_fetch_filtered_events_json_bad_local(fetch, select):
+    with pytest.raises(
+        ValueError,
+        match="Could not parse"
+    ):
+        api.fetch_filtered_events_json(select=[select])
+
+
+@pytest.mark.remote
 def test_fetch_event_json():
     out = api.fetch_event_json("GW150914")
     meta = out["events"]["GW150914-v3"]

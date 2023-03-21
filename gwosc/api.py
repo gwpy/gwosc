@@ -9,6 +9,8 @@ that handle direct requests to the GWOSC host.
 
 import logging
 import os
+import re
+from urllib.parse import urlencode
 
 import requests
 
@@ -27,6 +29,23 @@ DEFAULT_URL = "https://www.gw-openscience.org"
 
 #: Cache of downloaded blobs
 JSON_CACHE = {}
+
+_ALLOWED_OPS = set((">=", "=>", "<=", "=<"))
+_ALLOWED_PARAMS = [
+    "gps-time",
+    "mass-1-source",
+    "mass-2-source",
+    "network-matched-filter-snr",
+    "luminosity-distance",
+    "chi-eff",
+    "total-mass-source",
+    "chirp-mass",
+    "chirp-mass-source",
+    "redshift",
+    "far",
+    "p-astro",
+    "final-mass-source",
+]
 
 
 # -- JSON handling ------------------------------------------------------------
@@ -269,6 +288,122 @@ def _fetch_allevents_event_json(
     if catalog is not None:
         msg += " in catalog '{}'".format(catalog)
     raise ValueError(msg)
+
+
+def _parse_two_ops(compiled_m):
+    md = compiled_m.groupdict()
+    op1, op2 = md["op1"], md["op2"]
+    if not set((op1, op2)).issubset(_ALLOWED_OPS):
+        raise ValueError(
+            "Could not parse select string.\n"
+            "Unknown operators."
+        )
+    param, val1, val2 = md["param"], md["val1"], md["val2"]
+    if param not in _ALLOWED_PARAMS:
+        raise ValueError(
+            "Could not parse select string.\n"
+            f"Unrecognized parameter: {param}.\n"
+            f"Use one of:\n{_ALLOWED_PARAMS}"
+        )
+    queries = []
+    if ">" in op1:
+        queries.append((f"max-{param}", val1))
+    if "<" in op1:
+        queries.append((f"min-{param}", val1))
+    if ">" in op2:
+        queries.append((f"min-{param}", val2))
+    if "<" in op2:
+        queries.append((f"max-{param}", val2))
+    return queries
+
+
+def _parse_one_op(compiled_m):
+    md = compiled_m.groupdict()
+    op = md["op"]
+    if not set((op,)).issubset(_ALLOWED_OPS):
+        raise ValueError(
+            "Could not parse select string.\n"
+            "Unknown operator."
+        )
+    param, val = md["param"], md["val"]
+    if param not in _ALLOWED_PARAMS:
+        raise ValueError(
+            f"Could not parse select string.\n"
+            f"Unrecognized parameter: {param}.\n"
+            f"Use one of:\n{_ALLOWED_PARAMS}"
+        )
+    queries = []
+    if ">" in op:
+        queries.append((f"min-{param}", val))
+    if "<" in op:
+        queries.append((f"max-{param}", val))
+    return queries
+
+
+def _select_to_query(select):
+    """Parse select string and translate into URL GET parameters"""
+
+    # Captures strings of the form `1.44 <= param <= 5.0`
+    two_ops = re.compile(
+        r"^\s*(?P<val1>[\d.+-eE]+)\s*(?P<op1>[<>=]{2})\s*(?P<param>[\w-]+)"
+        r"\s*(?P<op2>[<>=]+)\s*(?P<val2>[\d.+-eE]+)\s*$"
+    )
+    # Captures strings of the form `param <= 5.0`
+    one_op = re.compile(
+        r"^\s*(?P<param>[\w-]+)\s*(?P<op>[<>=]{2})\s*(?P<val>[\d.+-eE]+)\s*$"
+    )
+
+    queries = []
+    for s in select:
+        for regex, _parse in (
+            (one_op, _parse_one_op),
+            (two_ops, _parse_two_ops),
+        ):
+            m = regex.match(s)
+            if m is not None:
+                queries.extend(_parse(m))
+                break
+        else:
+            raise ValueError(f"Could not parse select string: {s}")
+    return urlencode(queries)
+
+
+def _query_events_url(select, host=DEFAULT_URL):
+    return "{}/eventapi/json/query/show?{}".format(
+        host, _select_to_query(select)
+    )
+
+
+def fetch_filtered_events_json(select, host=DEFAULT_URL):
+    """"Return the JSON metadata for the events constrained by select
+
+    Parameters
+    ----------
+    select : `list-like`
+        a list of range constrains for the events.
+        All ranges should have inclusive ends (<= and >= operators).
+
+    host : `str`, optional
+        the URL of the GWOSC host to query, defaults to
+        https://www.gw-openscience.org
+
+    Returns
+    -------
+    data : `dict` or `list`
+        the JSON data retrieved from GWOSC and returnend by
+        :meth:`requests.Response.json`
+
+    Example
+    -------
+    >>> fetch_filtered_events_json(
+    ...     select=[
+    ...         "mass-1-source <= 5",
+    ...         "mass-2-source =< 10",
+    ...         "10 <= luminosity-distance <= 100",
+    ...     ]
+    ... )
+    """
+    return fetch_json(_query_events_url(select, host=host))
 
 
 def _event_url(
