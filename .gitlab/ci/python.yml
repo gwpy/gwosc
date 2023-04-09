@@ -74,3 +74,7 @@ test:python3.10:remote:
     - test:python3.10
   variables:
     PYTEST_OPTIONS: "-ra -v --pyargs gwosc --disable-socket -m 'not remote'"
+
+test:python3.11:
+   extends: .test:pip
+   image: python:3.11
