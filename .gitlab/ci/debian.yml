@@ -140,7 +140,7 @@ test:bullseye:
     - .debian:lint
   stage: Code quality
   variables:
-    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug --fail-on-warnings --allow-root --pedantic"
+    LINTIAN_OPTIONS: "--color always --suppress-tags initial-upload-closes-no-bugs,groff-message --fail-on warning --allow-root --pedantic"
 
 lintian:buster:
   extends:
@@ -148,6 +148,8 @@ lintian:buster:
     - .buster
   needs:
     - deb:buster
+  variables:
+    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug,latest-debian-changelog-entry-without-new-version --fail-on-warnings --allow-root --pedantic"
 
 lintian:bullseye:
   extends:
@@ -155,5 +157,3 @@ lintian:bullseye:
     - .bullseye
   needs:
     - deb:bullseye
-  variables:
-    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug,groff-message --fail-on warning --allow-root --pedantic"
