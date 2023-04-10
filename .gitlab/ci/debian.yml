@@ -34,20 +34,14 @@ include:
     TARBALL: "gwosc-*.tar.*"
   before_script:
     - !reference [".debian:dsc", "before_script"]
-    - apt-get -yqq install devscripts dpkg-dev
+    - apt-get -yqq install devscripts
     # -- hack the tarball so that setuptools-scm version matches
     #    the debian changelog
     - tar -zxf ${TARBALL}
-    # get versions from the Python metadata and the Debian changelog
+    # get version from the Python metadata
     - PKG_VERSION=$(grep ^Version gwosc-*/PKG-INFO | cut -d\  -f2)
-    - CHANGELOG_VERSION=$(dpkg-parsechangelog -l gwosc-*/debian/changelog --show-field Version)
-    # and compare them:
-    - USE_PKG_VERSION=$(python3 -c "print(str('${PKG_VERSION}' > '${CHANGELOG_VERSION}').lower())")
-    # if the package version is newer than the changelog version
-    # (standard dev update), we need to add a changelog entry
-    - if ${USE_PKG_VERSION}; then
-          (cd gwosc-*/; dch --newversion ${PKG_VERSION}-9999 --controlmaint "ci build");
-      fi
+    # add a changelog entry for this version
+    - (cd gwosc-*/; dch --force-bad-version --newversion ${PKG_VERSION}-9999 --controlmaint "ci build")
     # repack the tarball
     - tar -zcf ${TARBALL} */
 
@@ -146,7 +140,7 @@ test:bullseye:
     - .debian:lint
   stage: Code quality
   variables:
-    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug --fail-on-warnings --allow-root --pedantic"
+    LINTIAN_OPTIONS: "--color always --suppress-tags initial-upload-closes-no-bugs,groff-message --fail-on warning --allow-root --pedantic"
 
 lintian:buster:
   extends:
@@ -154,6 +148,8 @@ lintian:buster:
     - .buster
   needs:
     - deb:buster
+  variables:
+    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug,latest-debian-changelog-entry-without-new-version --fail-on-warnings --allow-root --pedantic"
 
 lintian:bullseye:
   extends:
@@ -161,5 +157,3 @@ lintian:bullseye:
     - .bullseye
   needs:
     - deb:bullseye
-  variables:
-    LINTIAN_OPTIONS: "--color always --suppress-tags new-package-should-close-itp-bug,groff-message --fail-on warning --allow-root --pedantic"
