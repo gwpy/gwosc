@@ -11,6 +11,7 @@ import logging
 import os
 import re
 from urllib.parse import urlencode
+from . import __version__
 
 import requests
 
@@ -61,7 +62,8 @@ def fetch_json(url, **kwargs):
         return JSON_CACHE[url]
     except KeyError:
         logger.debug("fetching {}".format(url))
-        resp = requests.get(url, **kwargs)
+        client_headers = {"User-Agent": f"python-gwosc/{__version__}"}
+        resp = requests.get(url, headers=client_headers, **kwargs)
         resp.raise_for_status()
         return JSON_CACHE.setdefault(
             url,
