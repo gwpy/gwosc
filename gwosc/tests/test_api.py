@@ -46,7 +46,7 @@ def check_json_url_list(urllist, keys={'detector', 'format', 'url'}):
 
 @pytest.mark.remote
 def test_fetch_json():
-    url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/json/'
+    url = 'https://gwosc.org/archive/1126257414/1126261510/json/'
     out = api.fetch_json(url)
     assert isinstance(out, dict)
     assert len(out['events']) == 3
@@ -57,7 +57,7 @@ def test_fetch_json():
 @pytest.mark.remote
 def test_fetch_json_error():
     # check errors (use legit URL that isn't JSON)
-    url = 'https://www.gw-openscience.org/archive/1126257414/1126261510/'
+    url = 'https://gwosc.org/archive/1126257414/1126261510/'
     with pytest.raises((RequestException, ValueError)):
         api.fetch_json(url)
 
