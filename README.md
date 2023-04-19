@@ -1,7 +1,7 @@
 # `gwosc` client API
 
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+releases hosted on <https://gwosc.org> from the GEO, LIGO,
 and Virgo gravitational-wave observatories.
 
 ## Release status
@@ -67,14 +67,14 @@ You can search for remote data URLS based on the event name:
 ```python
 >>> from gwosc.locate import get_event_urls
 >>> get_event_urls('GW150914')
-['https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126257415-4096.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126257415-4096.hdf5']
+['https://gwosc.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://gwosc.org/eventapi/json/GWTC-1-confident/GW150914/v3/H-H1_GWOSC_4KHZ_R1-1126257415-4096.hdf5', 'https://gwosc.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5', 'https://gwosc.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126257415-4096.hdf5']
 ```
 
 You can down-select the URLs using keyword arguments:
 
 ```python
 >>> get_event_urls('GW150914', detector='L1', duration=32)
-['https://www.gw-openscience.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5']
+['https://gwosc.org/eventapi/json/GWTC-1-confident/GW150914/v3/L-L1_GWOSC_4KHZ_R1-1126259447-32.hdf5']
 ```
 
 ## Locating data URLs by GPS interval
@@ -85,7 +85,7 @@ follows:
 ```python
 >>> from gwosc.locate import get_urls
 >>> get_urls('L1', 968650000, 968660000)
-['https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://www.gw-openscience.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
+['https://gwosc.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968646656-4096.hdf5', 'https://gwosc.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968650752-4096.hdf5', 'https://gwosc.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968654848-4096.hdf5', 'https://gwosc.org/archive/data/S6/967835648/L-L1_LOSC_4_V1-968658944-4096.hdf5']
 ```
 
 This arguments for this function are as follows
@@ -119,6 +119,6 @@ The output is a `list` of `(start, end)` 2-tuples which each represent a
 semi-open time interval.
 
 For documentation on what flags are available, for example for the O1
-science run, see [the O1 data release page](https://gw-openscience.org/O1/)
+science run, see [the O1 data release page](https://gwosc.org/O1/)
 (*Data Quality*).
 

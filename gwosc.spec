@@ -38,7 +38,7 @@ BuildRequires: python%{python3_pkgversion}-requests-mock >= 1.5.0
 
 %description
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+releases hosted on <https://gwosc.org> from the GEO, LIGO,
 and Virgo gravitational-wave observatories.
 
 # -- python-3X-gwosc
@@ -49,7 +49,7 @@ Requires: python%{python3_pkgversion}-requests >= 1.0.0
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %description -n python%{python3_pkgversion}-%{name}
 The `gwosc` package provides an interface to querying the open data
-releases hosted on <https://gw-openscience.org> from the GEO, LIGO,
+releases hosted on <https://gwosc.org> from the GEO, LIGO,
 and Virgo gravitational-wave observatories.
 
 # -- build steps
