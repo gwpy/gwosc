@@ -256,7 +256,7 @@ def find_datasets(
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -323,7 +323,7 @@ def event_gps(event, catalog=None, version=None, host=api.DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -373,7 +373,7 @@ def event_segment(
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -417,7 +417,7 @@ def event_at_gps(gps, host=api.DEFAULT_URL, tol=1):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     tol : `float`, optional
         the search window (in seconds), default: ``1``
@@ -458,7 +458,7 @@ def event_detectors(event, catalog=None, version=None, host=api.DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     version : `int`, `None`, optional
         the version of the data release to use,
@@ -498,7 +498,7 @@ def run_segment(run, host=api.DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -533,7 +533,7 @@ def run_at_gps(gps, host=api.DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------

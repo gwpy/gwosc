@@ -17,7 +17,7 @@ represent a semi-open time interval.
 
 For documentation on what flags are available, for example for the O1
 science run, see `the O1 data release
-page <https://gw-openscience.org/O1/>`__ (*Data Quality*).
+page <https://gwosc.org/O1/>`__ (*Data Quality*).
 """  # noqa: E501
 
 from operator import itemgetter

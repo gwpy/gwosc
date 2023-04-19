@@ -25,7 +25,7 @@ logger.setLevel(int(os.getenv("GWOSC_LOG_LEVEL", logging.NOTSET)))
 _MAX_GPS = 99999999999
 
 #: The default GWOSC host URL
-DEFAULT_URL = "https://www.gw-openscience.org"
+DEFAULT_URL = "https://gwosc.org"
 
 #: Cache of downloaded blobs
 JSON_CACHE = {}
@@ -88,7 +88,7 @@ def fetch_dataset_json(gpsstart, gpsend, host=DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -124,7 +124,7 @@ def fetch_run_json(run, detector, gpsstart=0, gpsend=_MAX_GPS,
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -180,7 +180,7 @@ def fetch_catalog_json(catalog, host=DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -207,7 +207,7 @@ def fetch_allevents_json(full=False, host=DEFAULT_URL):
     Parameters
     ----------
     host : `str`, optional
-        the URL of the GWOSC host to query, defaults to gw-openscience.org
+        the URL of the GWOSC host to query, defaults to https://gwosc.org
 
     Returns
     -------
@@ -380,7 +380,7 @@ def fetch_filtered_events_json(select, host=DEFAULT_URL):
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------
@@ -441,7 +441,7 @@ def fetch_event_json(
 
     host : `str`, optional
         the URL of the GWOSC host to query, defaults to
-        https://www.gw-openscience.org
+        https://gwosc.org
 
     Returns
     -------

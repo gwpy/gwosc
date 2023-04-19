@@ -3,7 +3,7 @@
 =======
 
 A python interface to the
-`Gravitational-Wave Open Science Center <https://gw-openscience.org>`_ archive.
+`Gravitational-Wave Open Science Center <https://gwosc.org>`_ archive.
 
 Installation
 ------------
