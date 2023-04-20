@@ -1,5 +1,5 @@
 %define name    gwosc
-%define version 0.7.0
+%define version 0.7.1
 %define release 1
 
 Name:      %{name}
@@ -79,6 +79,9 @@ rm -rf $RPM_BUILD_ROOT
 # -- changelog
 
 %changelog
+* Thu Apr 20 2023 Duncan Macleod <duncan.macleod@ligo.org> - 0.7.1-1
+- update to 0.7.1
+
 * Mon Apr 10 2023 Duncan Macleod <duncan.macleod@ligo.org> - 0.7.0-1
 - update to 0.7.0
 
