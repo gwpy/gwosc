@@ -631,19 +631,19 @@ def query_events(select, host=api.DEFAULT_URL):
 
     Parameters:
 
-    - ``gps-time`,
-    - ``mass-1-source``,
-    - ``mass-2-source``,
+    - ``gps-time`` [s],
+    - ``mass-1-source`` [solar mass],
+    - ``mass-2-source`` [solar mass],
     - ``network-matched-filter-snr``,
-    - ``luminosity-distance``,
+    - ``luminosity-distance`` [Mpc],
     - ``chi-eff``,
-    - ``total-mass-source``,
-    - ``chirp-mass``,
-    - ``chirp-mass-source``,
+    - ``total-mass-source`` [solar mass],
+    - ``chirp-mass`` [solar mass],
+    - ``chirp-mass-source`` [solar mass],
     - ``redshift``,
-    - ``far``,
+    - ``far`` [events/year],
     - ``p-astro``,
-    - ``final-mass-source``
+    - ``final-mass-source`` [solar mass],
 
     For a full description of all parameters see
     https://www.gwosc.org/apidocs/#event5
